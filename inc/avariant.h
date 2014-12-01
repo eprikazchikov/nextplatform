@@ -43,21 +43,22 @@ public:
     };
 
     struct Data {
-        Type                        type;
+        Data                    ();
+        Type                    type;
 
-        bool                        shared;
+        bool                    shared;
 
         union Union {
-            bool                    b;
-            int                     i;
-            float                   f;
-            void                   *so;
+            bool                b;
+            int                 i;
+            float               f;
+            void               *so;
         } base;
 
 
-        std::string                 s;
-        AVector3D                   v;
-        Color                       c;
+        std::string             s;
+        AVector3D               v;
+        Color                   c;
     };
 
 public:

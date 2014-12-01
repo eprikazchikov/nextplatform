@@ -81,82 +81,74 @@ inline T aConversionHelper(AVariant::Data &data, AVariant::Type type, T value) {
     return result;
 }
 
-AVariant::AVariant() {
-    mData.type      = ANY;
-    mData.base.so   = 0;
-    mData.shared    = false;
+AVariant::Data::Data() {
+    type    = AVariant::ANY;
+    base.so = 0;
+    shared  = false;
 }
 
-AVariant::AVariant(Type type) :
-    AVariant() {
+AVariant::AVariant() {
+
+}
+
+AVariant::AVariant(Type type) {
     mData.type      = type;
 }
 
-AVariant::AVariant(bool value) :
-    AVariant() {
+AVariant::AVariant(bool value) {
     mData.type      = BOOL;
     mData.base.b    = value;
 }
 
-AVariant::AVariant(int value) :
-    AVariant() {
+AVariant::AVariant(int value) {
     mData.type       = INT;
     mData.base.i     = value;
 }
 
-AVariant::AVariant(float value) :
-    AVariant() {
+AVariant::AVariant(float value) {
     mData.type       = FLOAT;
     mData.base.f     = value;
 }
 
-AVariant::AVariant(const char *value) :
-    AVariant() {
+AVariant::AVariant(const char *value) {
     mData.type       = STRING;
     mData.s          = value;
 }
 
-AVariant::AVariant(const std::string &value) :
-    AVariant() {
+AVariant::AVariant(const std::string &value) {
     mData.type       = STRING;
     mData.s          = value;
 }
 
-AVariant::AVariant(const AVector3D &value) :
-    AVariant() {
+AVariant::AVariant(const AVector3D &value) {
     mData.type       = VECTOR;
     mData.v          = value;
 }
 
-AVariant::AVariant(const Color &value) :
-    AVariant() {
+AVariant::AVariant(const Color &value) {
     mData.type       = COLOR;
     mData.c          = value;
 }
 
-AVariant::AVariant(bool *value) :
-    AVariant() {
+AVariant::AVariant(bool *value) {
     mData.type       = BOOL;
     mData.base.so    = value;
     mData.shared     = true;
 }
 
-AVariant::AVariant(int *value) :
-    AVariant() {
+AVariant::AVariant(int *value) {
     mData.type       = INT;
     mData.base.so    = value;
     mData.shared     = true;
 }
 
-AVariant::AVariant(float *value) :
-    AVariant() {
+AVariant::AVariant(float *value) {
     mData.type       = FLOAT;
     mData.base.so    = value;
     mData.shared     = true;
 }
 
-AVariant::AVariant(AObject *value) :
-    AVariant() {
+AVariant::AVariant(AObject *value) {
     mData.type       = OBJECT;
     mData.base.so    = value;
     mData.shared     = true;
