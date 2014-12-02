@@ -8,57 +8,62 @@ bool convert(const AVariant::Data &data, AVariant::Type type, void *value) {
 
     bool result = true;
 
-    switch(data.type) {
+    switch(type) {
     case AVariant::BOOL: {
-        switch(type) {
-        case AVariant::BOOL:    { *static_cast<bool *>(value) = data.base.b; } break;
-        case AVariant::INT:     { *static_cast<bool *>(value) = (data.base.i != 0); } break;
-        case AVariant::FLOAT:   { *static_cast<bool *>(value) = (data.base.f != 0); } break;
-        case AVariant::OBJECT:  { *static_cast<bool *>(value) = (data.base.so != 0); } break;
+        bool *r     = static_cast<bool *>(value);
+        switch(data.type) {
+        case AVariant::BOOL:    { *r    = data.base.b; } break;
+        case AVariant::INT:     { *r    = (data.base.i != 0); } break;
+        case AVariant::FLOAT:   { *r    = (data.base.f != 0); } break;
         default:                { result    = false; } break;
         }
     } break;
     case AVariant::INT: {
-        switch(type) {
-        case AVariant::BOOL:    { *static_cast<int *>(value) = (data.base.b) ? 1 : 0; } break;
-        case AVariant::FLOAT:   { *static_cast<int *>(value) = (int)data.base.f; } break;
-        case AVariant::INT:     { *static_cast<int *>(value) = data.base.i; } break;
+        int *r      = static_cast<int *>(value);
+        switch(data.type) {
+        case AVariant::BOOL:    { *r    = (data.base.b) ? 1 : 0; } break;
+        case AVariant::FLOAT:   { *r    = (int)data.base.f; } break;
+        case AVariant::INT:     { *r    = data.base.i; } break;
         default:                { result    = false; } break;
         }
     } break;
     case AVariant::FLOAT: {
-        switch(type) {
-        case AVariant::BOOL:    { *static_cast<float *>(value)  = data.base.b; } break;
-        case AVariant::FLOAT:   { *static_cast<float *>(value)  = data.base.f; } break;
-        case AVariant::INT:     { *static_cast<float *>(value)  = data.base.i; } break;
+        float *r    = static_cast<float *>(value);
+        switch(data.type) {
+        case AVariant::BOOL:    { *r    = float(data.base.b); } break;
+        case AVariant::FLOAT:   { *r    = data.base.f; } break;
+        case AVariant::INT:     { *r    = float(data.base.i); } break;
         default:                { result    = false; } break;
         }
     } break;
     case AVariant::STRING: {
+        std::string *r  = static_cast<std::string *>(value);
         std::ostringstream ss;
-        switch(type) {
-        case AVariant::BOOL:    { *static_cast<std::string *>(value)    = (data.base.b) ? "true" : "false"; } break;
-        case AVariant::FLOAT:   { ss << data.base.f; *static_cast<std::string *>(value) = ss.str(); } break;
-        case AVariant::INT:     { ss << data.base.i; *static_cast<std::string *>(value) = ss.str(); } break;
-        case AVariant::STRING:  { *static_cast<std::string *>(value)    = data.s; } break;
+        switch(data.type) {
+        case AVariant::BOOL:    { *r    = (data.base.b) ? "true" : "false"; } break;
+        case AVariant::FLOAT:   { ss << data.base.f; *r = ss.str(); } break;
+        case AVariant::INT:     { ss << data.base.i; *r = ss.str(); } break;
+        case AVariant::STRING:  { *r    = data.s; } break;
         default:                { result    = false; } break;
         }
     } break;
     case AVariant::VECTOR: {
-        switch(type) {
-        case AVariant::FLOAT:   { *static_cast<AVector3D *>(value)      = AVector3D(data.base.f); } break;
-        case AVariant::INT:     { *static_cast<AVector3D *>(value)      = AVector3D(data.base.i); } break;
-        case AVariant::VECTOR:  { *static_cast<AVector3D *>(value)      = data.v; } break;
-        case AVariant::COLOR:   { *static_cast<AVector3D *>(value)      = AVector3D(data.c.x, data.c.y, data.c.z); } break;
+        AVector3D *r    = static_cast<AVector3D *>(value);
+        switch(data.type) {
+        case AVariant::FLOAT:   { *r    = AVector3D(data.base.f); } break;
+        case AVariant::INT:     { *r    = AVector3D(data.base.i); } break;
+        case AVariant::VECTOR:  { *r    = data.v; } break;
+        case AVariant::COLOR:   { *r    = AVector3D(data.c.x, data.c.y, data.c.z); } break;
         default:                { result    = false; } break;
         }
     } break;
     case AVariant::COLOR: {
-        switch(type) {
-        case AVariant::FLOAT:   { *static_cast<AVariant::Color *>(value)    = AVariant::Color(data.base.f); } break;
-        case AVariant::INT:     { *static_cast<AVariant::Color *>(value)    = AVariant::Color(data.base.i); } break;
-        case AVariant::VECTOR:  { *static_cast<AVariant::Color *>(value)    = AVariant::Color(data.v, 1.0); } break;
-        case AVariant::COLOR:   { *static_cast<AVariant::Color *>(value)    = data.c; } break;
+        AVariant::Color *r  = static_cast<AVariant::Color *>(value);
+        switch(data.type) {
+        case AVariant::FLOAT:   { *r    = AVariant::Color(data.base.f); } break;
+        case AVariant::INT:     { *r    = AVariant::Color(data.base.i); } break;
+        case AVariant::VECTOR:  { *r    = AVariant::Color(data.v, 1.0); } break;
+        case AVariant::COLOR:   { *r    = data.c; } break;
         default:                { result    = false; } break;
         }
     } break;
@@ -83,6 +88,9 @@ inline T aConversionHelper(AVariant::Data &data, AVariant::Type type, T value) {
 
 AVariant::Data::Data() {
     type    = AVariant::ANY;
+    base.b  = false;
+    base.i  = 0;
+    base.f  = 0.0f;
     base.so = 0;
     shared  = false;
 }

@@ -84,5 +84,42 @@ void VariantTest::Shared_value() {
 }
 
 void VariantTest::Convert_value() {
-
+    {
+        AVariant value  = true;
+        QVariant result = true;
+        QCOMPARE(value.toInt(),     result.toInt());
+        QCOMPARE(value.toFloat(),   result.toFloat());
+        QCOMPARE(value.toString(),  result.toString().toStdString());
+    }
+    {
+        AVariant value  = 5;
+        QVariant result = 5;
+        QCOMPARE(value.toBool(),    result.toBool());
+        QCOMPARE(value.toFloat(),   result.toFloat());
+        QCOMPARE(value.toString(),  result.toString().toStdString());
+    }
+    {
+        AVariant value  = 6.4f;
+        QVariant result = 6.4f;
+        QCOMPARE(value.toBool(),    result.toBool());
+        QCOMPARE(value.toInt(),     result.toInt());
+        QCOMPARE(value.toString(),  result.toString().toStdString());
+    }
+    {
+        AVariant value  = 6.6f;
+        QVariant result = 6.6f;
+        QCOMPARE(value.toInt(),     result.toInt());
+    }
+    {
+        AVariant value  = "7.4";
+        QVariant result = "7.4";
+        QCOMPARE(value.toBool(),    result.toBool());
+        QCOMPARE(value.toInt(),     result.toInt());
+        QCOMPARE(value.toFloat(),   result.toFloat());
+    }
+    {
+        AVariant value  = "7.6";
+        QVariant result = "7.6";
+        QCOMPARE(value.toInt(),     result.toInt());
+    }
 }
