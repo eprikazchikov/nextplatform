@@ -26,7 +26,21 @@
 
 #include <avariant.h>
 
-#define APROPERTY(object, name, value, flags) object->setProperty(name, value); object->setPropertyFlags(name, flags);
+#define APROPERTY(name, value, flags) \
+{\
+    setProperty(name, value);\
+    setPropertyFlags(name, flags);\
+}
+
+#define ASIGNAL(name) \
+{\
+    m_mSignals.push_back(name);\
+}
+
+#define ASLOT(name, callback) \
+{\
+    m_mSlots[name] = &callback;\
+}
 
 using namespace std;
 

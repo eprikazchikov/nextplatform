@@ -23,6 +23,9 @@
 
 #include <QtTest>
 
+#include <iostream>
+#include <ctime>
+
 #define TSLOT       "testSlot"
 #define TVALUE      "testValue"
 #define TSIGNAL     "testSignal"
@@ -32,13 +35,14 @@ class ATestObject : public AObject {
 public:
     ATestObject     (AObject *parent) :
             AObject(parent) {
+        APROPERTY(TPROPERTY, "", AObject::READ | AObject::WRITE)
+        ASIGNAL(TSIGNAL)
+        ASLOT(TSLOT, ATestObject::testSlot)
 
-        m_mSignals.push_back(TSIGNAL);
-        m_mSlots[TSLOT] = &ATestObject::testSlot;
         m_bSlot         = false;
     }
 
-    static void     testSlot     (AObject *pThis, const variant_vector &args) {
+    static void     testSlot        (AObject *pThis, const variant_vector &args) {
         (static_cast<ATestObject *>(pThis))->m_bSlot  = true;
     }
 
@@ -91,7 +95,9 @@ void ObjectTest::Emit_signal() {
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSLOT);
 
-    obj1->emitSignal(TSIGNAL, AObject::variant_vector(1, TVALUE));
+    QBENCHMARK {
+        obj1->emitSignal(TSIGNAL, AObject::variant_vector(1, TVALUE));
+    }
 
     QCOMPARE(obj2->m_bSlot, true);
 
@@ -100,14 +106,14 @@ void ObjectTest::Emit_signal() {
 }
 
 void ObjectTest::Synchronize_property() {
-    AObject *obj1   = new AObject(0);
-    AObject *obj2   = new AObject(0);
-    APROPERTY(obj1, TPROPERTY, "", AObject::READ | AObject::WRITE)
-    APROPERTY(obj2, TPROPERTY, "", AObject::READ | AObject::WRITE)
+    ATestObject *obj1   = new ATestObject(0);
+    ATestObject *obj2   = new ATestObject(0);
 
     AObject::addEventListner(obj1, TPROPERTY, obj2, TPROPERTY);
 
-    obj1->setProperty(TPROPERTY, TVALUE);
+    QBENCHMARK {
+        obj1->setProperty(TPROPERTY, TVALUE);
+    }
 
     QCOMPARE(obj1->property(TPROPERTY).toString().c_str(), TVALUE);
     QCOMPARE(obj2->property(TPROPERTY).toString().c_str(), TVALUE);
