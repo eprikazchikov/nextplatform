@@ -106,20 +106,25 @@ void VariantTest::Convert_value() {
         QCOMPARE(value.toString(),  result.toString().toStdString());
     }
     {
-        AVariant value  = 6.6f;
-        QVariant result = 6.6f;
+        AVariant value  = 7.6f;
+        QVariant result = 7.6f;
         QCOMPARE(value.toInt(),     result.toInt());
     }
     {
-        AVariant value  = "7.4";
-        QVariant result = "7.4";
+        AVariant value  = "true";
+        QVariant result = "true";
+        QCOMPARE(value.toBool(),     result.toBool());
+    }
+    {
+        AVariant value  = "8.4";
+        QVariant result = "8.4";
         QCOMPARE(value.toBool(),    result.toBool());
         QCOMPARE(value.toInt(),     result.toInt());
         QCOMPARE(value.toFloat(),   result.toFloat());
     }
     {
-        AVariant value  = "7.6";
-        QVariant result = "7.6";
+        AVariant value  = "9.6";
+        QVariant result = "9.6";
         QCOMPARE(value.toInt(),     result.toInt());
     }
 }

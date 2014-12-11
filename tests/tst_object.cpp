@@ -23,9 +23,6 @@
 
 #include <QtTest>
 
-#include <iostream>
-#include <ctime>
-
 #define TSLOT       "testSlot"
 #define TVALUE      "testValue"
 #define TSIGNAL     "testSignal"

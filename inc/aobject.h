@@ -74,7 +74,7 @@ public:
     typedef vector<AVariant>        variant_vector;
     typedef list<link_data>         links_list;
 
-    typedef void                (*callback)                 (AObject *pThis, const variant_vector &args);
+    typedef void                (*callback)        (AObject *pThis, const variant_vector &args);
 
     typedef map<string, property_data>  properties_map;
     typedef map<string, callback>       slots_map;
