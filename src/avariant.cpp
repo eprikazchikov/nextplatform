@@ -156,6 +156,24 @@ AVariant::AVariant(float *value) {
     mData.shared     = true;
 }
 
+AVariant::AVariant(std::string *value) {
+    mData.type       = STRING;
+    mData.base.so    = value;
+    mData.shared     = true;
+}
+
+AVariant::AVariant(AVector3D *value) {
+    mData.type       = VECTOR;
+    mData.base.so    = value;
+    mData.shared     = true;
+}
+
+AVariant::AVariant(Color *value) {
+    mData.type       = COLOR;
+    mData.base.so    = value;
+    mData.shared     = true;
+}
+
 AVariant::AVariant(AObject *value) {
     mData.type       = OBJECT;
     mData.base.so    = value;

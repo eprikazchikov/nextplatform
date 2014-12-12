@@ -74,6 +74,9 @@ public:
     AVariant                    (bool *value);
     AVariant                    (int *value);
     AVariant                    (float *value);
+    AVariant                    (std::string *value);
+    AVariant                    (AVector3D *value);
+    AVariant                    (Color *value);
     AVariant                    (AObject *value);
 
     ~AVariant                   ();

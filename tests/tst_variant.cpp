@@ -81,6 +81,17 @@ void VariantTest::Shared_value() {
         value   = 0.0f;
         QCOMPARE(result, 0.0f);
     }
+    {
+        AVector3D result(0.0f);
+        AVariant value = &result;
+        QCOMPARE(value.toVector().z, 0.0f);
+
+        result.z    = 5.0f;
+        QCOMPARE(value.toVector().z, 5.0f);
+
+        value       = AVector3D(1.0f);
+        QCOMPARE(result.y, 1.0f);
+    }
 }
 
 void VariantTest::Convert_value() {
