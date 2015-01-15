@@ -12,11 +12,11 @@ int main(int argc, char *argv[]) {
     }
     {
         ObjectTest tc;
-        status |= QTest::qExec(&tc, argc, argv);
+        //status |= QTest::qExec(&tc, argc, argv);
     }
     {
         ObjectSystemTest tc;
-        status |= QTest::qExec(&tc, argc, argv);
+        //status |= QTest::qExec(&tc, argc, argv);
     }
     return status;
 }
