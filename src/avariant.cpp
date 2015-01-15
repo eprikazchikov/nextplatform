@@ -201,26 +201,26 @@ bool AVariant::isConvertible() {
 }
 
 // Conversion and getters
-bool AVariant::toBool() {
+const bool AVariant::toBool() {
     return aConversionHelper<bool>(mData, BOOL, true);
 }
 
-int AVariant::toInt() {
+const int AVariant::toInt() {
     return aConversionHelper<int>(mData, INT, 0);
 }
 
-float AVariant::toFloat() {
+const float AVariant::toFloat() {
     return aConversionHelper<float>(mData, FLOAT, 0.0f);
 }
 
-std::string AVariant::toString() {
+const std::string AVariant::toString() {
     return aConversionHelper<std::string>(mData, STRING, "");
 }
 
-AVector3D AVariant::toVector() {
+const AVector3D AVariant::toVector() {
     return aConversionHelper<AVector3D>(mData, VECTOR, AVector3D());
 }
 
-AVariant::Color AVariant::toColor() {
+const AVariant::Color AVariant::toColor() {
     return aConversionHelper<Color>(mData, COLOR, Color());
 }

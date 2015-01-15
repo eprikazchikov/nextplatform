@@ -88,12 +88,12 @@ public:
     bool                        isConvertible               ();
 
     // Conversion and getters
-    bool                        toBool                      ();
-    int                         toInt                       ();
-    float                       toFloat                     ();
-    std::string                 toString                    ();
-    AVector3D                   toVector                    ();
-    Color                       toColor                     ();
+    const bool                  toBool                      ();
+    const int                   toInt                       ();
+    const float                 toFloat                     ();
+    const std::string           toString                    ();
+    const AVector3D             toVector                    ();
+    const Color                 toColor                     ();
 
 protected:
     Data                        mData;

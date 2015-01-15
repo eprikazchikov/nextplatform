@@ -73,6 +73,17 @@
 				<artifactId>cxx-maven-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>clean</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>launch</goal>
+						</goals>
+						<configuration>
+							<executable>"${VS120COMNTOOLS}VsDevCmd.bat"</executable>
+							<commandArgs></commandArgs>
+						</configuration>
+					</execution>
+					<execution>
 						<id>qmake</id>
 						<!--<phase>initialize</phase> -->
 						<!-- initialize is qmake goal default phase -->
@@ -100,8 +111,8 @@
 						</goals>
 						<configuration>
 							<makecommandPerOS>
-								<WindowsXP>nmake</WindowsXP>
-								<Windows7>nmake</Windows7>
+								<WindowsXP>scripts/build.bat</WindowsXP>
+								<Windows7>scripts/build.bat</Windows7>
 								<Linux>make</Linux>
 							</makecommandPerOS>
 							<projectDir>${OutSourceDir}/tests</projectDir>

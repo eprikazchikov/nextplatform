@@ -1,0 +1,2 @@
+CALL "%VS120COMNTOOLS%VsDevCmd.bat"
+CALL nmake
