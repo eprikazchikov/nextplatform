@@ -3,65 +3,126 @@
 
 	<groupId>com.frostspear</groupId>
 	<artifactId>next</artifactId>
-	<packaging>nar</packaging>
+	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>Mark.Donszelmann@gmail.com</id>
-			<name>Duns' Maven Snapshot Repository</name>
-			<url>http://duns.github.com/maven-snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>Mark.Donszelmann@gmail.com-custom-build</id>
-			<name>Duns' Maven Snapshot Repository (custom build)</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-			</snapshots>
-		</pluginRepository>
-    </pluginRepositories>
-	
 	<properties>
-		<sonar.language>c++</sonar.language>
-		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+		<OutSourceDir>target</OutSourceDir>
 	</properties>
-	
+	<!--
+	<repositories>
+		<repository>
+			<id>central</id>
+			<url>http://nexus.forge.avaya.com/content/groups/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<dependencies>
+		<dependency>
+		  <groupId>qtlibrary</groupId>
+		  <artifactId>qt-everywhere-opensource-src</artifactId>
+		  <version>4.8.3</version>
+		  <type>tar.gz</type>
+		</dependency>
+	</dependencies>
+	-->
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>cxx-maven-plugin</artifactId>
+					<version>0.0.5-SNAPSHOT</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
-			<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-nar-plugin</artifactId>
-                <version>2.1-SNAPSHOT</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <layout>NarLayout20</layout>
-                    <libraries>
-                        <library>	
-                            <type>shared</type>
-                        </library>
-                    </libraries>
-                </configuration>
-            </plugin>
 			<!--
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.5.1</version>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>qtlibrary</groupId>
+									<artifactId>qt-everywhere-opensource-src</artifactId>
+									<version>4.8.3</version>
+									<type>tar.gz</type>
+									<outputDirectory>target/product</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cxx-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>qmake</id>
+						<!--<phase>initialize</phase> -->
+						<!-- initialize is qmake goal default phase -->
+						<goals>
+							<goal>qmake</goal>
+						</goals>
+						<configuration>
+							<pros>
+								<pro>${basedir}/Next_Tests.pro</pro>
+							</pros>
+							<outsourceDir>${OutSourceDir}/tests</outsourceDir>
+							<qmakecommandPerOS>
+								<WindowsXP>qmake</WindowsXP>
+								<Windows7>qmake</Windows7>
+								<Linux>qmake-qt4</Linux>
+							</qmakecommandPerOS>
+						</configuration>
+					</execution>
+					<execution>
+						<id>make</id>
+						<!--<phase>compile</phase>-->
+						<!-- compile is make goal default phase -->
+						<goals>
+							<goal>make</goal>
+						</goals>
+						<configuration>
+							<makecommandPerOS>
+								<WindowsXP>nmake</WindowsXP>
+								<Windows7>nmake</Windows7>
+								<Linux>make</Linux>
+							</makecommandPerOS>
+							<projectDir>${OutSourceDir}/tests</projectDir>
+						</configuration>
+					</execution>
+					<execution>
+						<id>unit-test</id>
+						<!--<phase>test</phase>-->
+						<!-- test is xunit goal default phase -->
+						<goals>
+							<goal>xunit</goal>
+						</goals>
+						<configuration>
+							<executable>${OutSourceDir}/tests/debug/tst_next.exe</executable>
+							<commandArgs>-xunitxml</commandArgs>
+							<reportsfileDir>${OutSourceDir}/reports/</reportsfileDir>
+							<outputStreamOut>${OutSourceDir}/reports/xunit-${project.artifactId}-${project.version}.xml</outputStreamOut>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
   </build>
 
