@@ -7,7 +7,7 @@
 QT       += testlib
 QT       -= gui
 
-TARGET    = tst_next
+TARGET    = ../bin/tst_next
 CONFIG   += console
 CONFIG   -= app_bundle
 
