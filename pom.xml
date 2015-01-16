@@ -127,9 +127,8 @@
 						</goals>
 						<configuration>
 							<executable>${OutSourceDir}/tests/bin/tst_next.exe</executable>
-							<commandArgs>-xunitxml</commandArgs>
+							<commandArgs>-xunitxml -t ${OutSourceDir}/reports/xunit-${project.artifactId}-${project.version}-*.xml</commandArgs>
 							<reportsfileDir>${OutSourceDir}/reports/</reportsfileDir>
-							<outputStreamOut>${OutSourceDir}/reports/xunit-${project.artifactId}-${project.version}.xml</outputStreamOut>
 						</configuration>
 					</execution>
 				</executions>
