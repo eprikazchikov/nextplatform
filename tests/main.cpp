@@ -4,54 +4,50 @@
 #include "tst_object.h"
 #include "tst_objectsystem.h"
 
-#define addReport(args, tpl, ts) { \
-    if(!tpl.isEmpty()) { \
-        QString arg = tpl; \
-        arg.replace('*', ts.metaObject()->className()); \
-        args.append("-o"); \
-        args.append(arg); \
-    } \
-} \
-
-#define Cleanup(args, tpl) { \
-    if(!tpl.isEmpty()) { \
-        args.removeLast(); \
-        args.removeLast(); \
-    } \
-} \
-
-int main(int argc, char *argv[]) {
+inline int aExec(QObject &ts, int argc, char *argv[]) {
     QStringList args;
     for(int i = 0; i < argc; i++) {
         args.append(argv[i]);
     }
 
-    QString tpl;
+    int result  = 0;
     int index   = args.indexOf("-t");
     if(index != -1) {
-        tpl = args.at(index + 1);
         args.removeAt(index);
-        args.removeAt(index);
+        if(index < argc) {
+            QString arg = args.at(index);
+            arg.replace('*', ts.metaObject()->className());
+
+            args.removeAt(index);
+            args.append("-o");
+            args.append(arg);
+
+            result  = QTest::qExec(&ts, args);
+
+            args.removeLast();
+            args.removeLast();
+        }
+    } else {
+        result  = QTest::qExec(&ts, args);
     }
+
+    return result;
+}
+
+int main(int argc, char *argv[]) {
 
     int status = 0;
     {
         VariantTest ts;
-        addReport(args, tpl, ts);
-        status |= QTest::qExec(&ts, args);
-        Cleanup(args, tpl);
+        status |= aExec(ts, argc, argv);
     }
     {
         ObjectTest ts;
-        addReport(args, tpl, ts);
-        status |= QTest::qExec(&ts, args);
-        Cleanup(args, tpl);
+        status |= aExec(ts, argc, argv);
     }
     {
         ObjectSystemTest ts;
-        addReport(args, tpl, ts);
-        status |= QTest::qExec(&ts, args);
-        Cleanup(args, tpl);
+        status |= aExec(ts, argc, argv);
     }
     return status;
 }

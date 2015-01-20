@@ -9,11 +9,12 @@
 	<properties>
 		<OutSourceDir>target</OutSourceDir>
 	</properties>
-	<!--
+
 	<repositories>
 		<repository>
-			<id>central</id>
-			<url>http://nexus.forge.avaya.com/content/groups/public</url>
+			<id>nexus-repo</id>
+			<name>Nexus repo</name>
+			<url>http://localhost:8081/nexus/content/repositories/snapshots/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -22,6 +23,20 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	<pluginRepositories>
+      <pluginRepository>
+        <id>nexus-repo</id>
+        <name>Nexus repo</name>
+        <url>http://localhost:8081/nexus/content/repositories/snapshots/</url>
+        <releases>
+          <enabled>true</enabled>
+        </releases>
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>
+      </pluginRepository>
+    </pluginRepositories>
+<!--	
 	<dependencies>
 		<dependency>
 		  <groupId>qtlibrary</groupId>
@@ -30,7 +45,7 @@
 		  <type>tar.gz</type>
 		</dependency>
 	</dependencies>
-	-->
+-->
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -92,8 +107,9 @@
 						</goals>
 						<configuration>
 							<pros>
-								<pro>${basedir}/Next_Tests.pro</pro>
+								<pro>${basedir}/Next.pro</pro>
 							</pros>
+							<commandArgs>"CONFIG+=tests"</commandArgs>
 							<outsourceDir>${OutSourceDir}/tests</outsourceDir>
 							<qmakecommandPerOS>
 								<WindowsXP>qmake</WindowsXP>
