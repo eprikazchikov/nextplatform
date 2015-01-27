@@ -203,31 +203,6 @@ void AObject::setProperty(const string &name, const AVariant &value) {
     emitSignal(name, variant_vector(1, value));
 }
 
-void AObject::load(/*const xml_node &node*/) {
-/*
-    m_bEnable   = node.attribute("Enable").as_bool();
-    m_sName     = node.attribute("Name").value();
-    m_id        = node.attribute("ID").as_uint();
-*/
-}
-
-void AObject::save(/*xml_node &node*/) {
-/*
-    node.append_attribute("Enable").set_value(m_bEnable);
-    node.append_attribute("Name").set_value(m_sName.c_str());
-    node.append_attribute("ID").set_value(m_id);
-
-    auto it = m_mProperties.begin();
-    while(it != m_mProperties.end()) {
-        xml_node property   = node.append_child("Property");
-        property.append_attribute("Name").set_value(((*it).first).c_str());
-        property.append_attribute("Flags").set_value(((*it).second).flags);
-        property.append_attribute("Value").set_value(((*it).second).data.toString().c_str());
-        it++;
-    }
-*/
-}
-
 void AObject::setPropertyFlags(const string &name, const int flags) {
     m_mProperties[name].flags   = (AccessTypes)flags;
 }

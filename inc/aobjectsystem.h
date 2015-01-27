@@ -2,8 +2,11 @@
 #define AOBJECTSYSTEM_H
 
 #include <unordered_map>
+#include <string>
 
-#include <aobject.h>
+class AObject;
+
+using namespace std;
 
 // callback_object_factory
 typedef AObject            *(*handler_callback)     (AObject *);

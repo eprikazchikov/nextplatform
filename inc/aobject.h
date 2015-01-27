@@ -149,9 +149,6 @@ public:
 
     virtual void                setProperty                 (const string &name, const AVariant &value);
     void                        setPropertyFlags            (const string &name, const int flags);
-
-    virtual void                load                        (/*const xml_node &node*/);
-    virtual void                save                        (/*xml_node &node*/);
 };
 
 #endif // AOBJECT_H
