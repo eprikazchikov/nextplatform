@@ -9,6 +9,16 @@
 #define J_FALSE "false"
 #define J_NULL  "null"
 
+enum States {
+    objectBegin = 1,
+    objectEnd,
+    arrayBegin,
+    arrayEnd,
+    propertyNext,
+    propertyName,
+    propertyValue
+};
+
 string AJson::objectSave(const AObject &object) {
     return string();
 }
@@ -20,7 +30,7 @@ AObject *AJson::objectLoad(const string &data) {
 bool AJson::parse(const string &data) {
     unsigned int it = 0;
     string name;
-    objectMap object;
+    AJsonNode node;
     States state    = propertyValue;
     bool array      = false;
     while(it < data.length()) {
@@ -69,7 +79,7 @@ bool AJson::parse(const string &data) {
                 if(state == propertyName) {
                     name    = str;
                 } else {
-                    object[name]    = str;
+                    node[name]  = str;
                 }
             } break;
             case '0':
@@ -92,14 +102,14 @@ bool AJson::parse(const string &data) {
                     }
                 }
                 if(state == propertyValue) {
-                    object[name]    = data.substr(s, it - s);
+                    node[name]  = data.substr(s, it - s);
                 }
                 it--;
             } break;
             case 't': {
                 if(data.substr(it, 4) == J_TRUE) {
                     if(state == propertyValue) {
-                        object[name]    = J_TRUE;
+                        node[name]  = J_TRUE;
                     }
                     it  += 3;
                 }
@@ -107,7 +117,7 @@ bool AJson::parse(const string &data) {
             case 'f': {
                 if(data.substr(it, 5) == J_FALSE) {
                     if(state == propertyValue) {
-                        object[name]    = J_FALSE;
+                        node[name]  = J_FALSE;
                     }
                     it  += 4;
                 }
@@ -115,7 +125,7 @@ bool AJson::parse(const string &data) {
             case 'n': {
                 if(data.substr(it, 4) == J_NULL) {
                     if(state == propertyValue) {
-                        object[name]    = J_NULL;
+                        node[name]  = J_NULL;
                     }
                     it  += 3;
                 }
@@ -139,4 +149,12 @@ inline bool AJson::isSpace(char c) {
 
 inline bool AJson::isDigit(char c) {
     return c >= '0' && c <= '9';
+}
+
+AJsonNode::types AJsonNode::type() {
+    return mType;
+}
+
+void AJsonNode::setValue(const string &name, const AVariant &value) {
+
 }

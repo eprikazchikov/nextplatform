@@ -11,6 +11,27 @@ using namespace std;
 
 class AObject;
 
+class AJsonNode {
+public:
+    types                       type                        ();
+    void                        setType                     (const types type);
+
+    void                        setValue                    (const AVariant &value);
+    void                        setValue                    (const string &name, const AVariant &value);
+
+protected:
+    enum types {
+        VARIANT,
+        ARRAY,
+        OBJECT
+    };
+
+    types                       mType;
+    AVariant                    mValue;
+    list<AJsonNode>             mArray;
+    map<string, AJsonNode>      mMap;
+};
+
 class AJson {
 public:
     static string               objectSave                  (const AObject &object);
@@ -19,18 +40,6 @@ public:
     bool                        parse                       (const string &data);
 
 protected:
-    enum States {
-        objectBegin = 1,
-        objectEnd,
-        arrayBegin,
-        arrayEnd,
-        propertyNext,
-        propertyName,
-        propertyValue
-    };
-
-    typedef map<string, AVariant>   objectMap;
-
     void                        skipSpaces                  (const char *data, unsigned int &p);
 
     inline bool                 isSpace                     (char c);
