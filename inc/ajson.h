@@ -4,6 +4,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <stack>
 
 #include "avariant.h"
 
@@ -11,25 +12,25 @@ using namespace std;
 
 class AObject;
 
-class AJsonNode {
+class AJsonValue {
 public:
-    types                       type                        ();
-    void                        setType                     (const types type);
-
-    void                        setValue                    (const AVariant &value);
-    void                        setValue                    (const string &name, const AVariant &value);
-
-protected:
     enum types {
         VARIANT,
         ARRAY,
         OBJECT
     };
 
+    types                       type                        ();
+    void                        setType                     (const types type);
+
+    void                        setValue                    (const string &name, const AVariant &value);
+    void                        setValue                    (const string &name, AJsonValue *value);
+
+protected:
     types                       mType;
     AVariant                    mValue;
-    list<AJsonNode>             mArray;
-    map<string, AJsonNode>      mMap;
+    list<AJsonValue *>          mArray;
+    map<string, AJsonValue *>   mMap;
 };
 
 class AJson {

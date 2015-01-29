@@ -3,8 +3,6 @@
 #include "aobject.h"
 #include "aobjectsystem.h"
 
-#include <QDebug>
-
 #define J_TRUE  "true"
 #define J_FALSE "false"
 #define J_NULL  "null"
@@ -29,35 +27,51 @@ AObject *AJson::objectLoad(const string &data) {
 
 bool AJson::parse(const string &data) {
     unsigned int it = 0;
+    AJsonValue *n   = 0;
+    stack<AJsonValue *> nodes;
     string name;
-    AJsonNode node;
     States state    = propertyValue;
-    bool array      = false;
     while(it < data.length()) {
         skipSpaces(data.c_str(), it);
         switch(data[it]) {
             case '{': {
-                qDebug() << "Begin object";
+                AJsonValue *v   = new AJsonValue;
+                v->setType(AJsonValue::OBJECT);
+                if(!nodes.empty()) {
+                    nodes.top()->setValue(name, v);
+                } else {
+                    n   = v;
+                }
+                nodes.push(v);
+
                 state   = propertyName;
                 name    = "";
             } break;
             case '}': {
-                qDebug() << "End object";
+                nodes.pop();
             } break;
             case '[': {
                 if(state == propertyValue) {
-                    array   = true;
+                    AJsonValue *v   = new AJsonValue;
+                    v->setType(AJsonValue::ARRAY);
+                    if(!nodes.empty()) {
+                        nodes.top()->setValue(name, v);
+                    } else {
+                        n   = v;
+                    }
+                    nodes.push(v);
+                    name    = "";
                 }
             } break;
             case ']': {
-                array   = false;
+                nodes.pop();
                 state   = propertyName;
             } break;
             case ':': {
                 state   = propertyValue;
             } break;
             case ',': {
-                if(state == propertyValue && !array) {
+                if(state == propertyValue && nodes.top()->type() != AJsonValue::ARRAY) {
                     state   = propertyName;
                     name    = "";
                 } else {
@@ -79,7 +93,7 @@ bool AJson::parse(const string &data) {
                 if(state == propertyName) {
                     name    = str;
                 } else {
-                    node[name]  = str;
+                    nodes.top()->setValue(name, str);
                 }
             } break;
             case '0':
@@ -102,14 +116,15 @@ bool AJson::parse(const string &data) {
                     }
                 }
                 if(state == propertyValue) {
-                    node[name]  = data.substr(s, it - s);
+                    /// \todo: Need to convert to INT / FLOAT
+                    nodes.top()->setValue(name, data.substr(s, it - s));
                 }
                 it--;
             } break;
             case 't': {
                 if(data.substr(it, 4) == J_TRUE) {
                     if(state == propertyValue) {
-                        node[name]  = J_TRUE;
+                        nodes.top()->setValue(name, true);
                     }
                     it  += 3;
                 }
@@ -117,7 +132,7 @@ bool AJson::parse(const string &data) {
             case 'f': {
                 if(data.substr(it, 5) == J_FALSE) {
                     if(state == propertyValue) {
-                        node[name]  = J_FALSE;
+                        nodes.top()->setValue(name, false);
                     }
                     it  += 4;
                 }
@@ -125,7 +140,7 @@ bool AJson::parse(const string &data) {
             case 'n': {
                 if(data.substr(it, 4) == J_NULL) {
                     if(state == propertyValue) {
-                        node[name]  = J_NULL;
+                        nodes.top()->setValue(name, NULL);
                     }
                     it  += 3;
                 }
@@ -151,10 +166,22 @@ inline bool AJson::isDigit(char c) {
     return c >= '0' && c <= '9';
 }
 
-AJsonNode::types AJsonNode::type() {
+AJsonValue::types AJsonValue::type() {
     return mType;
 }
 
-void AJsonNode::setValue(const string &name, const AVariant &value) {
+void AJsonValue::setType(const types type) {
+    mType       = type;
+}
 
+void AJsonValue::setValue(const string &name, const AVariant &value) {
+
+}
+
+void AJsonValue::setValue(const string &name, AJsonValue *value) {
+    if(mType == AJsonValue::OBJECT) {
+        mMap[name]  = value;
+    } else {
+        mArray.push_back(value);
+    }
 }
