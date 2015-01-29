@@ -94,7 +94,7 @@ void VariantTest::Shared_value() {
     }
 }
 
-void VariantTest::Convert_value() {
+void VariantTest::Convert_Bool_to_Int_Float_String() {
     {
         AVariant value  = true;
         QVariant result = true;
@@ -102,6 +102,9 @@ void VariantTest::Convert_value() {
         QCOMPARE(value.toFloat(),   result.toFloat());
         QCOMPARE(value.toString(),  result.toString().toStdString());
     }
+}
+
+void VariantTest::Convert_Int_to_Bool_Float_String() {
     {
         AVariant value  = 5;
         QVariant result = 5;
@@ -109,6 +112,9 @@ void VariantTest::Convert_value() {
         QCOMPARE(value.toFloat(),   result.toFloat());
         QCOMPARE(value.toString(),  result.toString().toStdString());
     }
+}
+
+void VariantTest::Convert_Float_to_Bool_Int_String() {
     {
         AVariant value  = 6.4f;
         QVariant result = 6.4f;
@@ -121,6 +127,9 @@ void VariantTest::Convert_value() {
         QVariant result = 7.6f;
         QCOMPARE(value.toInt(),     result.toInt());
     }
+}
+
+void VariantTest::Convert_String_to_Bool_Int_Float() {
     {
         AVariant value  = "true";
         QVariant result = "true";

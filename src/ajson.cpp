@@ -27,22 +27,19 @@ AObject *AJson::objectLoad(const string &data) {
 
 bool AJson::parse(const string &data) {
     unsigned int it = 0;
-    AJsonValue *n   = 0;
+    AJsonValue n;
+    n.setType(AJsonValue::ROOT);
     stack<AJsonValue *> nodes;
+    nodes.push(&n);
     string name;
     States state    = propertyValue;
     while(it < data.length()) {
         skipSpaces(data.c_str(), it);
         switch(data[it]) {
             case '{': {
-                AJsonValue *v   = new AJsonValue;
-                v->setType(AJsonValue::OBJECT);
-                if(!nodes.empty()) {
-                    nodes.top()->setValue(name, v);
-                } else {
-                    n   = v;
-                }
-                nodes.push(v);
+                AJsonValue v;
+                v.setType(AJsonValue::OBJECT);
+                nodes.push(&nodes.top()->setValue(name, v));
 
                 state   = propertyName;
                 name    = "";
@@ -52,14 +49,9 @@ bool AJson::parse(const string &data) {
             } break;
             case '[': {
                 if(state == propertyValue) {
-                    AJsonValue *v   = new AJsonValue;
-                    v->setType(AJsonValue::ARRAY);
-                    if(!nodes.empty()) {
-                        nodes.top()->setValue(name, v);
-                    } else {
-                        n   = v;
-                    }
-                    nodes.push(v);
+                    AJsonValue v;
+                    v.setType(AJsonValue::ARRAY);
+                    nodes.push(&nodes.top()->setValue(name, v));
                     name    = "";
                 }
             } break;
@@ -109,15 +101,19 @@ bool AJson::parse(const string &data) {
             case '-': {
                 unsigned int s  = it;
                 char c          = 0;
+                bool number     = false;
                 while(it < data.length()) {
                     c = data[++it];
                     if(!isDigit(c) && c != '.') {
                         break;
                     }
+                    if(c == '.') {
+                        number  = true;
+                    }
                 }
                 if(state == propertyValue) {
-                    /// \todo: Need to convert to INT / FLOAT
-                    nodes.top()->setValue(name, data.substr(s, it - s));
+                    AVariant v(data.substr(s, it - s));
+                    nodes.top()->setValue(name, ((number) ? v.toFloat() : v.toInt()));
                 }
                 it--;
             } break;
@@ -175,13 +171,18 @@ void AJsonValue::setType(const types type) {
 }
 
 void AJsonValue::setValue(const string &name, const AVariant &value) {
-
+    AJsonValue v;
+    v.mType     = AJsonValue::VARIANT;
+    v.mValue    = value;
+    setValue(name, v);
 }
 
-void AJsonValue::setValue(const string &name, AJsonValue *value) {
+AJsonValue &AJsonValue::setValue(const string &name, AJsonValue &value) {
     if(mType == AJsonValue::OBJECT) {
         mMap[name]  = value;
+        return mMap[name];
     } else {
         mArray.push_back(value);
+        return mArray.back();
     }
 }

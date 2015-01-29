@@ -28,7 +28,10 @@ class VariantTest : public QObject {
 private slots:
     void Set_Get_check();
     void Shared_value();
-    void Convert_value();
+    void Convert_Bool_to_Int_Float_String();
+    void Convert_Int_to_Bool_Float_String();
+    void Convert_Float_to_Bool_Int_String();
+    void Convert_String_to_Bool_Int_Float();
 };
 
 #endif // TST_VARIANT_H

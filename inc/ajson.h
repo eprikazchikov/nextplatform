@@ -15,6 +15,7 @@ class AObject;
 class AJsonValue {
 public:
     enum types {
+        ROOT,
         VARIANT,
         ARRAY,
         OBJECT
@@ -24,13 +25,13 @@ public:
     void                        setType                     (const types type);
 
     void                        setValue                    (const string &name, const AVariant &value);
-    void                        setValue                    (const string &name, AJsonValue *value);
+    AJsonValue                 &setValue                    (const string &name, AJsonValue &value);
 
 protected:
     types                       mType;
     AVariant                    mValue;
-    list<AJsonValue *>          mArray;
-    map<string, AJsonValue *>   mMap;
+    list<AJsonValue>            mArray;
+    map<string, AJsonValue>     mMap;
 };
 
 class AJson {
