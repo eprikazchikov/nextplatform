@@ -12,41 +12,37 @@ using namespace std;
 
 class AObject;
 
-class AJsonValue {
+class AJson {
 public:
+    typedef list<AJson>         jsonArray;
+    typedef map<string, AJson>  jsonMap;
+
     enum types {
-        ROOT,
         VARIANT,
         ARRAY,
         OBJECT
     };
 
-    types                       type                        ();
-    void                        setType                     (const types type);
-
-    void                        setValue                    (const string &name, const AVariant &value);
-    AJsonValue                 &setValue                    (const string &name, AJsonValue &value);
-
 protected:
     types                       mType;
     AVariant                    mValue;
-    list<AJsonValue>            mArray;
-    map<string, AJsonValue>     mMap;
-};
+    jsonArray                   mArray;
+    jsonMap                     mMap;
 
-class AJson {
 public:
-    static string               objectSave                  (const AObject &object);
-    static AObject             *objectLoad                  (const string &data);
+    AJson                       ();
 
-    bool                        parse                       (const string &data);
+    bool                        load                        (const string &data);
+    string                      save                        (int depth = -1);
 
 protected:
-    void                        skipSpaces                  (const char *data, unsigned int &p);
+    inline void                 skipSpaces                  (const char *data, unsigned int &p);
 
     inline bool                 isSpace                     (char c);
     inline bool                 isDigit                     (char c);
 
+    void                        setValue                    (const string &name, const AVariant &value);
+    AJson                      &setValue                    (const string &name, AJson &value);
 };
 
 #endif // AJSON_H

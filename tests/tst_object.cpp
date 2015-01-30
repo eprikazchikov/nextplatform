@@ -91,10 +91,7 @@ void ObjectTest::Emit_signal() {
     ATestObject *obj2   = new ATestObject(0);
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSLOT);
-
-    QBENCHMARK {
-        obj1->emitSignal(TSIGNAL, AObject::variant_vector(1, TVALUE));
-    }
+    obj1->emitSignal(TSIGNAL, AObject::variant_vector(1, TVALUE));
 
     QCOMPARE(obj2->m_bSlot, true);
 
@@ -107,10 +104,7 @@ void ObjectTest::Synchronize_property() {
     ATestObject *obj2   = new ATestObject(0);
 
     AObject::addEventListner(obj1, TPROPERTY, obj2, TPROPERTY);
-
-    QBENCHMARK {
-        obj1->setProperty(TPROPERTY, TVALUE);
-    }
+    obj1->setProperty(TPROPERTY, TVALUE);
 
     QCOMPARE(obj1->property(TPROPERTY).toString().c_str(), TVALUE);
     QCOMPARE(obj2->property(TPROPERTY).toString().c_str(), TVALUE);

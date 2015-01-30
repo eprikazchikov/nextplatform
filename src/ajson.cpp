@@ -17,41 +17,43 @@ enum States {
     propertyValue
 };
 
-string AJson::objectSave(const AObject &object) {
-    return string();
+AJson::AJson() {
+    mType   = AJson::VARIANT;
 }
 
-AObject *AJson::objectLoad(const string &data) {
-    return 0;
-}
-
-bool AJson::parse(const string &data) {
-    unsigned int it = 0;
-    AJsonValue n;
-    n.setType(AJsonValue::ROOT);
-    stack<AJsonValue *> nodes;
-    nodes.push(&n);
+bool AJson::load(const string &data) {
+    stack<AJson *> nodes;
+    nodes.push(this);
     string name;
     States state    = propertyValue;
+    unsigned int it = 0;
+    bool root       = true;
     while(it < data.length()) {
         skipSpaces(data.c_str(), it);
         switch(data[it]) {
             case '{': {
-                AJsonValue v;
-                v.setType(AJsonValue::OBJECT);
-                nodes.push(&nodes.top()->setValue(name, v));
-
-                state   = propertyName;
+                if(!root) {
+                    AJson v;
+                    nodes.push(&nodes.top()->setValue(name, v));
+                } else {
+                    root    = false;
+                }
+                nodes.top()->mType  = AJson::OBJECT;
                 name    = "";
+                state   = propertyName;
             } break;
             case '}': {
                 nodes.pop();
             } break;
             case '[': {
                 if(state == propertyValue) {
-                    AJsonValue v;
-                    v.setType(AJsonValue::ARRAY);
-                    nodes.push(&nodes.top()->setValue(name, v));
+                    if(!root) {
+                        AJson v;
+                        nodes.push(&nodes.top()->setValue(name, v));
+                    } else {
+                        root    = false;
+                    }
+                    nodes.top()->mType  = AJson::ARRAY;
                     name    = "";
                 }
             } break;
@@ -63,7 +65,7 @@ bool AJson::parse(const string &data) {
                 state   = propertyValue;
             } break;
             case ',': {
-                if(state == propertyValue && nodes.top()->type() != AJsonValue::ARRAY) {
+                if(state == propertyValue && nodes.top()->mType != AJson::ARRAY) {
                     state   = propertyName;
                     name    = "";
                 } else {
@@ -148,7 +150,40 @@ bool AJson::parse(const string &data) {
     return true;
 }
 
-void AJson::skipSpaces(const char *data, unsigned int &p) {
+string AJson::save(int depth) {
+    string result;
+    switch(mType) {
+        case AJson::VARIANT: {
+            if(mValue.type() == AVariant::STRING) {
+                result += '"' + mValue.toString() + '"';
+            } else {
+                result += mValue.toString();
+            }
+        } break;
+        case AJson::OBJECT: {
+            result += "{";
+            unsigned int i = 1;
+            for(auto &it: mMap) {
+                result += "\"" + it.first + "\": " + (it.second).save(depth) + ((i < mMap.size()) ? "," : "");
+                i++;
+            }
+            result += "}";
+        } break;
+        case AJson::ARRAY: {
+            result += "[";
+            unsigned int i = 1;
+            for(auto &it: mArray) {
+                result += (it).save(depth) + ((i < mArray.size()) ? "," : "");
+                i++;
+            }
+            result += "]";
+        } break;
+        default: break;
+    }
+    return result;
+}
+
+inline void AJson::skipSpaces(const char *data, unsigned int &p) {
     while(isSpace(data[p])) {
         p++;
     }
@@ -162,23 +197,15 @@ inline bool AJson::isDigit(char c) {
     return c >= '0' && c <= '9';
 }
 
-AJsonValue::types AJsonValue::type() {
-    return mType;
-}
-
-void AJsonValue::setType(const types type) {
-    mType       = type;
-}
-
-void AJsonValue::setValue(const string &name, const AVariant &value) {
-    AJsonValue v;
-    v.mType     = AJsonValue::VARIANT;
+void AJson::setValue(const string &name, const AVariant &value) {
+    AJson v;
+    v.mType     = AJson::VARIANT;
     v.mValue    = value;
     setValue(name, v);
 }
 
-AJsonValue &AJsonValue::setValue(const string &name, AJsonValue &value) {
-    if(mType == AJsonValue::OBJECT) {
+AJson &AJson::setValue(const string &name, AJson &value) {
+    if(mType == AJson::OBJECT) {
         mMap[name]  = value;
         return mMap[name];
     } else {

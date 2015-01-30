@@ -192,7 +192,7 @@ AVariant AVariant::operator=(const AVariant &value) {
     return *this;
 }
 
-AVariant::Type AVariant::type() {
+AVariant::Type AVariant::type() const {
     return mData.type;
 }
 

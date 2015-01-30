@@ -83,7 +83,7 @@ public:
 
     AVariant                    operator =                  (const AVariant &value);
 
-    Type                        type                        ();
+    Type                        type                        () const;
 
     bool                        isConvertible               ();
 

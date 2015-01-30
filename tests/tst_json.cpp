@@ -5,7 +5,9 @@
 #include <QtTest>
 
 void JsonTest::Desirialize() {
-    AJson parser;
+    AJson json;
 
-    QCOMPARE(parser.parse(JSON_STUB2), true);
+    QCOMPARE(json.load(JSON_STUB2), true);
+
+    qDebug() << json.save().c_str();
 }
