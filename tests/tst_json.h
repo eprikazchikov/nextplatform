@@ -3,8 +3,6 @@
 
 #include <QObject>
 
-#define JSON_STUB1 "{\"test\":1,\"data\":\"2\",\"flag\":true,\"number\":1.11}"
-
 #define JSON_STUB2 " \
 { \
     \"Reference\": \"thor://factory/AObject\", \
@@ -37,7 +35,7 @@
 class JsonTest: public QObject {
     Q_OBJECT
 private slots:
-    void Desirialize();
+    void Serialize_Desirialize();
 
 };
 

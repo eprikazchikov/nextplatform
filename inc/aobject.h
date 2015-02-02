@@ -102,7 +102,7 @@ protected:
     AObject                    *m_pParent;
 
 public:
-    AObject                     (AObject *parent);
+    AObject                     (AObject *parent = 0);
     virtual ~AObject            ();
 
     unsigned int                id                          () const;
@@ -131,6 +131,10 @@ public:
 
     bool                        isEnable                    () const;
 
+    static AObject             *callbackClassFactory        (AObject *parent = 0);
+
+    static void                 registerClassFactory        ();
+
 // Virtual members
 public:
     virtual bool                update                      (float dt);
@@ -141,7 +145,7 @@ public:
 
     virtual AVariant            property                    (const string &name);
 
-    static string               reference                   ();
+    virtual string              reference                   () const;
 
     virtual string              typeName                    () const;
 

@@ -99,6 +99,11 @@ AVariant::AVariant() {
 
 }
 
+AVariant::AVariant(const AVariant &copy) {
+    mData.type  = copy.mData.type;
+    *this       = copy;
+}
+
 AVariant::AVariant(Type type) {
     mData.type      = type;
 }
@@ -183,9 +188,11 @@ AVariant::AVariant(AObject *value) {
 AVariant::~AVariant() {
 }
 
-AVariant AVariant::operator=(const AVariant &value) {
+AVariant &AVariant::operator=(const AVariant &value) {
     if(mData.shared) {
         convert(value.mData, mData.type, mData.base.so);
+    } else if(value.mData.shared) {
+        convert(mData, value.mData.type, value.mData.base.so);
     } else {
         mData   = value.mData;
     }
@@ -198,6 +205,10 @@ AVariant::Type AVariant::type() const {
 
 bool AVariant::isConvertible() {
     return false;
+}
+
+bool AVariant::isShared() {
+    return mData.shared;
 }
 
 // Conversion and getters

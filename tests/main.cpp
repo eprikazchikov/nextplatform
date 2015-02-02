@@ -42,6 +42,10 @@ int main(int argc, char *argv[]) {
         status |= aExec(ts, argc, argv);
     }
     {
+        JsonTest ts;
+        status |= aExec(ts, argc, argv);
+    }
+    {
         ObjectTest ts;
         status |= aExec(ts, argc, argv);
     }
@@ -49,9 +53,6 @@ int main(int argc, char *argv[]) {
         ObjectSystemTest ts;
         status |= aExec(ts, argc, argv);
     }
-    {
-        JsonTest ts;
-        status |= aExec(ts, argc, argv);
-    }
+
     return status;
 }

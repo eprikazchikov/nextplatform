@@ -44,7 +44,8 @@ HEADERS += \
     inc/avariant.h \
     inc/aobjectsystem.h \
     inc/ajson.h \
-    tests/tst_json.h
+    tests/tst_json.h \
+    tests/tst_common.h
 
 INCLUDEPATH += \
     inc

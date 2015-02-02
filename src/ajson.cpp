@@ -7,6 +7,8 @@
 #define J_FALSE "false"
 #define J_NULL  "null"
 
+#define FORMAT (depth > -1) ? "\n" : "";
+
 enum States {
     objectBegin = 1,
     objectEnd,
@@ -34,7 +36,7 @@ bool AJson::load(const string &data) {
             case '{': {
                 if(!root) {
                     AJson v;
-                    nodes.push(&nodes.top()->setValue(name, v));
+                    nodes.push(&nodes.top()->appendProperty(v, name));
                 } else {
                     root    = false;
                 }
@@ -49,7 +51,7 @@ bool AJson::load(const string &data) {
                 if(state == propertyValue) {
                     if(!root) {
                         AJson v;
-                        nodes.push(&nodes.top()->setValue(name, v));
+                        nodes.push(&nodes.top()->appendProperty(v, name));
                     } else {
                         root    = false;
                     }
@@ -87,7 +89,7 @@ bool AJson::load(const string &data) {
                 if(state == propertyName) {
                     name    = str;
                 } else {
-                    nodes.top()->setValue(name, str);
+                    nodes.top()->appendProperty(str, name);
                 }
             } break;
             case '0':
@@ -115,14 +117,14 @@ bool AJson::load(const string &data) {
                 }
                 if(state == propertyValue) {
                     AVariant v(data.substr(s, it - s));
-                    nodes.top()->setValue(name, ((number) ? v.toFloat() : v.toInt()));
+                    nodes.top()->appendProperty(((number) ? v.toFloat() : v.toInt()), name);
                 }
                 it--;
             } break;
             case 't': {
                 if(data.substr(it, 4) == J_TRUE) {
                     if(state == propertyValue) {
-                        nodes.top()->setValue(name, true);
+                        nodes.top()->appendProperty(true, name);
                     }
                     it  += 3;
                 }
@@ -130,7 +132,7 @@ bool AJson::load(const string &data) {
             case 'f': {
                 if(data.substr(it, 5) == J_FALSE) {
                     if(state == propertyValue) {
-                        nodes.top()->setValue(name, false);
+                        nodes.top()->appendProperty(false, name);
                     }
                     it  += 4;
                 }
@@ -138,7 +140,7 @@ bool AJson::load(const string &data) {
             case 'n': {
                 if(data.substr(it, 4) == J_NULL) {
                     if(state == propertyValue) {
-                        nodes.top()->setValue(name, NULL);
+                        nodes.top()->appendProperty(NULL, name);
                     }
                     it  += 3;
                 }
@@ -162,25 +164,53 @@ string AJson::save(int depth) {
         } break;
         case AJson::OBJECT: {
             result += "{";
+            result += FORMAT;
             unsigned int i = 1;
             for(auto &it: mMap) {
-                result += "\"" + it.first + "\": " + (it.second).save(depth) + ((i < mMap.size()) ? "," : "");
+                result.append(depth + 1, '\t');
+                result += "\"" + it.first + "\": " + (it.second).save((depth > -1) ? depth + 1 : depth);
+                result += ((i < mMap.size()) ? "," : "");
+                result += FORMAT;
                 i++;
+            }
+            if(depth > -1) {
+                result.append(depth, '\t');
             }
             result += "}";
         } break;
         case AJson::ARRAY: {
             result += "[";
+            result += FORMAT;
             unsigned int i = 1;
             for(auto &it: mArray) {
-                result += (it).save(depth) + ((i < mArray.size()) ? "," : "");
+                result.append(depth + 1, '\t');
+                result += (it).save((depth > -1) ? depth + 1 : depth) + ((i < mArray.size()) ? "," : "");
+                result += ((i < mMap.size()) ? "," : "");
+                result += FORMAT;
                 i++;
+            }
+            if(depth > -1) {
+                result.append(depth, '\t');
             }
             result += "]";
         } break;
         default: break;
     }
     return result;
+}
+
+AJson::types AJson::type() const {
+    return mType;
+}
+
+void AJson::setType(AJson::types type) {
+    mType   = type;
+}
+
+AJson &AJson::property(const string &key) {
+    if(mType == AJson::OBJECT) {
+        return mMap[key];
+    }
 }
 
 inline void AJson::skipSpaces(const char *data, unsigned int &p) {
@@ -197,14 +227,14 @@ inline bool AJson::isDigit(char c) {
     return c >= '0' && c <= '9';
 }
 
-void AJson::setValue(const string &name, const AVariant &value) {
+void AJson::appendProperty(const AVariant &value, const string &name) {
     AJson v;
     v.mType     = AJson::VARIANT;
     v.mValue    = value;
-    setValue(name, v);
+    appendProperty(v, name);
 }
 
-AJson &AJson::setValue(const string &name, AJson &value) {
+AJson &AJson::appendProperty(const AJson &value, const string &name) {
     if(mType == AJson::OBJECT) {
         mMap[name]  = value;
         return mMap[name];

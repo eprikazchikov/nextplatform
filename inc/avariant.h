@@ -63,6 +63,7 @@ public:
 
 public:
     AVariant                    ();
+    AVariant                    (const AVariant &copy);
     AVariant                    (Type type);
     AVariant                    (bool value);
     AVariant                    (int value);
@@ -81,11 +82,12 @@ public:
 
     ~AVariant                   ();
 
-    AVariant                    operator =                  (const AVariant &value);
+    AVariant                   &operator =                  (const AVariant &value);
 
     Type                        type                        () const;
 
     bool                        isConvertible               ();
+    bool                        isShared                    ();
 
     // Conversion and getters
     const bool                  toBool                      ();

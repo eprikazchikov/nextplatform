@@ -1,5 +1,7 @@
 #include "aobject.h"
 
+#include "aobjectsystem.h"
+
 AObject::AObject(AObject *parent) {
     m_bEnable   = true;
     m_bDelete   = false;
@@ -145,6 +147,16 @@ bool AObject::isEnable() const {
     return m_bEnable;
 }
 
+AObject *AObject::callbackClassFactory(AObject *parent) {
+    return new AObject(parent);
+}
+
+void AObject::registerClassFactory() {
+    AObject object;
+    AObjectSystem::instance()->factoryAdd(object.reference(), &AObject::callbackClassFactory);
+}
+
+
 bool AObject::update(float dt) {
     auto it = m_mComponents.begin();
     for(it; it != m_mComponents.end(); it++) {
@@ -185,7 +197,7 @@ AVariant AObject::property(const string &name) {
     return m_mProperties[name].data;
 }
 
-string AObject::reference() {
+string AObject::reference() const {
     return "thor://factory/AObject";
 }
 
