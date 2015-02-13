@@ -4,6 +4,7 @@
 #include "tst_object.h"
 #include "tst_objectsystem.h"
 #include "tst_json.h"
+#include "tst_uri.h"
 
 inline int aExec(QObject &ts, int argc, char *argv[]) {
     QStringList args;
@@ -43,6 +44,10 @@ int main(int argc, char *argv[]) {
     }
     {
         JsonTest ts;
+        status |= aExec(ts, argc, argv);
+    }
+    {
+        UriTest ts;
         status |= aExec(ts, argc, argv);
     }
     {

@@ -27,11 +27,7 @@ public:
 
     static void     registerClassFactory() {
         ATestObject object;
-        AObjectSystem::instance()->factoryAdd(object.reference(), &ATestObject::callbackClassFactory);
-    }
-
-    string          reference       () const {
-        return "thor://factory/ATestObject";
+        AObjectSystem::instance()->factoryAdd(object.typeName(), &ATestObject::callbackClassFactory);
     }
 
     string          typeName        () const {

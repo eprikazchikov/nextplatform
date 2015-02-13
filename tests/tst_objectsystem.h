@@ -7,7 +7,6 @@ class ObjectSystemTest : public QObject {
     Q_OBJECT
 
 private slots:
-    void Serialize_Desirialize_Object();
 
 };
 

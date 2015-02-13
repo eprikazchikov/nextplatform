@@ -5,18 +5,21 @@
 #include <QtTest>
 
 void JsonTest::Serialize_Desirialize() {
-    AJson json1;
-    json1.setType(AJson::OBJECT);
-    json1.appendProperty(true,  "test1");
-    json1.appendProperty("1",   "test2");
-    json1.appendProperty(2,     "test3");
-    json1.appendProperty(3.3f,  "test4");
-    json1.appendProperty(static_cast<AObject *>(NULL), "test5");
+    AVariant var1(AVariant::MAP);
+    var1.appendProperty(true,   "test1");
+    var1.appendProperty("",     "test2");
+    var1.appendProperty(2,      "test3");
+    var1.appendProperty(3.0f,   "test4");
 
-    string data = json1.save();
+    AVariant m(AVariant::MAP);
+    m.appendProperty(true,      "test_1");
+    m.appendProperty("true",    "test_2");
+    m.appendProperty(1,         "test_3");
 
-    AJson json2;
-    QCOMPARE(json2.load(data), true);
+    var1.appendProperty(m,      "test5");
 
-    QCOMPARE((json1 == json2), true);
+    var1.appendProperty(AVector3D(),        "test6");
+    var1.appendProperty(AVariant::Color(),  "test7");
+
+    QCOMPARE(var1, AJson::load(AJson::save(var1)));
 }

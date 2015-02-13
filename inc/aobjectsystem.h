@@ -5,7 +5,7 @@
 #include <string>
 
 class AObject;
-class AJson;
+class AVariant;
 
 using namespace std;
 
@@ -18,9 +18,6 @@ public:
     static AObjectSystem               *instance                ();
     static void                         destroy                 ();
 
-    AObject                            *load                    (const string &data);
-    string                              save                    (const AObject &object);
-
     AObject                            *createObject            (const string &uri, AObject *parent = 0);
 
     void                                factoryAdd              (const string &uri, handler_callback callback);
@@ -30,11 +27,14 @@ public:
     bool                                factoryFirst            (string &uri);
     bool                                factoryNext             (string &uri);
 
+    unsigned int                        nextId                  ();
+
+    const string                       &systemName              () const;
+    void                                setSytemName            (const string &name);
+
 private:
     AObjectSystem                       ();
     ~AObjectSystem                      ();
-
-    AJson                               toJson                  (const AObject &object);
 
     static AObjectSystem               *m_pInstance;
 
@@ -43,6 +43,9 @@ private:
 
     factory_map::iterator               fIterator;
 
+    unsigned int                        mNextId;
+
+    string                              mSystemName;
 };
 
 #endif // AOBJECTSYSTEM_H
