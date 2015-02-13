@@ -89,3 +89,21 @@ void ObjectTest::Synchronize_property() {
     delete obj1;
     delete obj2;
 }
+
+void ObjectTest::Serialize_Desirialize_Object() {
+    ATestObject::registerClassFactory();
+
+    ATestObject obj1;
+    ATestObject obj2;
+
+    obj1.setComponent("TestComponent", &obj2);
+    AObject::addEventListner(&obj1, TSIGNAL, &obj2, TSLOT);
+    AObject::addEventListner(&obj1, TPROPERTY, &obj2, TPROPERTY);
+
+    AVariant data   = AObject::toVariant(obj1);
+    AObject *result = AObject::toObject(data);
+
+    QCOMPARE(*dynamic_cast<AObject*>(&obj1), *result);
+
+    delete result;
+}

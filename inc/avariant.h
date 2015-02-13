@@ -21,13 +21,18 @@
 #define AVARIANT_H
 
 #include <string>
+#include <map>
+#include <list>
 
 #include <amath.h>
 
-class AObject;
+using namespace std;
 
 class AVariant {
 public:
+    typedef map<string, AVariant>   AVariantMap;
+    typedef list<AVariant>          AVariantList;
+
     typedef AVector4D           Color;
 
     /*! \enum Type */
@@ -37,9 +42,10 @@ public:
         INT                     = 2,
         FLOAT                   = 3,
         STRING                  = 4,
-        OBJECT                  = 5,
-        VECTOR                  = 6,
-        COLOR                   = 8
+        VECTOR                  = 5,
+        COLOR                   = 6,
+        MAP                     = 7,
+        LIST                    = 8
     };
 
     struct Data {
@@ -55,10 +61,11 @@ public:
             void               *so;
         } base;
 
-
         std::string             s;
         AVector3D               v;
         Color                   c;
+        AVariantMap             m;
+        AVariantList            l;
     };
 
 public:
@@ -70,34 +77,44 @@ public:
     AVariant                    (float value);
     AVariant                    (const char *value);
     AVariant                    (const std::string &value);
+    AVariant                    (const AVariantMap &value);
+    AVariant                    (const AVariantList &value);
+    /// \todo: Are they realy needed?
     AVariant                    (const AVector3D &value);
     AVariant                    (const Color &value);
+
     AVariant                    (bool *value);
     AVariant                    (int *value);
     AVariant                    (float *value);
     AVariant                    (std::string *value);
+    /// \todo: Are they realy needed?
     AVariant                    (AVector3D *value);
     AVariant                    (Color *value);
-    AVariant                    (AObject *value);
 
     ~AVariant                   ();
 
-    AVariant                   &operator =                  (const AVariant &value);
+    AVariant                   &operator=                   (const AVariant &value);
+
+    bool                        operator==                  (const AVariant &right) const;
+    bool                        operator!=                  (const AVariant &right) const;
 
     Type                        type                        () const;
 
-    bool                        isConvertible               ();
-    bool                        isShared                    ();
-
     // Conversion and getters
-    const bool                  toBool                      ();
-    const int                   toInt                       ();
-    const float                 toFloat                     ();
-    const std::string           toString                    ();
-    const AVector3D             toVector                    ();
-    const Color                 toColor                     ();
+    const bool                  toBool                      () const;
+    const int                   toInt                       () const;
+    const float                 toFloat                     () const;
+    const std::string           toString                    () const;
+    const AVector3D             toVector                    () const;
+    const Color                 toColor                     () const;
+    const AVariantMap           toMap                       () const;
+    const AVariantList          toList                      () const;
+
+    void                        appendProperty              (const AVariant &value, const string &name = "");
 
 protected:
+    inline bool                 toFloatArray                (float *v, const AVariantList &list);
+
     Data                        mData;
 
 };

@@ -110,6 +110,8 @@ public:
     AObject                    *component                   (string &name);
     string                      name                        () const;
 
+    string                      reference                   () const;
+
     static void                 addEventListner             (AObject *sender, const string &signal, AObject *receiver, const string &slot);
     static void                 removeEventListner          (AObject *sender, const string &signal, AObject *receiver, const string &slot);
 
@@ -123,8 +125,10 @@ public:
     string_vector               getSignals                  () const;
     slots_map                   getSlots                    () const;
     links_list                  getLinks                    () const;
+    AVariant                    getLinks                    (const string &name) const;
 
-    void                        setId                       (unsigned int id);
+    AObject                    *findObject                  (const string &path);
+
     void                        setParent                   (AObject *parent);
     void                        setName                     (const string &value);
     void                        setComponent                (const string &name, AObject *value);
@@ -135,17 +139,24 @@ public:
 
     static void                 registerClassFactory        ();
 
+    static AVariant             toVariant                   (const AObject &object);
+
+    static AObject             *toObject                    (const AVariant &variant);
+
+    bool                        operator==                  (const AObject &right) const;
+    bool                        operator!=                  (const AObject &right) const;
+
 // Virtual members
 public:
     virtual bool                update                      (float dt);
 
     virtual void                dispatchEvent               (const string &name, const variant_vector &args);
 
+    virtual void                onEvent                     (const string &name, const variant_vector &args);
+
     virtual void                emitSignal                  (const string &name, const variant_vector &args);
 
     virtual AVariant            property                    (const string &name);
-
-    virtual string              reference                   () const;
 
     virtual string              typeName                    () const;
 
@@ -154,5 +165,8 @@ public:
     virtual void                setProperty                 (const string &name, const AVariant &value);
     void                        setPropertyFlags            (const string &name, const int flags);
 };
+
+inline bool                     operator==                  (const AObject::property_data &left, const AObject::property_data &right);
+inline bool                     operator==                  (const AObject::link_data &left, const AObject::link_data &right);
 
 #endif // AOBJECT_H
