@@ -19,32 +19,9 @@
 
 #include "tst_object.h"
 
-#include "aobject.h"
+#include "tst_common.h"
 
 #include <QtTest>
-
-#define TSLOT       "testSlot"
-#define TVALUE      "testValue"
-#define TSIGNAL     "testSignal"
-#define TPROPERTY   "testProperty"
-
-class ATestObject : public AObject {
-public:
-    ATestObject     (AObject *parent) :
-            AObject(parent) {
-        APROPERTY(TPROPERTY, "", AObject::READ | AObject::WRITE)
-        ASIGNAL(TSIGNAL)
-        ASLOT(TSLOT, ATestObject::testSlot)
-
-        m_bSlot         = false;
-    }
-
-    static void     testSlot        (AObject *pThis, const variant_vector &args) {
-        (static_cast<ATestObject *>(pThis))->m_bSlot  = true;
-    }
-
-    bool            m_bSlot;
-};
 
 void ObjectTest::Base_add_remove_link() {
     AObject *obj1   = new AObject(0);
@@ -91,10 +68,7 @@ void ObjectTest::Emit_signal() {
     ATestObject *obj2   = new ATestObject(0);
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSLOT);
-
-    QBENCHMARK {
-        obj1->emitSignal(TSIGNAL, AObject::variant_vector(1, TVALUE));
-    }
+    obj1->emitSignal(TSIGNAL, AObject::variant_vector(1, TVALUE));
 
     QCOMPARE(obj2->m_bSlot, true);
 
@@ -107,13 +81,10 @@ void ObjectTest::Synchronize_property() {
     ATestObject *obj2   = new ATestObject(0);
 
     AObject::addEventListner(obj1, TPROPERTY, obj2, TPROPERTY);
+    obj1->setProperty(TPROPERTY, true);
 
-    QBENCHMARK {
-        obj1->setProperty(TPROPERTY, TVALUE);
-    }
-
-    QCOMPARE(obj1->property(TPROPERTY).toString().c_str(), TVALUE);
-    QCOMPARE(obj2->property(TPROPERTY).toString().c_str(), TVALUE);
+    QCOMPARE(obj1->property(TPROPERTY).toBool(), true);
+    QCOMPARE(obj2->property(TPROPERTY).toBool(), true);
 
     delete obj1;
     delete obj2;

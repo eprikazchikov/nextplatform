@@ -3,6 +3,7 @@
 #include "tst_variant.h"
 #include "tst_object.h"
 #include "tst_objectsystem.h"
+#include "tst_json.h"
 
 inline int aExec(QObject &ts, int argc, char *argv[]) {
     QStringList args;
@@ -35,10 +36,13 @@ inline int aExec(QObject &ts, int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-
     int status = 0;
     {
         VariantTest ts;
+        status |= aExec(ts, argc, argv);
+    }
+    {
+        JsonTest ts;
         status |= aExec(ts, argc, argv);
     }
     {
@@ -49,5 +53,6 @@ int main(int argc, char *argv[]) {
         ObjectSystemTest ts;
         status |= aExec(ts, argc, argv);
     }
+
     return status;
 }

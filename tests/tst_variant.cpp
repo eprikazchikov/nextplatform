@@ -47,7 +47,7 @@ void VariantTest::Set_Get_check() {
     }
 }
 
-void VariantTest::Shared_value() {
+void VariantTest::Value_to_Shared() {
     {
         bool result = false;
         AVariant value = &result;
@@ -92,9 +92,35 @@ void VariantTest::Shared_value() {
         value       = AVector3D(1.0f);
         QCOMPARE(result.y, 1.0f);
     }
+    /// \todo: Add string color etc
 }
 
-void VariantTest::Convert_value() {
+void VariantTest::Shared_to_Value() {
+    {
+        bool result     = true;
+        AVariant value1 = &result;
+        AVariant value2 = value1;
+        QCOMPARE(value2.isShared(), false);
+        QCOMPARE(value2.toBool(),   true);
+    }
+    {
+        int result      = 1;
+        AVariant value1 = &result;
+        AVariant value2 = value1;
+        QCOMPARE(value2.isShared(), false);
+        QCOMPARE(value2.toInt(),    1);
+    }
+    {
+        float result    = 2.0f;
+        AVariant value1 = &result;
+        AVariant value2 = value1;
+        QCOMPARE(value2.isShared(), false);
+        QCOMPARE(value2.toFloat(),  2.0f);
+    }
+    /// \todo: Add string color etc
+}
+
+void VariantTest::Convert_Bool_to_Int_Float_String() {
     {
         AVariant value  = true;
         QVariant result = true;
@@ -102,6 +128,9 @@ void VariantTest::Convert_value() {
         QCOMPARE(value.toFloat(),   result.toFloat());
         QCOMPARE(value.toString(),  result.toString().toStdString());
     }
+}
+
+void VariantTest::Convert_Int_to_Bool_Float_String() {
     {
         AVariant value  = 5;
         QVariant result = 5;
@@ -109,6 +138,9 @@ void VariantTest::Convert_value() {
         QCOMPARE(value.toFloat(),   result.toFloat());
         QCOMPARE(value.toString(),  result.toString().toStdString());
     }
+}
+
+void VariantTest::Convert_Float_to_Bool_Int_String() {
     {
         AVariant value  = 6.4f;
         QVariant result = 6.4f;
@@ -121,6 +153,9 @@ void VariantTest::Convert_value() {
         QVariant result = 7.6f;
         QCOMPARE(value.toInt(),     result.toInt());
     }
+}
+
+void VariantTest::Convert_String_to_Bool_Int_Float() {
     {
         AVariant value  = "true";
         QVariant result = "true";

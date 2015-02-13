@@ -35,12 +35,17 @@ QT       -= gui
 SOURCES += \
     src/aobject.cpp \
     src/avariant.cpp \
-    src/aobjectsystem.cpp
+    src/aobjectsystem.cpp \
+    src/ajson.cpp \
+    tests/tst_json.cpp
 
 HEADERS += \
     inc/aobject.h \
     inc/avariant.h \
-    inc/aobjectsystem.h
+    inc/aobjectsystem.h \
+    inc/ajson.h \
+    tests/tst_json.h \
+    tests/tst_common.h
 
 INCLUDEPATH += \
     inc
