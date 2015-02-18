@@ -31,6 +31,7 @@ private slots:
     void Sender_destructor();
     void Emit_signal();
     void Synchronize_property();
+    void Find_object();
     void Serialize_Desirialize_Object();
 };
 

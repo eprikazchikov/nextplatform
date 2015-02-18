@@ -21,6 +21,8 @@
 
 #include "tst_common.h"
 
+#include "auri.h"
+
 #include <QtTest>
 
 void ObjectTest::Base_add_remove_link() {
@@ -90,15 +92,42 @@ void ObjectTest::Synchronize_property() {
     delete obj2;
 }
 
+void ObjectTest::Find_object() {
+    ATestObject obj1;
+    ATestObject obj2;
+    ATestObject obj3;
+
+    obj1.setComponent("TestComponent2", &obj2);
+    obj1.setComponent("TestComponent3", &obj3);
+
+    {
+        AUri uri(obj2.reference());
+        AObject *result = obj1.findObject(uri.path());
+
+        QCOMPARE(&obj2, result);
+    }
+
+    {
+        AUri uri(obj3.reference());
+        AObject *result = obj1.findObject(uri.path());
+
+        QCOMPARE(&obj3, result);
+    }
+}
+
 void ObjectTest::Serialize_Desirialize_Object() {
     ATestObject::registerClassFactory();
 
     ATestObject obj1;
     ATestObject obj2;
+    ATestObject obj3;
 
-    obj1.setComponent("TestComponent", &obj2);
+    obj1.setComponent("TestComponent2", &obj2);
+    obj1.setComponent("TestComponent3", &obj3);
     AObject::addEventListner(&obj1, TSIGNAL, &obj2, TSLOT);
+    AObject::addEventListner(&obj1, TSIGNAL, &obj3, TSLOT);
     AObject::addEventListner(&obj1, TPROPERTY, &obj2, TPROPERTY);
+    AObject::addEventListner(&obj1, TPROPERTY, &obj3, TPROPERTY);
 
     AVariant data   = AObject::toVariant(obj1);
     AObject *result = AObject::toObject(data);
