@@ -149,7 +149,10 @@ AObject *AObject::findObject(const string &path) {
     int index  = path.find('/', 1);
     if(index > -1) {
         for(const auto &it : m_mComponents) {
-            return it.second->findObject(path.substr(index + 1));
+            AObject *o  = it.second->findObject(path.substr(index + 1));
+            if(o) {
+                return o;
+            }
         }
     } else if(path.substr(start, index) == m_sName) {
         return this;
