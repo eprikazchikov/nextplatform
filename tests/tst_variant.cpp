@@ -31,15 +31,21 @@ void VariantTest::Set_Get_check() {
         QCOMPARE(result.c_str(), "5");
     }
     {
+        AVariant value      = AVector2D(1.0f, 2.0f);
+        AVector2D result    = value.toVector2D();
+        QCOMPARE(result.x, 1.0f);
+        QCOMPARE(result.y, 2.0f);
+    }
+    {
         AVariant value      = AVector3D(1.0f, 2.0f, 3.0f);
-        AVector3D result    = value.toVector();
+        AVector3D result    = value.toVector3D();
         QCOMPARE(result.x, 1.0f);
         QCOMPARE(result.y, 2.0f);
         QCOMPARE(result.z, 3.0f);
     }
     {
-        AVariant value      = AVariant::Color(1.0f, 2.0f, 3.0f, 4.0f);
-        AVariant::Color result  = value.toColor();
+        AVariant value      = AVector4D(1.0f, 2.0f, 3.0f, 4.0f);
+        AVector4D result    = value.toVector4D();
         QCOMPARE(result.x, 1.0f);
         QCOMPARE(result.y, 2.0f);
         QCOMPARE(result.z, 3.0f);
@@ -84,10 +90,10 @@ void VariantTest::Value_to_Shared() {
     {
         AVector3D result(0.0f);
         AVariant value = &result;
-        QCOMPARE(value.toVector().z, 0.0f);
+        QCOMPARE(value.toVector3D().z, 0.0f);
 
         result.z    = 5.0f;
-        QCOMPARE(value.toVector().z, 5.0f);
+        QCOMPARE(value.toVector3D().z, 5.0f);
 
         value       = AVector3D(1.0f);
         QCOMPARE(result.y, 1.0f);

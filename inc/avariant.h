@@ -33,8 +33,6 @@ public:
     typedef map<string, AVariant>   AVariantMap;
     typedef list<AVariant>          AVariantList;
 
-    typedef AVector4D           Color;
-
     /*! \enum Type */
     enum Type {
         ANY                     = 0,
@@ -42,10 +40,11 @@ public:
         INT                     = 2,
         FLOAT                   = 3,
         STRING                  = 4,
-        VECTOR                  = 5,
-        COLOR                   = 6,
-        MAP                     = 7,
-        LIST                    = 8
+        VECTOR2D                = 5,
+        VECTOR3D                = 6,
+        VECTOR4D                = 7,
+        MAP                     = 8,
+        LIST                    = 9
     };
 
     struct Data {
@@ -62,8 +61,7 @@ public:
         } base;
 
         std::string             s;
-        AVector3D               v;
-        Color                   c;
+        AVector4D               v;
         AVariantMap             m;
         AVariantList            l;
     };
@@ -79,17 +77,17 @@ public:
     AVariant                    (const std::string &value);
     AVariant                    (const AVariantMap &value);
     AVariant                    (const AVariantList &value);
-    /// \todo: Are they realy needed?
+    AVariant                    (const AVector2D &value);
     AVariant                    (const AVector3D &value);
-    AVariant                    (const Color &value);
+    AVariant                    (const AVector4D &value);
 
     AVariant                    (bool *value);
     AVariant                    (int *value);
     AVariant                    (float *value);
     AVariant                    (std::string *value);
-    /// \todo: Are they realy needed?
+    AVariant                    (AVector2D *value);
     AVariant                    (AVector3D *value);
-    AVariant                    (Color *value);
+    AVariant                    (AVector4D *value);
 
     ~AVariant                   ();
 
@@ -105,8 +103,9 @@ public:
     const int                   toInt                       () const;
     const float                 toFloat                     () const;
     const std::string           toString                    () const;
-    const AVector3D             toVector                    () const;
-    const Color                 toColor                     () const;
+    const AVector2D             toVector2D                  () const;
+    const AVector3D             toVector3D                  () const;
+    const AVector4D             toVector4D                  () const;
     const AVariantMap           toMap                       () const;
     const AVariantList          toList                      () const;
 

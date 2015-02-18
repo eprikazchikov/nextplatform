@@ -14,7 +14,7 @@ class ATestObject : public AObject {
 public:
     ATestObject     (AObject *parent = 0) :
             AObject(parent) {
-        APROPERTY(TPROPERTY, &m_bSlot, AObject::READ | AObject::WRITE)
+        APROPERTY(TPROPERTY, &m_bSlot, AObject::READ | AObject::WRITE, NONE, -1)
         ASIGNAL(TSIGNAL)
         ASLOT(TSLOT, ATestObject::testSlot)
 

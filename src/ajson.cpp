@@ -165,8 +165,9 @@ string AJson::save(const AVariant &data, int depth) {
             }
             result += "}";
         } break;
-        case AVariant::VECTOR:
-        case AVariant::COLOR:
+        case AVariant::VECTOR2D:
+        case AVariant::VECTOR3D:
+        case AVariant::VECTOR4D:
         case AVariant::LIST: {
             result += "[";
             result += FORMAT;

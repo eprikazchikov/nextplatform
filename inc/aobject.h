@@ -26,10 +26,10 @@
 
 #include <avariant.h>
 
-#define APROPERTY(name, value, flags) \
+#define APROPERTY(name, value, flags, type, order) \
 {\
     setProperty(name, value);\
-    setPropertyFlags(name, flags);\
+    setPropertySettings(name, flags, type, order);\
 }
 
 #define ASIGNAL(name) \
@@ -50,7 +50,13 @@ public:
         NONE                    = 0,
         READ                    = (1<<0),
         WRITE                   = (1<<1),
-        CONSTANT                = (1<<2)
+        SCHEME                  = (1<<2),
+        EDITOR                  = (1<<3)
+    };
+
+    enum UserTypes {
+        FILEPATH                = 1,
+        COLOR
     };
 
     struct link_data {
@@ -67,6 +73,10 @@ public:
         AVariant                data;
 
         AccessTypes             flags;
+
+        int                     type;
+
+        int                     order;
     };
 
     typedef map<string, AObject *>  objects_map;
@@ -163,7 +173,7 @@ public:
     virtual void                setEnable                   (bool state);
 
     virtual void                setProperty                 (const string &name, const AVariant &value);
-    void                        setPropertyFlags            (const string &name, const int flags);
+    inline void                 setPropertySettings         (const string &name, const int flags, const int type = 0, const int order = -1);
 };
 
 inline bool                     operator==                  (const AObject::property_data &left, const AObject::property_data &right);
