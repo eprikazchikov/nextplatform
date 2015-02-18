@@ -7,6 +7,7 @@
 #define NAME        "Name"
 #define DATA        "Data"
 #define FLAGS       "Flags"
+#define ORDER       "Order"
 #define LINKS       "Links"
 #define ENABLE      "Enable"
 #define SLOTS       "Slots"
@@ -128,7 +129,7 @@ AVariant AObject::getLinks(const string &name) const {
     AVariant result(AVariant::LIST);
     for(const auto &link : m_lLinks) {
         if(link.sender == this && link.signal == name) {
-            result.appendProperty(link.receiver->reference() + "#" + link.slot);
+            result.appendProperty(link.receiver->reference() + "?" + link.slot);
         } else if(link.receiver == this && link.slot == name) {
             result.appendProperty(link.sender->reference() + "#" + link.signal);
         }
@@ -267,8 +268,11 @@ void AObject::setProperty(const string &name, const AVariant &value) {
     emitSignal(name, variant_vector(1, value));
 }
 
-void AObject::setPropertyFlags(const string &name, const int flags) {
-    m_mProperties[name].flags   = (AccessTypes)flags;
+void AObject::setPropertySettings(const string &name, const int flags, const int type, const int order) {
+    auto &it    = m_mProperties[name];
+    it.flags    = (AccessTypes)flags;
+    it.type     = type;
+    it.order    = order;
 }
 
 AVariant AObject::toVariant(const AObject &object) {
@@ -285,6 +289,8 @@ AVariant AObject::toVariant(const AObject &object) {
             p.appendProperty(it.first,          NAME);
             p.appendProperty(it.second.flags,   FLAGS);
             p.appendProperty(it.second.data,    DATA);
+            p.appendProperty(it.second.type,    TYPE);
+            p.appendProperty(it.second.order,   ORDER);
             p.appendProperty(object.getLinks(it.first), LINKS);
 
             s.appendProperty(p);
@@ -381,7 +387,7 @@ AObject *AObject::toObject(const AVariant &variant) {
                     AUri uri(link.toString());
                     AObject *o  = result->findObject(uri.path());
                     if(o) {
-                        addEventListner(result, m[NAME].toString(), o, uri.fragment());
+                        addEventListner(result, m[NAME].toString(), o, uri.query());
                     }
                 }
             }
@@ -390,13 +396,17 @@ AObject *AObject::toObject(const AVariant &variant) {
             for(const auto &it : map[PROPERTIES].toList()) {
                 AVariant::AVariantMap p = it.toMap();
                 result->setProperty(p[NAME].toString(), p[DATA]);
-                result->setPropertyFlags(p[NAME].toString(), p[FLAGS].toInt());
+                result->setPropertySettings(p[NAME].toString(), p[FLAGS].toInt(), p[TYPE].toInt(), p[ORDER].toInt());
 
                 for(const auto &link : p[LINKS].toList()) {
                     AUri uri(link.toString());
                     AObject *o  = result->findObject(uri.path());
                     if(o) {
-                        addEventListner(result, p[NAME].toString(), o, uri.fragment());
+                        if(uri.fragment().empty()) {
+                            addEventListner(result, p[NAME].toString(), o, uri.query());
+                        } else {
+                            addEventListner(o, uri.fragment(), result, p[NAME].toString());
+                        }
                     }
                 }
             }
@@ -455,6 +465,7 @@ inline bool operator==(const AObject::property_data &left, const AObject::proper
     bool result = true;
     result &= left.flags    == right.flags;
     result &= left.data     == right.data;
+    result &= left.type     == right.type;
     return result;
 }
 

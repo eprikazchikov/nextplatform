@@ -49,23 +49,36 @@ bool convert(const AVariant::Data &data, AVariant::Type type, void *value) {
         default:                { result    = false; } break;
         }
     } break;
-    case AVariant::VECTOR: {
+    case AVariant::VECTOR2D: {
+        AVector2D *r    = static_cast<AVector2D *>(value);
+        switch(data.type) {
+        case AVariant::FLOAT:   { *r    = AVector2D(SHARED(float) : data.base.f); } break;
+        case AVariant::INT:     { *r    = AVector2D(SHARED(int) : data.base.i); } break;
+        case AVariant::VECTOR2D:{ *r    = SHARED(AVector2D) : AVector2D(data.v.x, data.v.y); } break;
+        case AVariant::VECTOR3D:{ AVector3D v   = SHARED(AVector3D) : AVector3D(data.v.x, data.v.y, data.v.z); *r = AVector2D(v.x, v.y); } break;
+        case AVariant::VECTOR4D:{ AVector4D v   = SHARED(AVector4D) : data.v; *r = AVector2D(v.x, v.y); } break;
+        default:                { result    = false; } break;
+        }
+    } break;
+    case AVariant::VECTOR3D: {
         AVector3D *r    = static_cast<AVector3D *>(value);
         switch(data.type) {
         case AVariant::FLOAT:   { *r    = AVector3D(SHARED(float) : data.base.f); } break;
         case AVariant::INT:     { *r    = AVector3D(SHARED(int) : data.base.i); } break;
-        case AVariant::VECTOR:  { *r    = SHARED(AVector3D) : data.v; } break;
-        case AVariant::COLOR:   { AVector4D v   = SHARED(AVector4D) : data.c; *r = AVector3D(v.x, v.y, v.z); } break;
+        case AVariant::VECTOR2D:{ AVector2D v   = SHARED(AVector2D) : AVector2D(data.v.x, data.v.y); *r = AVector3D(v.x, v.y, 0.0); } break;
+        case AVariant::VECTOR3D:{ *r    = SHARED(AVector3D) : AVector3D(data.v.x, data.v.y, data.v.z); } break;
+        case AVariant::VECTOR4D:{ AVector4D v   = SHARED(AVector4D) : data.v; *r = AVector3D(v.x, v.y, v.z); } break;
         default:                { result    = false; } break;
         }
     } break;
-    case AVariant::COLOR: {
-        AVariant::Color *r  = static_cast<AVariant::Color *>(value);
+    case AVariant::VECTOR4D: {
+        AVector4D *r    = static_cast<AVector4D *>(value);
         switch(data.type) {
-        case AVariant::FLOAT:   { *r    = AVariant::Color(SHARED(float) : data.base.f); } break;
-        case AVariant::INT:     { *r    = AVariant::Color(SHARED(int) : data.base.i); } break;
-        case AVariant::VECTOR:  { *r    = AVariant::Color(SHARED(AVector3D) : data.v, 1.0); } break;
-        case AVariant::COLOR:   { *r    = SHARED(AVector4D) : data.c; } break;
+        case AVariant::FLOAT:   { *r    = AVector4D(SHARED(float) : data.base.f); } break;
+        case AVariant::INT:     { *r    = AVector4D(SHARED(int) : data.base.i); } break;
+        case AVariant::VECTOR2D:{ AVector2D v   = SHARED(AVector2D) : AVector2D(data.v.x, data.v.y); *r = AVector4D(v.x, v.y, 0.0, 1.0); } break;
+        case AVariant::VECTOR3D:{ AVector3D v   = SHARED(AVector3D) : AVector3D(data.v.x, data.v.y, data.v.z); *r = AVector4D(v.x, v.y, v.z, 1.0); } break;
+        case AVariant::VECTOR4D:{ *r    = SHARED(AVector4D) : data.v; } break;
         default:                { result    = false; } break;
         }
     } break;
@@ -139,31 +152,33 @@ AVariant::AVariant(const AVariantList &value) {
     mData.type      = LIST;
     mData.l         = value;
 
-    if(value.size() == 3) {
-        AVector3D v;
-        if(toFloatArray(v.v, value)) {
-            mData.type  = VECTOR;
-            mData.v     = v;
-            mData.l.clear();
+    AVector4D v;
+    if(toFloatArray(v.v, value)) {
+        switch (value.size()) {
+            case 2: mData.type  = VECTOR2D; break;
+            case 3: mData.type  = VECTOR3D; break;
+            case 4: mData.type  = VECTOR4D; break;
+            default: return;
         }
-    } else if(value.size() == 4) {
-        Color c;
-        if(toFloatArray(c.v, value)) {
-            mData.type  = COLOR;
-            mData.c     = c;
-            mData.l.clear();
-        }
+        mData.v = v;
+        mData.l.clear();
     }
 }
 
-AVariant::AVariant(const AVector3D &value) {
-    mData.type      = VECTOR;
-    mData.v         = value;
+AVariant::AVariant(const AVector2D &value) {
+    mData.type      = VECTOR2D;
+    mData.v         = AVector4D(value, 0.0f, 1.0f);
 }
 
-AVariant::AVariant(const Color &value) {
-    mData.type      = COLOR;
-    mData.c         = value;
+
+AVariant::AVariant(const AVector3D &value) {
+    mData.type      = VECTOR3D;
+    mData.v         = AVector4D(value, 1.0f);
+}
+
+AVariant::AVariant(const AVector4D &value) {
+    mData.type      = VECTOR4D;
+    mData.v         = value;
 }
 
 AVariant::AVariant(bool *value) {
@@ -190,14 +205,20 @@ AVariant::AVariant(string *value) {
     mData.shared    = true;
 }
 
-AVariant::AVariant(AVector3D *value) {
-    mData.type      = VECTOR;
+AVariant::AVariant(AVector2D *value) {
+    mData.type      = VECTOR2D;
     mData.base.so   = value;
     mData.shared    = true;
 }
 
-AVariant::AVariant(Color *value) {
-    mData.type      = COLOR;
+AVariant::AVariant(AVector3D *value) {
+    mData.type      = VECTOR3D;
+    mData.base.so   = value;
+    mData.shared    = true;
+}
+
+AVariant::AVariant(AVector4D *value) {
+    mData.type      = VECTOR4D;
     mData.base.so   = value;
     mData.shared    = true;
 }
@@ -222,14 +243,19 @@ bool AVariant::operator==(const AVariant &right) const {
         case INT:   return toInt()      == right.toInt();
         case FLOAT: return toFloat()    == right.toFloat();
         case STRING:return toString()   == right.toString();
-        case VECTOR:{
-            AVector3D v1    = toVector();
-            AVector3D v2    = right.toVector();
+        case VECTOR2D: {
+            AVector2D c1    = toVector2D();
+            AVector2D c2    = right.toVector2D();
+            return c1 == c2;
+        }
+        case VECTOR3D:{
+            AVector3D v1    = toVector3D();
+            AVector3D v2    = right.toVector3D();
             return v1 == v2;
         }
-        case COLOR: {
-            Color c1    = toColor();
-            Color c2    = right.toColor();
+        case VECTOR4D: {
+            AVector4D c1    = toVector4D();
+            AVector4D c2    = right.toVector4D();
             return c1 == c2;
         }
         case MAP:   return toMap()      == right.toMap();
@@ -264,12 +290,16 @@ const string AVariant::toString() const {
     return aConversionHelper<string>(mData, STRING, "");
 }
 
-const AVector3D AVariant::toVector() const {
-    return aConversionHelper<AVector3D>(mData, VECTOR, AVector3D());
+const AVector2D AVariant::toVector2D() const {
+    return aConversionHelper<AVector2D>(mData, VECTOR2D, AVector2D());
 }
 
-const AVariant::Color AVariant::toColor() const {
-    return aConversionHelper<Color>(mData, COLOR, Color());
+const AVector3D AVariant::toVector3D() const {
+    return aConversionHelper<AVector3D>(mData, VECTOR3D, AVector3D());
+}
+
+const AVector4D AVariant::toVector4D() const {
+    return aConversionHelper<AVector4D>(mData, VECTOR4D, AVector4D());
 }
 
 const AVariant::AVariantMap AVariant::toMap() const {
@@ -282,19 +312,25 @@ const AVariant::AVariantMap AVariant::toMap() const {
 const AVariant::AVariantList AVariant::toList() const {
     switch(mData.type) {
         case LIST: return mData.l;
-        case VECTOR: {
+        case VECTOR2D: {
+            AVariantList l;
+            l.push_back(mData.v.x);
+            l.push_back(mData.v.y);
+            return l;
+        }
+        case VECTOR3D: {
             AVariantList l;
             l.push_back(mData.v.x);
             l.push_back(mData.v.y);
             l.push_back(mData.v.z);
             return l;
         }
-        case COLOR: {
+        case VECTOR4D: {
             AVariantList l;
-            l.push_back(mData.c.x);
-            l.push_back(mData.c.y);
-            l.push_back(mData.c.z);
-            l.push_back(mData.c.w);
+            l.push_back(mData.v.x);
+            l.push_back(mData.v.y);
+            l.push_back(mData.v.z);
+            l.push_back(mData.v.w);
             return l;
         }
         default: break;
@@ -306,15 +342,19 @@ const AVariant::AVariantList AVariant::toList() const {
 void AVariant::appendProperty(const AVariant &value, const string &name) {
     AVariant v   = value;
     if(value.mData.type == AVariant::LIST) {
-        if(value.mData.l.size() == 3) {
-            AVector3D vector;
-            if(toFloatArray(vector.v, value.mData.l)) {
-                v = vector;
-            }
-        } else if(value.mData.l.size() == 4) {
-            Color color;
-            if(toFloatArray(color.v, value.mData.l)) {
-                v = color;
+        AVector4D vector;
+        if(toFloatArray(vector.v, value.mData.l)) {
+            switch(value.mData.l.size()) {
+                case 2: {
+                    v   = AVector2D(vector.x, vector.y);
+                } break;
+                case 3: {
+                    v   = AVector3D(vector.x, vector.y, vector.z);
+                } break;
+                case 4: {
+                    v   = AVector4D(vector.x, vector.y, vector.z, vector.w);
+                } break;
+                default: break;
             }
         }
     }
