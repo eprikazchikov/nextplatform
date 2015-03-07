@@ -8,17 +8,21 @@
 #define TSLOT       "testSlot"
 #define TVALUE      "testValue"
 #define TSIGNAL     "testSignal"
-#define TPROPERTY   "testProperty"
+#define TPROPERTY1  "testProperty1"
+#define TPROPERTY2  "testProperty2"
 
 class ATestObject : public AObject {
 public:
     ATestObject     (AObject *parent = 0) :
             AObject(parent) {
-        APROPERTY(TPROPERTY, &m_bSlot, AObject::READ | AObject::WRITE, NONE, -1)
+        APROPERTY(TPROPERTY1, &m_bSlot, AObject::READ | AObject::WRITE, NONE, -1)
+        APROPERTY(TPROPERTY2, &m_Vector2, AObject::READ | AObject::WRITE, NONE, -1)
+
         ASIGNAL(TSIGNAL)
         ASLOT(TSLOT, ATestObject::testSlot)
 
         m_bSlot         = false;
+        m_Vector2       = AVector2D(1, 0);
     }
 
     static AObject *callbackClassFactory(AObject *parent = 0) {
@@ -39,6 +43,7 @@ public:
     }
 
     bool            m_bSlot;
+    AVector2D       m_Vector2;
 };
 
 #endif // TST_COMMON_H

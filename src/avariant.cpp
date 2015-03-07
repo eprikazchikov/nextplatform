@@ -227,10 +227,10 @@ AVariant::~AVariant() {
 }
 
 AVariant &AVariant::operator=(const AVariant &value) {
-    /// \todo: Need to think about case when value is shared
     if(mData.shared) {
         convert(value.mData, mData.type, mData.base.so);
     } else {
+        /// \todo: Need to think about case when value is shared
         mData   = value.mData;
     }
     return *this;
@@ -271,6 +271,10 @@ bool AVariant::operator!=(const AVariant &right) const {
 
 AVariant::Type AVariant::type() const {
     return mData.type;
+}
+
+bool AVariant::isShared() const {
+    return mData.shared;
 }
 
 // Conversion and getters
@@ -314,23 +318,26 @@ const AVariant::AVariantList AVariant::toList() const {
         case LIST: return mData.l;
         case VECTOR2D: {
             AVariantList l;
-            l.push_back(mData.v.x);
-            l.push_back(mData.v.y);
+            AVector2D v = toVector2D();
+            l.push_back(v.x);
+            l.push_back(v.y);
             return l;
         }
         case VECTOR3D: {
             AVariantList l;
-            l.push_back(mData.v.x);
-            l.push_back(mData.v.y);
-            l.push_back(mData.v.z);
+            AVector3D v = toVector3D();
+            l.push_back(v.x);
+            l.push_back(v.y);
+            l.push_back(v.z);
             return l;
         }
         case VECTOR4D: {
             AVariantList l;
-            l.push_back(mData.v.x);
-            l.push_back(mData.v.y);
-            l.push_back(mData.v.z);
-            l.push_back(mData.v.w);
+            AVector4D v = toVector4D();
+            l.push_back(v.x);
+            l.push_back(v.y);
+            l.push_back(v.z);
+            l.push_back(v.w);
             return l;
         }
         default: break;

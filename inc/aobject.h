@@ -151,7 +151,7 @@ public:
 
     static AVariant             toVariant                   (const AObject &object);
 
-    static AObject             *toObject                    (const AVariant &variant);
+    static AObject             *toObject                    (const AVariant &variant, AObject *parent = 0);
 
     bool                        operator==                  (const AObject &right) const;
     bool                        operator!=                  (const AObject &right) const;

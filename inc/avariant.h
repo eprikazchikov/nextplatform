@@ -97,6 +97,7 @@ public:
     bool                        operator!=                  (const AVariant &right) const;
 
     Type                        type                        () const;
+    bool                        isShared                    () const;
 
     // Conversion and getters
     const bool                  toBool                      () const;
