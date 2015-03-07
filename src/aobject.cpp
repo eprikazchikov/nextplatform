@@ -86,6 +86,12 @@ void AObject::removeEventListner(AObject *sender, const string &signal, AObject 
 
 void AObject::addLink(link_data &link) {
     /// \todo: Place for link_mutex
+    for(const auto &it : m_lLinks) {
+        if(it.signal == link.signal && it.slot == link.slot &&
+           it.sender == link.sender && it.receiver == link.receiver) {
+            return;
+        }
+    }
     m_lLinks.push_back(link);
 }
 
@@ -171,6 +177,11 @@ void AObject::setParent(AObject *parent) {
 void AObject::setName(const string &value) {
     if(!value.empty()) {
         if(m_sName != value && m_pParent) {
+            auto it =  m_pParent->m_mComponents.find(m_sName);
+            if(it !=  m_pParent->m_mComponents.end()) {
+                 m_pParent->m_mComponents.erase(it);
+            }
+
             m_pParent->setComponent(value, this);
         }
         m_sName = value;
@@ -338,11 +349,11 @@ AVariant AObject::toVariant(const AObject &object) {
     return result;
 }
 
-AObject *AObject::toObject(const AVariant &variant) {
+AObject *AObject::toObject(const AVariant &variant, AObject *parent) {
     AVariant::AVariantMap map   = variant.toMap();
     string type     = map[TYPE].toString();
 
-    AObject *result = AObjectSystem::instance()->createObject(type);
+    AObject *result = AObjectSystem::instance()->createObject(type, parent);
     if(result) {
         result->setName     (map[NAME].toString());
         result->setEnable   (map[ENABLE].toBool());
@@ -350,7 +361,7 @@ AObject *AObject::toObject(const AVariant &variant) {
         {
             for(const auto &it : map[COMPONENTS].toMap()) {
                 if(result->m_mComponents.find(it.first) == result->m_mComponents.end()) {
-                    result->setComponent(it.first, toObject(it.second));
+                    toObject(it.second, result);
                 }
             }
         }

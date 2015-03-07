@@ -18,9 +18,9 @@ void JsonTest::Serialize_Desirialize() {
 
     var1.appendProperty(m,      "test5");
 
-    var1.appendProperty(AVector2D(),  "test6");
-    var1.appendProperty(AVector3D(),  "test7");
-    var1.appendProperty(AVector4D(),  "test8");
+    var1.appendProperty(AVector2D(1),  "test6");
+    var1.appendProperty(AVector3D(2),  "test7");
+    var1.appendProperty(AVector4D(3),  "test8");
 
     QCOMPARE(var1, AJson::load(AJson::save(var1)));
 }

@@ -53,7 +53,7 @@ void VariantTest::Set_Get_check() {
     }
 }
 
-void VariantTest::Value_to_Shared() {
+void VariantTest::Value_Copy_to_Shared() {
     {
         bool result = false;
         AVariant value = &result;
@@ -98,29 +98,105 @@ void VariantTest::Value_to_Shared() {
         value       = AVector3D(1.0f);
         QCOMPARE(result.y, 1.0f);
     }
-    /// \todo: Add string color etc
+    /// \todo: Add string
 }
 
-void VariantTest::Shared_to_Value() {
+void VariantTest::Shared_Copy_to_Value() {
     {
         bool result     = true;
         AVariant value1 = &result;
         AVariant value2 = value1;
-        QCOMPARE(value2.toBool(),   true);
+        QCOMPARE(value2.isShared(),     false);
+        QCOMPARE(value2.toBool(),       true);
     }
     {
         int result      = 1;
         AVariant value1 = &result;
         AVariant value2 = value1;
-        QCOMPARE(value2.toInt(),    1);
+        QCOMPARE(value2.isShared(),     false);
+        QCOMPARE(value2.toInt(),        1);
     }
     {
         float result    = 2.0f;
         AVariant value1 = &result;
         AVariant value2 = value1;
-        QCOMPARE(value2.toFloat(),  2.0f);
+        QCOMPARE(value2.isShared(),     false);
+        QCOMPARE(value2.toFloat(),      2.0f);
     }
-    /// \todo: Add string color etc
+    {
+        string result   = "string";
+        AVariant value1 = &result;
+        AVariant value2 = value1;
+        QCOMPARE(value2.isShared(),     false);
+        QCOMPARE(value2.toString().c_str(),  "string");
+    }
+    {
+        AVector2D result(1.0f, 2.0f);
+        AVariant value1 = &result;
+        AVariant value2 = value1;
+        QCOMPARE(value2.isShared(),     false);
+        AVector2D v     = value2.toVector2D();
+        QCOMPARE(v.x, 1.0f);
+        QCOMPARE(v.y, 2.0f);
+    }
+    {
+        AVector3D result(1.0f, 2.0f, 3.0f);
+        AVariant value1 = &result;
+        AVariant value2 = value1;
+        QCOMPARE(value2.isShared(), false);
+        AVector3D v     = value2.toVector3D();
+        QCOMPARE(v.x,               1.0f);
+        QCOMPARE(v.y,               2.0f);
+        QCOMPARE(v.z,               3.0f);
+    }
+    {
+        AVector4D result(1.0f, 2.0f, 3.0f, 4.0f);
+        AVariant value1 = &result;
+        AVariant value2 = value1;
+        QCOMPARE(value2.isShared(), false);
+        AVector4D v     = value2.toVector4D();
+        QCOMPARE(v.x,               1.0f);
+        QCOMPARE(v.y,               2.0f);
+        QCOMPARE(v.z,               3.0f);
+        QCOMPARE(v.w,               4.0f);
+    }
+}
+
+void VariantTest::Shared_Copy_to_Shared() {
+    /// \todo: Implementation required
+}
+
+void VariantTest::Variant_to_List() {
+    {
+        AVector2D v     = AVector2D(1.0f, 2.0f);
+        AVariant value  = &v;
+        AVariant::AVariantList list = value.toList();
+        float i = 1.0f;
+        for(const auto &it : list) {
+            QCOMPARE(it.toFloat(), i);
+            i += 1.0f;
+        }
+    }
+    {
+        AVector3D v     = AVector3D(1.0f, 2.0f, 3.0f);
+        AVariant value  = &v;
+        AVariant::AVariantList list = value.toList();
+        float i = 1.0f;
+        for(const auto &it : list) {
+            QCOMPARE(it.toFloat(), i);
+            i += 1.0f;
+        }
+    }
+    {
+        AVector4D v     = AVector4D(1.0f, 2.0f, 3.0f, 4.0f);
+        AVariant value  = &v;
+        AVariant::AVariantList list = value.toList();
+        float i = 1.0f;
+        for(const auto &it : list) {
+            QCOMPARE(it.toFloat(), i);
+            i += 1.0f;
+        }
+    }
 }
 
 void VariantTest::Convert_Bool_to_Int_Float_String() {
