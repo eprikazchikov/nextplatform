@@ -125,8 +125,8 @@ public:
     static void                 addEventListner             (AObject *sender, const string &signal, AObject *receiver, const string &slot);
     static void                 removeEventListner          (AObject *sender, const string &signal, AObject *receiver, const string &slot);
 
-    void                        addLink                     (link_data &link);
-    void                        removeLink                  (link_data &link);
+    void                        addLink                     (const link_data &link);
+    void                        removeLink                  (const link_data &link);
 
     void                        deleteLater                 ();
 

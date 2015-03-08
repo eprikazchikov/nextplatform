@@ -40,6 +40,18 @@ void ObjectTest::Base_add_remove_link() {
     delete obj1;
 }
 
+void ObjectTest::Child_destructor() {
+    AObject *obj1   = new AObject(0);
+    AObject *obj2   = new AObject(obj1);
+
+    QCOMPARE((int)obj1->getComponents().size(), 1);
+
+    delete obj2;
+    QCOMPARE((int)obj1->getComponents().size(), 0);
+
+    delete obj1;
+}
+
 void ObjectTest::Reciever_destructor() {
     AObject *obj1   = new AObject(0);
     AObject *obj2   = new AObject(0);
@@ -48,7 +60,7 @@ void ObjectTest::Reciever_destructor() {
     QCOMPARE((int)obj1->getLinks().size(), 1);
 
     delete obj2;
-    QCOMPARE((int)obj1->getLinks().size(), 0);
+    QCOMPARE((int)obj1->getLinks().size(),      0);
 
     delete obj1;
 }

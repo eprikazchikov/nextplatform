@@ -27,19 +27,31 @@ AObject::AObject(AObject *parent) {
 }
 
 AObject::~AObject() {
-    auto it = m_lLinks.begin();
-    for(it; it != m_lLinks.end(); it++) {
-        link_data data  = (*it);
-
-        if(data.receiver == this) {
-            data.sender->removeLink(data);
+    for(const auto &it : m_lLinks) {
+        if(it.receiver == this) {
+            it.sender->removeLink(it);
         }
 
-        if(data.sender == this) {
-            data.receiver->removeLink(data);
+        if(it.sender == this) {
+            it.receiver->removeLink(it);
         }
     }
     m_lLinks.clear();
+
+    for(const auto &it : m_mComponents) {
+        if(it.second) {
+            it.second->m_pParent    = 0;
+            delete it.second;
+        }
+    }
+    m_mComponents.clear();
+
+    if(m_pParent) {
+        const auto it   = m_pParent->m_mComponents.find(m_sName);
+        if(it != m_pParent->m_mComponents.end()) {
+            m_pParent->m_mComponents.erase(it);
+        }
+    }
 }
 
 unsigned int AObject::id() const {
@@ -84,7 +96,7 @@ void AObject::removeEventListner(AObject *sender, const string &signal, AObject 
     }
 }
 
-void AObject::addLink(link_data &link) {
+void AObject::addLink(const link_data &link) {
     /// \todo: Place for link_mutex
     for(const auto &it : m_lLinks) {
         if(it.signal == link.signal && it.slot == link.slot &&
@@ -95,7 +107,7 @@ void AObject::addLink(link_data &link) {
     m_lLinks.push_back(link);
 }
 
-void AObject::removeLink(link_data &link) {
+void AObject::removeLink(const link_data &link) {
     auto it = m_lLinks.begin();
     for(it; it != m_lLinks.end(); it++) {
         link_data *data = &(*it);
