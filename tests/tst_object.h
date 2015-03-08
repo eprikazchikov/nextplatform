@@ -27,6 +27,7 @@ class ObjectTest : public QObject {
 
 private slots:
     void Base_add_remove_link();
+    void Child_destructor();
     void Reciever_destructor();
     void Sender_destructor();
     void Emit_signal();
