@@ -35,16 +35,16 @@ public:
 
     /*! \enum Type */
     enum Type {
-        ANY                     = 0,
+        NONE                    = 0,
         BOOL                    = 1,
         INT                     = 2,
         FLOAT                   = 3,
         STRING                  = 4,
+        MAP                     = 8,
+        LIST                    = 9,
         VECTOR2D                = 5,
         VECTOR3D                = 6,
-        VECTOR4D                = 7,
-        MAP                     = 8,
-        LIST                    = 9
+        VECTOR4D                = 7
     };
 
     struct Data {

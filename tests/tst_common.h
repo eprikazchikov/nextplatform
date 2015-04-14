@@ -38,7 +38,7 @@ public:
         return "ATestObject";
     }
 
-    static void     testSlot        (AObject *pThis, const variant_vector &args) {
+    static void     testSlot        (AObject *pThis, const AVariant &args) {
         (static_cast<ATestObject *>(pThis))->m_bSlot  = true;
     }
 

@@ -97,7 +97,7 @@ inline T aConversionHelper(const AVariant::Data &data, AVariant::Type type, T va
 }
 
 AVariant::Data::Data() {
-    type    = AVariant::ANY;
+    type    = AVariant::NONE;
     base.b  = false;
     base.i  = 0;
     base.f  = 0.0f;
@@ -238,7 +238,7 @@ AVariant &AVariant::operator=(const AVariant &value) {
 
 bool AVariant::operator==(const AVariant &right) const {
     switch(mData.type) {
-        case ANY:   return (mData.type  == right.mData.type);
+        case NONE:  return (mData.type  == right.mData.type);
         case BOOL:  return toBool()     == right.toBool();
         case INT:   return toInt()      == right.toInt();
         case FLOAT: return toFloat()    == right.toFloat();

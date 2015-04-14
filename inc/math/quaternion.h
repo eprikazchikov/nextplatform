@@ -24,40 +24,40 @@ struct AQuaternion {
 	
 	AQuaternion() : x(0), y(0), z(0), w(1) { }
 	AQuaternion(const AVector3D &dir, float angle) {
-		set(dir,angle);
+        set(dir, angle);
 	}
 
 	AQuaternion(float x, float y, float z, float angle) {
-		set(x,y,z,angle);
+        set(x, y, z, angle);
 	}
 
 	AQuaternion(AMatrix3D &m) {
 		float t		= m.mat[0] + m.mat[4] + m.mat[8];
 		if(t > 0) {
-            float s	= (float)0.5 / (float)sqrt(t);
-            w	= (float)0.25 / s;
+            float s	= 0.5f / (float)sqrt(t);
+            w	= 0.25f / s;
 			x	= ( m.mat[7] - m.mat[5] ) * s;
 			y	= ( m.mat[2] - m.mat[6] ) * s;
 			z	= ( m.mat[3] - m.mat[1] ) * s;
 		} else {
 			if ( m.mat[0] > m.mat[4] && m.mat[0] > m.mat[8] ) {
-              float s	= (float)2.0 * (float)sqrt( (float)1.0 + m.mat[0] - m.mat[4] - m.mat[8] );
+              float s	= (float)2.0 * (float)sqrt( 1.0f + m.mat[0] - m.mat[4] - m.mat[8] );
 			  w = (m.mat[7] - m.mat[5] ) / s;
-              x = (float)0.25 * s;
+              x = 0.25f * s;
 			  y = (m.mat[1] + m.mat[3] ) / s;
 			  z = (m.mat[2] + m.mat[6] ) / s;
 			} else if (m.mat[4] > m.mat[8]) {
-              float s	= (float)2.0 * (float)sqrt( (float)1.0 + m.mat[4] - m.mat[0] - m.mat[8] );
+              float s	= (float)2.0 * (float)sqrt( 1.0f + m.mat[4] - m.mat[0] - m.mat[8] );
 			  w = (m.mat[2] - m.mat[6] ) / s;
 			  x = (m.mat[1] + m.mat[3] ) / s;
-              y = (float)0.25 * s;
+              y = 0.25f * s;
 			  z = (m.mat[5] + m.mat[7] ) / s;
 			} else {
-              float s	= (float)2.0 * (float)sqrt( (float)1.0 + m.mat[8] - m.mat[0] - m.mat[4] );
+              float s	= (float)2.0 * (float)sqrt( 1.0f + m.mat[8] - m.mat[0] - m.mat[4] );
 			  w = (m.mat[3] - m.mat[1] ) / s;
 			  x = (m.mat[2] + m.mat[6] ) / s;
 			  y = (m.mat[5] + m.mat[7] ) / s;
-              z = (float)0.25 * s;
+              z = 0.25f * s;
 			}
 		}
 	}
@@ -77,7 +77,7 @@ struct AQuaternion {
 		return ret;
 	}
 	
-	void set(const AVector3D &dir,float angle) {
+    void set(const AVector3D &dir, float angle) {
 		float length = dir.length();
 		if(length != 0.0) {
 			length = 1.0f / length;
@@ -91,11 +91,11 @@ struct AQuaternion {
 			w = 1.0;
 		}
 	}
-	void set(float x,float y,float z,float angle) {
-        set(AVector3D(x, y, z),angle);
+    void set(float x, float y, float z, float angle) {
+        set(AVector3D(x, y, z), angle);
 	}
 	
-	void slerp(const AQuaternion &q0,const AQuaternion &q1,float t) {
+    void slerp(const AQuaternion &q0, const AQuaternion &q1, float t) {
 		float k0,k1,cosomega = q0.x * q1.x + q0.y * q1.y + q0.z * q1.z + q0.w * q1.w;
 		AQuaternion q;
 		if(cosomega < 0.0) {
@@ -125,7 +125,7 @@ struct AQuaternion {
 		w = q0.w * k0 + q.w * k1;
 	}
 	
-	AMatrix3D to_matrix() const {
+    AMatrix3D toMatrix() const {
 		AMatrix3D ret;
 		float x2 = x + x;
 		float y2 = y + y;

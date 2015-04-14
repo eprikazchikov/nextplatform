@@ -80,11 +80,9 @@ public:
     };
 
     typedef map<string, AObject *>  objects_map;
-
-    typedef vector<AVariant>        variant_vector;
     typedef list<link_data>         links_list;
 
-    typedef void                (*callback)        (AObject *pThis, const variant_vector &args);
+    typedef void                (*callback)        (AObject *pThis, const AVariant &args);
 
     typedef map<string, property_data>  properties_map;
     typedef map<string, callback>       slots_map;
@@ -160,11 +158,11 @@ public:
 public:
     virtual bool                update                      (float dt);
 
-    virtual void                dispatchEvent               (const string &name, const variant_vector &args);
+    virtual void                dispatchEvent               (const string &name, const AVariant &args);
 
-    virtual void                onEvent                     (const string &name, const variant_vector &args);
+    virtual void                onEvent                     (const string &name, const AVariant &args);
 
-    virtual void                emitSignal                  (const string &name, const variant_vector &args);
+    virtual void                emitSignal                  (const string &name, const AVariant &args);
 
     virtual AVariant            property                    (const string &name);
 

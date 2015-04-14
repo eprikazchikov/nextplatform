@@ -239,9 +239,9 @@ bool AObject::update(float dt) {
     return m_bDelete;
 }
 
-void AObject::dispatchEvent(const string &name, const variant_vector &args) {
+void AObject::dispatchEvent(const string &name, const AVariant &args) {
     if(m_mProperties.find(name) != m_mProperties.end()) {
-        setProperty(name, args.front());
+        setProperty(name, args);
     } else {
         if(m_mSlots.find(name) != m_mSlots.end()) {
             callback call   = m_mSlots[name];
@@ -254,11 +254,11 @@ void AObject::dispatchEvent(const string &name, const variant_vector &args) {
     }
 }
 
-void AObject::onEvent(const string &name, const variant_vector &args) {
+void AObject::onEvent(const string &name, const AVariant &args) {
 
 }
 
-void AObject::emitSignal(const string &name, const variant_vector &args) {
+void AObject::emitSignal(const string &name, const AVariant &args) {
     // Notify connected links
     auto it = m_lLinks.begin();
     for(it; it != m_lLinks.end(); it++) {
@@ -291,7 +291,7 @@ void AObject::setEnable(bool state) {
 void AObject::setProperty(const string &name, const AVariant &value) {
     m_mProperties[name].data    = value;
 
-    emitSignal(name, variant_vector(1, value));
+    emitSignal(name, value);
 }
 
 void AObject::setPropertySettings(const string &name, const int flags, const int type, const int order) {

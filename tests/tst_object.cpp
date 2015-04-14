@@ -83,7 +83,7 @@ void ObjectTest::Emit_signal() {
     ATestObject *obj2   = new ATestObject(0);
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSLOT);
-    obj1->emitSignal(TSIGNAL, AObject::variant_vector(1, TVALUE));
+    obj1->emitSignal(TSIGNAL, TVALUE);
 
     QCOMPARE(obj2->m_bSlot, true);
 
