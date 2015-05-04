@@ -18,6 +18,8 @@
 
 #define SQR(a) (a * a)
 
+#define RANGE(min, max) (min + ((max - min) * ((float)rand() / RAND_MAX)))
+
 #include "math/vector2.h"
 #include "math/vector3.h"
 #include "math/vector4.h"
@@ -27,14 +29,12 @@
 
 #include "math/quaternion.h"
 
-
-
 #include "math/curve.h"
-
+/*
 #include "math/range.h"
 #include "math/range3.h"
-
-
+*/
+#include "math/perlin.h"
 
 #include "math/plane.h"
 
@@ -42,10 +42,6 @@
 #include "math/obb.h"
 
 #include "math/ray.h"
-
-
-
-#include "math/perlin.h"
 
 namespace amath {
     inline void rotate(AVector2D &v, float angle, float x, float y) {

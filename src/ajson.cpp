@@ -145,29 +145,14 @@ AVariant AJson::load(const string &data) {
 string AJson::save(const AVariant &data, int depth) {
     string result;
     switch(data.type()) {
+        case AVariant::BOOL:
+        case AVariant::FLOAT:
+        case AVariant::INT: {
+            result += data.toString();
+        } break;
         case AVariant::STRING: {
             result += '"' + data.toString() + '"';
         } break;
-        case AVariant::MAP: {
-            result += "{";
-            result += FORMAT;
-            unsigned int i = 1;
-            AVariant::AVariantMap map   = data.toMap();
-            for(auto &it: map) {
-                result.append(depth + 1, '\t');
-                result += "\"" + it.first + "\":" + ((depth > -1) ? " " : "") + save(it.second, (depth > -1) ? depth + 1 : depth);
-                result += ((i < map.size()) ? "," : "");
-                result += FORMAT;
-                i++;
-            }
-            if(depth > -1) {
-                result.append(depth, '\t');
-            }
-            result += "}";
-        } break;
-        case AVariant::VECTOR2D:
-        case AVariant::VECTOR3D:
-        case AVariant::VECTOR4D:
         case AVariant::LIST: {
             result += "[";
             result += FORMAT;
@@ -186,7 +171,21 @@ string AJson::save(const AVariant &data, int depth) {
             result += "]";
         } break;
         default: {
-            result += data.toString();
+            result += "{";
+            result += FORMAT;
+            unsigned int i = 1;
+            AVariant::AVariantMap map   = data.toMap();
+            for(auto &it: map) {
+                result.append(depth + 1, '\t');
+                result += "\"" + it.first + "\":" + ((depth > -1) ? " " : "") + save(it.second, (depth > -1) ? depth + 1 : depth);
+                result += ((i < map.size()) ? "," : "");
+                result += FORMAT;
+                i++;
+            }
+            if(depth > -1) {
+                result.append(depth, '\t');
+            }
+            result += "}";
         } break;
     }
     return result;

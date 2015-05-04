@@ -10,10 +10,10 @@ struct AVector3D {
     AVector3D(const AVector3D &v) : x(v.x), y(v.y), z(v.z)          { }
 
     /// Comparison operators
-    int operator==(const AVector3D &v)                          { return (x == v.x) && (y == v.y) && (z == v.z); }
-    int operator!=(const AVector3D &v)                          { return (x != v.x) || (y != v.y) || (z != v.z); }
-    int operator> (const float v)                               { return (x > v) || (y > v) || (z > v); }
-    int operator< (const float v)                               { return (x < v) || (y < v) || (z < v); }
+    bool operator==(const AVector3D &v) const                   { return (x == v.x) && (y == v.y) && (z == v.z); }
+    bool operator!=(const AVector3D &v) const                   { return !(*this == v); }
+    bool operator> (const float v) const                        { return (x > v) || (y > v) || (z > v); }
+    bool operator< (const float v) const                        { return (x < v) || (y < v) || (z < v); }
 
     /// Math operators
     const AVector3D operator*(float f) const                    { return AVector3D(x * f, y * f, z * f); }
@@ -36,8 +36,8 @@ struct AVector3D {
     operator const float*() const                               { return (float*)&x; }
     
     /// Data operators
-    float &operator[](int i)                                    { return ((float*)&x)[i]; }
-    const float operator[](int i) const                         { return ((float*)&x)[i]; }
+    float &operator[](int i)                                    { return v[i]; }
+    const float operator[](int i) const                         { return v[i]; }
     
     /// Functions
     float length() const {

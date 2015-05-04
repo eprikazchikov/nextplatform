@@ -29,8 +29,8 @@ struct AVector4D {
 	AVector4D(const AVector4D &v) : x(v.x), y(v.y), z(v.z), w(v.w)                  { }
 	
     /// Comparison operators
-	int operator==(const AVector4D &v)                          { return (x == v.x) && (y == v.y) && (z == v.z) && (w == v.w); }
-	int operator!=(const AVector4D &v)                          { return (x != v.x) || (y != v.y) || (z != v.z) || (w != v.w); }
+    bool operator==(const AVector4D &v) const                   { return (x == v.x) && (y == v.y) && (z == v.z) && (w == v.w); }
+    bool operator!=(const AVector4D &v) const                   { return !(*this == v); }
 	
     /// Math operators
 	const AVector4D operator*(float f) const                    { return AVector4D(x * f, y * f, z * f, w * f); }
@@ -51,8 +51,8 @@ struct AVector4D {
 	operator const float*() const                               { return (float*)&x; }
 	
     /// Data operators
-	float &operator[](int i)                                    { return ((float*)&x)[i]; }
-	const float operator[](int i) const                         { return ((float*)&x)[i]; }
+    float &operator[](int i)                                    { return v[i]; }
+    const float operator[](int i) const                         { return v[i]; }
 	
     /// Functions
     float length() const {

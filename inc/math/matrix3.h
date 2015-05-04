@@ -88,10 +88,10 @@ struct AMatrix3D {
 	AMatrix3D &operator+=(const AMatrix3D &m) { return *this = *this + m; }
 	AMatrix3D &operator-=(const AMatrix3D &m) { return *this = *this - m; }
 	
-	operator float*() { return mat; }
-	operator const float*() const { return mat; }
+    operator float*()                   { return mat; }
+    operator const float*() const       { return mat; }
 	
-	float &operator[](int i) { return mat[i]; }
+    float &operator[](int i)            { return mat[i]; }
 	const float operator[](int i) const { return mat[i]; }
 	
 	AMatrix3D transpose() const {

@@ -61,12 +61,16 @@ struct AQuaternion {
 			}
 		}
 	}
+
+    /// Comparison operators
+    bool operator==(const AQuaternion &v) const { return (x == v.x) && (y == v.y) && (z == v.z) && (w == v.w); }
+    bool operator!=(const AQuaternion &v) const { return (x != v.x) || (y != v.y) || (z != v.z) || (w != v.w); }
 	
-	operator float*() { return (float*)&x; }
-	operator const float*() const { return (float*)&x; }
+    operator float*()                   { return (float*)&x; }
+    operator const float*() const       { return (float*)&x; }
 	
-	float &operator[](int i) { return ((float*)&x)[i]; }
-	const float operator[](int i) const { return ((float*)&x)[i]; }
+    float &operator[](int i)            { return q[i]; }
+    const float operator[](int i) const { return q[i]; }
 	
 	AQuaternion operator*(const AQuaternion &q) const {
 		AQuaternion ret;

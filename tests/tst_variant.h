@@ -26,15 +26,19 @@ class VariantTest : public QObject {
     Q_OBJECT
 
 private slots:
-    void Set_Get_check();
-    void Value_Copy_to_Shared();
-    void Shared_Copy_to_Value();
-    void Shared_Copy_to_Shared();
-    void Variant_to_List();
+    void Set_Get_Basic_Check();
+    void Set_Get_Advanced_Check();
+    void Value_Copy_to_Shared_Basic();
+    void Value_Copy_to_Shared_Advanced();
+    void Shared_Copy_to_Value_Basic();
+    void Shared_Copy_to_Value_Advanced();
+    void Shared_Copy_to_Shared_Basic();
+    void Shared_Copy_to_Shared_Advanced();
     void Convert_Bool_to_Int_Float_String();
     void Convert_Int_to_Bool_Float_String();
     void Convert_Float_to_Bool_Int_String();
     void Convert_String_to_Bool_Int_Float();
+    void Compare_Variants_Check();
 };
 
 #endif // TST_VARIANT_H

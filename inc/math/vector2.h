@@ -28,8 +28,8 @@ struct AVector2D {
     AVector2D(const AVector2D &v) : x(v.x), y(v.y)              { }
 
     /// Comparison operators
-    int operator==(const AVector2D &v)                          { return (x == v.x) && (y == v.y); }
-    int operator!=(const AVector2D &v)                          { return (x != v.x) || (y != v.y); }
+    bool operator==(const AVector2D &v) const                   { return (x == v.x) && (y == v.y); }
+    bool operator!=(const AVector2D &v) const                   { return !(*this == v); }
 
     /// Math operators
     const AVector2D operator*(float f) const                    { return AVector2D(x * f, y * f); }
@@ -50,8 +50,8 @@ struct AVector2D {
     operator const float*() const                               { return (float*)&x; }
     
     /// Data operators
-    float &operator[](int i)                                    { return ((float*)&x)[i]; }
-    const float operator[](int i) const                         { return ((float*)&x)[i]; }
+    float &operator[](int i)                                    { return v[i]; }
+    const float operator[](int i) const                         { return v[i]; }
     
     /// Functions
     float length() const {

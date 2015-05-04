@@ -157,7 +157,7 @@ struct ARay {
 
         return ret;
     }
-
+    /*
     inline ARay diffuse(const AVector3D &n, const AVector3D &p, ARange &seed) {
         ARay ret;
 
@@ -175,7 +175,7 @@ struct ARay {
 
         return ret;
     }
-
+    */
     AVector3D pos;      // Origin of ray
     AVector3D dir;      // Direction of ray
 };

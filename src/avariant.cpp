@@ -2,6 +2,9 @@
 
 #define SHARED(type) (data.shared) ? *static_cast<type *>(data.base.so)
 
+#define STRUCTURE "__S__"
+#define DATA "__D__"
+
 bool convert(const AVariant::Data &data, AVariant::Type type, void *value) {
     if(!value)
         return false;
@@ -49,39 +52,6 @@ bool convert(const AVariant::Data &data, AVariant::Type type, void *value) {
         default:                { result    = false; } break;
         }
     } break;
-    case AVariant::VECTOR2D: {
-        AVector2D *r    = static_cast<AVector2D *>(value);
-        switch(data.type) {
-        case AVariant::FLOAT:   { *r    = AVector2D(SHARED(float) : data.base.f); } break;
-        case AVariant::INT:     { *r    = AVector2D(SHARED(int) : data.base.i); } break;
-        case AVariant::VECTOR2D:{ *r    = SHARED(AVector2D) : AVector2D(data.v.x, data.v.y); } break;
-        case AVariant::VECTOR3D:{ AVector3D v   = SHARED(AVector3D) : AVector3D(data.v.x, data.v.y, data.v.z); *r = AVector2D(v.x, v.y); } break;
-        case AVariant::VECTOR4D:{ AVector4D v   = SHARED(AVector4D) : data.v; *r = AVector2D(v.x, v.y); } break;
-        default:                { result    = false; } break;
-        }
-    } break;
-    case AVariant::VECTOR3D: {
-        AVector3D *r    = static_cast<AVector3D *>(value);
-        switch(data.type) {
-        case AVariant::FLOAT:   { *r    = AVector3D(SHARED(float) : data.base.f); } break;
-        case AVariant::INT:     { *r    = AVector3D(SHARED(int) : data.base.i); } break;
-        case AVariant::VECTOR2D:{ AVector2D v   = SHARED(AVector2D) : AVector2D(data.v.x, data.v.y); *r = AVector3D(v.x, v.y, 0.0); } break;
-        case AVariant::VECTOR3D:{ *r    = SHARED(AVector3D) : AVector3D(data.v.x, data.v.y, data.v.z); } break;
-        case AVariant::VECTOR4D:{ AVector4D v   = SHARED(AVector4D) : data.v; *r = AVector3D(v.x, v.y, v.z); } break;
-        default:                { result    = false; } break;
-        }
-    } break;
-    case AVariant::VECTOR4D: {
-        AVector4D *r    = static_cast<AVector4D *>(value);
-        switch(data.type) {
-        case AVariant::FLOAT:   { *r    = AVector4D(SHARED(float) : data.base.f); } break;
-        case AVariant::INT:     { *r    = AVector4D(SHARED(int) : data.base.i); } break;
-        case AVariant::VECTOR2D:{ AVector2D v   = SHARED(AVector2D) : AVector2D(data.v.x, data.v.y); *r = AVector4D(v.x, v.y, 0.0, 1.0); } break;
-        case AVariant::VECTOR3D:{ AVector3D v   = SHARED(AVector3D) : AVector3D(data.v.x, data.v.y, data.v.z); *r = AVector4D(v.x, v.y, v.z, 1.0); } break;
-        case AVariant::VECTOR4D:{ *r    = SHARED(AVector4D) : data.v; } break;
-        default:                { result    = false; } break;
-        }
-    } break;
     default: break;
     }
 
@@ -94,6 +64,26 @@ inline T aConversionHelper(const AVariant::Data &data, AVariant::Type type, T va
     convert(data, type, &result);
 
     return result;
+}
+
+template <typename T>
+inline T aFloatArrayHelper(const AVariant::Data &data) {
+    T result;
+    if(data.shared) {
+        result  = *static_cast<T *>(data.base.so);
+    } else {
+        int i = 0;
+        for(auto &it : data.l) {
+            result[i]   = it.toFloat();
+            i++;
+        }
+    }
+    return result;
+}
+
+template <typename T>
+inline void aValueToSharedHelper(const AVariant::Data &data, const AVariant::Data &value) {
+    *static_cast<T *>(data.base.so) = aFloatArrayHelper<T>(value);
 }
 
 AVariant::Data::Data() {
@@ -151,34 +141,59 @@ AVariant::AVariant(const AVariantMap &value) {
 AVariant::AVariant(const AVariantList &value) {
     mData.type      = LIST;
     mData.l         = value;
-
-    AVector4D v;
-    if(toFloatArray(v.v, value)) {
-        switch (value.size()) {
-            case 2: mData.type  = VECTOR2D; break;
-            case 3: mData.type  = VECTOR3D; break;
-            case 4: mData.type  = VECTOR4D; break;
-            default: return;
-        }
-        mData.v = v;
-        mData.l.clear();
-    }
 }
+
 
 AVariant::AVariant(const AVector2D &value) {
     mData.type      = VECTOR2D;
-    mData.v         = AVector4D(value, 0.0f, 1.0f);
+    for(int i = 0; i < 2; i++) {
+        mData.l.push_back(value[i]);
+    }
 }
-
 
 AVariant::AVariant(const AVector3D &value) {
     mData.type      = VECTOR3D;
-    mData.v         = AVector4D(value, 1.0f);
+    for(int i = 0; i < 3; i++) {
+        mData.l.push_back(value[i]);
+    }
 }
 
 AVariant::AVariant(const AVector4D &value) {
     mData.type      = VECTOR4D;
-    mData.v         = value;
+    for(int i = 0; i < 4; i++) {
+        mData.l.push_back(value[i]);
+    }
+}
+
+AVariant::AVariant(const AQuaternion &value) {
+    mData.type      = QUATERNION;
+    for(int i = 0; i < 4; i++) {
+        mData.l.push_back(value[i]);
+    }
+}
+
+AVariant::AVariant(const AMatrix3D &value) {
+    mData.type      = MATRIX3D;
+    for(int i = 0; i < 9; i++) {
+        mData.l.push_back(value[i]);
+    }
+}
+
+AVariant::AVariant(const AMatrix4D &value) {
+    mData.type      = MATRIX4D;
+    for(int i = 0; i < 16; i++) {
+        mData.l.push_back(value[i]);
+    }
+}
+
+AVariant::AVariant(const ACurve &value) {
+    mData.type      = CURVE;
+    for(const ACurvePoint &it : value.mList) {
+        mData.l.push_back(it.mX);
+        mData.l.push_back(it.mY);
+        mData.l.push_back(it.mI);
+        mData.l.push_back(it.mO);
+    }
 }
 
 AVariant::AVariant(bool *value) {
@@ -223,14 +238,62 @@ AVariant::AVariant(AVector4D *value) {
     mData.shared    = true;
 }
 
+AVariant::AVariant(AQuaternion *value) {
+    mData.type      = QUATERNION;
+    mData.base.so   = value;
+    mData.shared    = true;
+}
+
+AVariant::AVariant(AMatrix3D *value) {
+    mData.type      = MATRIX3D;
+    mData.base.so   = value;
+    mData.shared    = true;
+}
+
+AVariant::AVariant(AMatrix4D *value) {
+    mData.type      = MATRIX4D;
+    mData.base.so   = value;
+    mData.shared    = true;
+}
+
+AVariant::AVariant(ACurve *value) {
+    mData.type      = CURVE;
+    mData.base.so   = value;
+    mData.shared    = true;
+}
+
 AVariant::~AVariant() {
 }
 
 AVariant &AVariant::operator=(const AVariant &value) {
     if(mData.shared) {
-        convert(value.mData, mData.type, mData.base.so);
+        switch(mData.type) {
+            case VECTOR2D: {
+                aValueToSharedHelper<AVector2D>     (mData, value.mData);
+            } break;
+            case VECTOR3D: {
+                aValueToSharedHelper<AVector3D>     (mData, value.mData);
+            } break;
+            case VECTOR4D: {
+                aValueToSharedHelper<AVector4D>     (mData, value.mData);
+            } break;
+            case QUATERNION: {
+                aValueToSharedHelper<AQuaternion>   (mData, value.mData);
+            } break;
+            case MATRIX3D: {
+                aValueToSharedHelper<AMatrix3D>     (mData, value.mData);
+            } break;
+            case MATRIX4D: {
+                aValueToSharedHelper<AMatrix4D>     (mData, value.mData);
+            } break;
+            case CURVE: {
+                //aValueToSharedHelper<ACurve *>      (mData, value.mData);
+            } break;
+            default: {
+                convert(value.mData, mData.type, mData.base.so);
+            } break;
+        }
     } else {
-        /// \todo: Need to think about case when value is shared
         mData   = value.mData;
     }
     return *this;
@@ -243,24 +306,10 @@ bool AVariant::operator==(const AVariant &right) const {
         case INT:   return toInt()      == right.toInt();
         case FLOAT: return toFloat()    == right.toFloat();
         case STRING:return toString()   == right.toString();
-        case VECTOR2D: {
-            AVector2D c1    = toVector2D();
-            AVector2D c2    = right.toVector2D();
-            return c1 == c2;
-        }
-        case VECTOR3D:{
-            AVector3D v1    = toVector3D();
-            AVector3D v2    = right.toVector3D();
-            return v1 == v2;
-        }
-        case VECTOR4D: {
-            AVector4D c1    = toVector4D();
-            AVector4D c2    = right.toVector4D();
-            return c1 == c2;
-        }
         case MAP:   return toMap()      == right.toMap();
-        case LIST:  return toList()     == right.toList();
-        default: break;
+        default: {
+            return toList()     == right.toList();
+        }
     }
     return false;
 }
@@ -294,51 +343,36 @@ const string AVariant::toString() const {
     return aConversionHelper<string>(mData, STRING, "");
 }
 
-const AVector2D AVariant::toVector2D() const {
-    return aConversionHelper<AVector2D>(mData, VECTOR2D, AVector2D());
-}
-
-const AVector3D AVariant::toVector3D() const {
-    return aConversionHelper<AVector3D>(mData, VECTOR3D, AVector3D());
-}
-
-const AVector4D AVariant::toVector4D() const {
-    return aConversionHelper<AVector4D>(mData, VECTOR4D, AVector4D());
-}
-
 const AVariant::AVariantMap AVariant::toMap() const {
-    if(mData.type == MAP) {
-        return mData.m;
+    AVariantMap result = mData.m;
+    switch(mData.type) {
+        case VECTOR2D:
+        case VECTOR3D:
+        case VECTOR4D:
+        case QUATERNION:
+        case MATRIX3D:
+        case MATRIX4D:
+        case CURVE: {
+            result[STRUCTURE]   = static_cast<int>(mData.type);
+            result[DATA]        = mData.l;
+        } break;
+        default: break;
     }
-    return AVariantMap();
+
+    return result;
 }
 
 const AVariant::AVariantList AVariant::toList() const {
     switch(mData.type) {
-        case LIST: return mData.l;
-        case VECTOR2D: {
-            AVariantList l;
-            AVector2D v = toVector2D();
-            l.push_back(v.x);
-            l.push_back(v.y);
-            return l;
-        }
-        case VECTOR3D: {
-            AVariantList l;
-            AVector3D v = toVector3D();
-            l.push_back(v.x);
-            l.push_back(v.y);
-            l.push_back(v.z);
-            return l;
-        }
-        case VECTOR4D: {
-            AVariantList l;
-            AVector4D v = toVector4D();
-            l.push_back(v.x);
-            l.push_back(v.y);
-            l.push_back(v.z);
-            l.push_back(v.w);
-            return l;
+        case VECTOR2D:
+        case VECTOR3D:
+        case VECTOR4D:
+        case QUATERNION:
+        case MATRIX3D:
+        case MATRIX4D:
+        case CURVE:
+        case LIST: {
+            return mData.l;
         }
         default: break;
     }
@@ -346,41 +380,56 @@ const AVariant::AVariantList AVariant::toList() const {
     return AVariantList();
 }
 
-void AVariant::appendProperty(const AVariant &value, const string &name) {
-    AVariant v   = value;
-    if(value.mData.type == AVariant::LIST) {
-        AVector4D vector;
-        if(toFloatArray(vector.v, value.mData.l)) {
-            switch(value.mData.l.size()) {
-                case 2: {
-                    v   = AVector2D(vector.x, vector.y);
-                } break;
-                case 3: {
-                    v   = AVector3D(vector.x, vector.y, vector.z);
-                } break;
-                case 4: {
-                    v   = AVector4D(vector.x, vector.y, vector.z, vector.w);
-                } break;
-                default: break;
-            }
-        }
-    }
-
-    if(mData.type == AVariant::MAP) {
-        mData.m[name]   = v;
-    } else if(mData.type == AVariant::LIST) {
-        mData.l.push_back(v);
-    }
+const AVector2D AVariant::toVector2D() const {
+    return aFloatArrayHelper<AVector2D>(mData);
 }
 
-inline bool AVariant::toFloatArray(float *v, const AVariantList &list) {
-    char i  = 0;
-    for(const auto &it: list) {
-        if(it.mData.type == FLOAT) {
-            v[i++]  = it.toFloat();
-        } else {
-            return false;
-        }
+const AVector3D AVariant::toVector3D() const {
+    return aFloatArrayHelper<AVector3D>(mData);
+}
+
+const AVector4D AVariant::toVector4D() const {
+    return aFloatArrayHelper<AVector4D>(mData);
+}
+
+const AQuaternion AVariant::toQuaternion() const {
+    return aFloatArrayHelper<AQuaternion>(mData);
+}
+
+const AMatrix3D AVariant::toMatrix3D() const {
+    return aFloatArrayHelper<AMatrix3D>(mData);
+}
+
+const AMatrix4D AVariant::toMatrix4D() const {
+    return aFloatArrayHelper<AMatrix4D>(mData);
+}
+
+const ACurve AVariant::toCurve() const {
+    ACurve result;
+    for(auto it = mData.l.begin(); it != mData.l.end(); it++) {
+        float x     = (*it).toFloat();
+        it++;
+        AVector3D y = (*it).toVector3D();
+        it++;
+        AVector3D i = (*it).toVector3D();
+        it++;
+        AVector3D o = (*it).toVector3D();
+
+        result.append(x, y, i, o);
     }
-    return true;
+    return result;
+}
+
+void AVariant::appendProperty(const AVariant &value, const string &name) {
+    if(mData.type == AVariant::MAP || mData.type >= VECTOR2D) {
+        if(name == STRUCTURE) {
+            mData.type  = static_cast<Type>(value.toInt());
+        } else if(name == DATA) {
+            mData.l     = value.toList();
+        } else {
+            mData.m[name]   = value;
+        }
+    } else if(mData.type == AVariant::LIST) {
+        mData.l.push_back(value);
+    }
 }

@@ -36,15 +36,20 @@ public:
     /*! \enum Type */
     enum Type {
         NONE                    = 0,
-        BOOL                    = 1,
-        INT                     = 2,
-        FLOAT                   = 3,
-        STRING                  = 4,
-        MAP                     = 8,
-        LIST                    = 9,
-        VECTOR2D                = 5,
-        VECTOR3D                = 6,
-        VECTOR4D                = 7
+        BOOL,
+        INT,
+        FLOAT,
+        STRING,
+        MAP,
+        LIST,
+
+        VECTOR2D                = 10,
+        VECTOR3D,
+        VECTOR4D,
+        QUATERNION,
+        MATRIX3D,
+        MATRIX4D,
+        CURVE
     };
 
     struct Data {
@@ -61,7 +66,6 @@ public:
         } base;
 
         std::string             s;
-        AVector4D               v;
         AVariantMap             m;
         AVariantList            l;
     };
@@ -74,20 +78,30 @@ public:
     AVariant                    (int value);
     AVariant                    (float value);
     AVariant                    (const char *value);
-    AVariant                    (const std::string &value);
+    AVariant                    (const string &value);
     AVariant                    (const AVariantMap &value);
     AVariant                    (const AVariantList &value);
+
     AVariant                    (const AVector2D &value);
     AVariant                    (const AVector3D &value);
     AVariant                    (const AVector4D &value);
+    AVariant                    (const AQuaternion &value);
+    AVariant                    (const AMatrix3D &value);
+    AVariant                    (const AMatrix4D &value);
+    AVariant                    (const ACurve &value);
 
     AVariant                    (bool *value);
     AVariant                    (int *value);
     AVariant                    (float *value);
-    AVariant                    (std::string *value);
+    AVariant                    (string *value);
+
     AVariant                    (AVector2D *value);
     AVariant                    (AVector3D *value);
     AVariant                    (AVector4D *value);
+    AVariant                    (AQuaternion *value);
+    AVariant                    (AMatrix3D *value);
+    AVariant                    (AMatrix4D *value);
+    AVariant                    (ACurve *value);
 
     ~AVariant                   ();
 
@@ -104,17 +118,21 @@ public:
     const int                   toInt                       () const;
     const float                 toFloat                     () const;
     const std::string           toString                    () const;
+
+    const AVariantMap           toMap                       () const;
+    const AVariantList          toList                      () const;
+
     const AVector2D             toVector2D                  () const;
     const AVector3D             toVector3D                  () const;
     const AVector4D             toVector4D                  () const;
-    const AVariantMap           toMap                       () const;
-    const AVariantList          toList                      () const;
+    const AQuaternion           toQuaternion                () const;
+    const AMatrix3D             toMatrix3D                  () const;
+    const AMatrix4D             toMatrix4D                  () const;
+    const ACurve                toCurve                     () const;
 
     void                        appendProperty              (const AVariant &value, const string &name = "");
 
 protected:
-    inline bool                 toFloatArray                (float *v, const AVariantList &list);
-
     Data                        mData;
 
 };
