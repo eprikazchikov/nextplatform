@@ -32,7 +32,10 @@ AObject *AObjectSystem::createObject(const string &uri, AObject *parent) {
     AObject *pObject  = 0;
     factory_map::iterator it    = mFactories.find(uri);
     if(it != mFactories.end()) {
-        pObject = ((*it).second)(parent);
+        pObject = ((*it).second)();
+        if(pObject) {
+            pObject->setParent(parent);
+        }
     }
 
     return pObject;

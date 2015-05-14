@@ -110,7 +110,7 @@ protected:
     AObject                    *m_pParent;
 
 public:
-    AObject                     (AObject *parent = 0);
+    AObject                     ();
     virtual ~AObject            ();
 
     unsigned int                id                          () const;
@@ -143,7 +143,7 @@ public:
 
     bool                        isEnable                    () const;
 
-    static AObject             *callbackClassFactory        (AObject *parent = 0);
+    static AObject             *callbackClassFactory        ();
 
     static void                 registerClassFactory        ();
 
@@ -153,6 +153,8 @@ public:
 
     bool                        operator==                  (const AObject &right) const;
     bool                        operator!=                  (const AObject &right) const;
+
+    static string               typeNameS                   () { return "AObject"; }
 
 // Virtual members
 public:

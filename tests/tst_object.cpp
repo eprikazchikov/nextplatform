@@ -26,8 +26,8 @@
 #include <QtTest>
 
 void ObjectTest::Base_add_remove_link() {
-    AObject *obj1   = new AObject(0);
-    AObject *obj2   = new AObject(0);
+    AObject *obj1   = new AObject();
+    AObject *obj2   = new AObject();
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
@@ -41,8 +41,9 @@ void ObjectTest::Base_add_remove_link() {
 }
 
 void ObjectTest::Child_destructor() {
-    AObject *obj1   = new AObject(0);
-    AObject *obj2   = new AObject(obj1);
+    AObject *obj1   = new AObject();
+    AObject *obj2   = new AObject();
+    obj2->setParent(obj1);
 
     QCOMPARE((int)obj1->getComponents().size(), 1);
 
@@ -53,8 +54,8 @@ void ObjectTest::Child_destructor() {
 }
 
 void ObjectTest::Reciever_destructor() {
-    AObject *obj1   = new AObject(0);
-    AObject *obj2   = new AObject(0);
+    AObject *obj1   = new AObject();
+    AObject *obj2   = new AObject();
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
     QCOMPARE((int)obj1->getLinks().size(), 1);
@@ -66,8 +67,8 @@ void ObjectTest::Reciever_destructor() {
 }
 
 void ObjectTest::Sender_destructor() {
-    AObject *obj1   = new AObject(0);
-    AObject *obj2   = new AObject(0);
+    AObject *obj1   = new AObject();
+    AObject *obj2   = new AObject();
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
     QCOMPARE((int)obj1->getLinks().size(), 1);
@@ -79,8 +80,8 @@ void ObjectTest::Sender_destructor() {
 }
 
 void ObjectTest::Emit_signal() {
-    ATestObject *obj1   = new ATestObject(0);
-    ATestObject *obj2   = new ATestObject(0);
+    ATestObject *obj1   = new ATestObject();
+    ATestObject *obj2   = new ATestObject();
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSLOT);
     obj1->emitSignal(TSIGNAL, TVALUE);
@@ -92,8 +93,8 @@ void ObjectTest::Emit_signal() {
 }
 
 void ObjectTest::Synchronize_property() {
-    ATestObject *obj1   = new ATestObject(0);
-    ATestObject *obj2   = new ATestObject(0);
+    ATestObject *obj1   = new ATestObject();
+    ATestObject *obj2   = new ATestObject();
 
     AObject::addEventListner(obj1, TPROPERTY1, obj2, TPROPERTY1);
     obj1->setProperty(TPROPERTY1, true);
@@ -150,4 +151,11 @@ void ObjectTest::Serialize_Desirialize_Object() {
     QCOMPARE(*dynamic_cast<AObject*>(&obj1), *result);
 
     delete result;
+}
+
+void ObjectTest::Object_Instansing() {
+    ATestObject obj1;
+    ATestObject obj2(obj1);
+
+    QCOMPARE(obj1, obj2);
 }

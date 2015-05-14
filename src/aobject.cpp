@@ -15,15 +15,12 @@
 #define PROPERTIES  "Properties"
 #define COMPONENTS  "Components"
 
-AObject::AObject(AObject *parent) {
+AObject::AObject() {
     m_bEnable   = true;
     m_bDelete   = false;
-
+    m_pParent   = 0;
+    m_sName     = "";
     m_id        = AObjectSystem::instance()->nextId();
-
-    m_sName     = typeName() + "_" +  to_string(m_id);
-
-    setParent(parent);
 }
 
 AObject::~AObject() {
@@ -189,9 +186,9 @@ void AObject::setParent(AObject *parent) {
 void AObject::setName(const string &value) {
     if(!value.empty()) {
         if(m_sName != value && m_pParent) {
-            auto it =  m_pParent->m_mComponents.find(m_sName);
+            auto it = m_pParent->m_mComponents.find(m_sName);
             if(it !=  m_pParent->m_mComponents.end()) {
-                 m_pParent->m_mComponents.erase(it);
+                m_pParent->m_mComponents.erase(it);
             }
 
             m_pParent->setComponent(value, this);
@@ -201,17 +198,32 @@ void AObject::setName(const string &value) {
 }
 
 void AObject::setComponent(const string &name, AObject *value) {
-    if(value && !name.empty()) {
-        auto it = m_mComponents.find(m_sName);
-        if(it != m_mComponents.end()) {
-            delete (*it).second;
-            m_mComponents.erase(it);
+    if(value) {
+        string str  = name;
+        if(str.empty()) {
+            string type = value->typeName();
+            str     = type;
+            int i   = 0;
+            while(true) {
+                if(m_mComponents.find(str) == m_mComponents.end()) {
+                    break;
+                } else {
+                    i++;
+                    str = type + "_" + to_string(i);
+                }
+            }
+        } else {
+            auto it = m_mComponents.find(str);
+            if(it != m_mComponents.end()) {
+                delete (*it).second;
+                m_mComponents.erase(it);
+            }
         }
 
-        m_mComponents[name] = value;
+        m_mComponents[str]  = value;
 
         value->m_pParent    = this;
-        value->m_sName      = name;
+        value->m_sName      = str;
     }
 }
 
@@ -219,13 +231,12 @@ bool AObject::isEnable() const {
     return m_bEnable;
 }
 
-AObject *AObject::callbackClassFactory(AObject *parent) {
-    return new AObject(parent);
+AObject *AObject::callbackClassFactory() {
+    return new AObject();
 }
 
 void AObject::registerClassFactory() {
-    AObject object;
-    AObjectSystem::instance()->factoryAdd(object.typeName(), &AObject::callbackClassFactory);
+    AObjectSystem::instance()->factoryAdd(AObject::typeNameS(), &AObject::callbackClassFactory);
 }
 
 bool AObject::update(float dt) {
@@ -281,7 +292,7 @@ string AObject::reference() const {
 }
 
 string AObject::typeName() const {
-    return "AObject";
+    return typeNameS();
 }
 
 void AObject::setEnable(bool state) {

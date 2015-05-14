@@ -13,8 +13,7 @@
 
 class ATestObject : public AObject {
 public:
-    ATestObject     (AObject *parent = 0) :
-            AObject(parent) {
+    ATestObject     () {
         APROPERTY(TPROPERTY1, &m_bSlot, AObject::READ | AObject::WRITE, NONE, -1)
         APROPERTY(TPROPERTY2, &m_Vector2, AObject::READ | AObject::WRITE, NONE, -1)
 
@@ -25,8 +24,8 @@ public:
         m_Vector2       = AVector2D(1, 0);
     }
 
-    static AObject *callbackClassFactory(AObject *parent = 0) {
-        return new ATestObject(parent);
+    static AObject *callbackClassFactory() {
+        return new ATestObject();
     }
 
     static void     registerClassFactory() {

@@ -6,38 +6,51 @@
 
 void JsonTest::Serialize_Desirialize() {
     AVariant var1(AVariant::MAP);
-    /*
-    var1.appendProperty(true,   "test1");
-    var1.appendProperty("",     "test2");
-    var1.appendProperty(2,      "test3");
-    var1.appendProperty(3.0f,   "test4");
+
+    var1.appendProperty(true,   "bool");
+    var1.appendProperty("",     "str");
+    var1.appendProperty(2,      "int");
+    var1.appendProperty(3.0f,   "float");
 
     AVariant m(AVariant::MAP);
-    m.appendProperty(true,      "test_1");
-    m.appendProperty("true",    "test_2");
-    m.appendProperty(1,         "test_3");
+    m.appendProperty(true,      "bool");
+    m.appendProperty("true",    "str");
+    m.appendProperty(1,         "int");
 
-    var1.appendProperty(m,      "test5");
+    var1.appendProperty(m,      "map");
 
-    var1.appendProperty(AVector2D(1),  "test6");
-    var1.appendProperty(AVector3D(2),  "test7");
-    var1.appendProperty(AVector4D(3),  "test8");
-    var1.appendProperty(AQuaternion(), "test9");
-    var1.appendProperty(AMatrix3D(),   "test10");
-    var1.appendProperty(AMatrix4D(),   "test11");
+    var1.appendProperty(AVector2D(1),  "vec2");
+    var1.appendProperty(AVector3D(2),  "vec3");
+    var1.appendProperty(AVector4D(3),  "vec4");
+    var1.appendProperty(AQuaternion(), "quat");
+    var1.appendProperty(AMatrix3D(),   "mat3");
+    var1.appendProperty(AMatrix4D(),   "mat4");
 
     ACurve curve;
     curve.append(0.0f, AVector3D(1.0f), AVector3D(2.0f), AVector3D(3.0f));
     curve.append(4.0f, AVector3D(5.0f), AVector3D(6.0f), AVector3D(7.0f));
 
-    var1.appendProperty(curve,  "test12");
-    */
+    var1.appendProperty(curve,  "curve");
+
     AVector2D vec2(1);
-    var1.appendProperty(&vec2,  "test13");
+    var1.appendProperty(&vec2,  "* vec2");
 
-    string data = AJson::save(var1);
+    AVector3D vec3(2);
+    var1.appendProperty(&vec3,  "* vec3");
 
-    qDebug() << data.c_str();
+    AVector4D vec4(3);
+    var1.appendProperty(&vec4,  "* vec3");
 
-    QCOMPARE(var1, AJson::load(data));
+    AQuaternion quat;
+    var1.appendProperty(&quat,  "* quat");
+
+    AMatrix3D mat3;
+    var1.appendProperty(&mat3,  "* mat3");
+
+    AMatrix3D mat4;
+    var1.appendProperty(&mat4,  "* mat4");
+
+    var1.appendProperty(&curve, "* curve");
+
+    QCOMPARE(var1, AJson::load(AJson::save(var1)));
 }

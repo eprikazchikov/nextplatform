@@ -301,12 +301,19 @@ AVariant &AVariant::operator=(const AVariant &value) {
 
 bool AVariant::operator==(const AVariant &right) const {
     switch(mData.type) {
-        case NONE:  return (mData.type  == right.mData.type);
-        case BOOL:  return toBool()     == right.toBool();
-        case INT:   return toInt()      == right.toInt();
-        case FLOAT: return toFloat()    == right.toFloat();
-        case STRING:return toString()   == right.toString();
-        case MAP:   return toMap()      == right.toMap();
+        case NONE:          return (mData.type  == right.mData.type);
+        case BOOL:          return toBool()     == right.toBool();
+        case INT:           return toInt()      == right.toInt();
+        case FLOAT:         return toFloat()    == right.toFloat();
+        case STRING:        return toString()   == right.toString();
+        case MAP:           return toMap()      == right.toMap();
+        case VECTOR2D:      return toVector2D() == right.toVector2D();
+        case VECTOR3D:      return toVector3D() == right.toVector3D();
+        case VECTOR4D:      return toVector4D() == right.toVector4D();
+        case QUATERNION:    return toQuaternion()   == right.toQuaternion();
+        case MATRIX3D:      return true;//toMatrix3D() == right.toMatrix3D();
+        case MATRIX4D:      return true;//toMatrix4D() == right.toMatrix4D();
+        case CURVE:         return true;//toCurve()    == right.toCurve();
         default: {
             return toList()     == right.toList();
         }
@@ -345,6 +352,7 @@ const string AVariant::toString() const {
 
 const AVariant::AVariantMap AVariant::toMap() const {
     AVariantMap result = mData.m;
+
     switch(mData.type) {
         case VECTOR2D:
         case VECTOR3D:
@@ -354,7 +362,7 @@ const AVariant::AVariantMap AVariant::toMap() const {
         case MATRIX4D:
         case CURVE: {
             result[STRUCTURE]   = static_cast<int>(mData.type);
-            result[DATA]        = mData.l;
+            result[DATA]        = toList();
         } break;
         default: break;
     }
@@ -363,18 +371,31 @@ const AVariant::AVariantMap AVariant::toMap() const {
 }
 
 const AVariant::AVariantList AVariant::toList() const {
-    switch(mData.type) {
-        case VECTOR2D:
-        case VECTOR3D:
-        case VECTOR4D:
-        case QUATERNION:
-        case MATRIX3D:
-        case MATRIX4D:
-        case CURVE:
-        case LIST: {
-            return mData.l;
+    if(!mData.shared) {
+        switch(mData.type) {
+            case VECTOR2D:
+            case VECTOR3D:
+            case VECTOR4D:
+            case QUATERNION:
+            case MATRIX3D:
+            case MATRIX4D:
+            case CURVE:
+            case LIST: {
+                return mData.l;
+            }
+            default: break;
         }
-        default: break;
+    } else {
+        switch(mData.type) {
+            case VECTOR2D:  return AVariant(*static_cast<AVector2D *>(mData.base.so)).toList();
+            case VECTOR3D:  return AVariant(*static_cast<AVector3D *>(mData.base.so)).toList();
+            case VECTOR4D:  return AVariant(*static_cast<AVector4D *>(mData.base.so)).toList();
+            case QUATERNION:return AVariant(*static_cast<AQuaternion *>(mData.base.so)).toList();
+            case MATRIX3D:  return AVariant(*static_cast<AMatrix3D *>(mData.base.so)).toList();
+            case MATRIX4D:  return AVariant(*static_cast<AMatrix4D *>(mData.base.so)).toList();
+            case CURVE:     return AVariant(*static_cast<ACurve *>(mData.base.so)).toList();
+            default: break;
+        }
     }
 
     return AVariantList();

@@ -10,7 +10,7 @@ class AVariant;
 using namespace std;
 
 // callback_object_factory
-typedef AObject            *(*handler_callback)     (AObject *);
+typedef AObject            *(*handler_callback)     ();
 typedef unordered_map<string, handler_callback>     factory_map;
 
 class AObjectSystem {
