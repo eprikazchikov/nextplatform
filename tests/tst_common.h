@@ -12,29 +12,19 @@
 #define TPROPERTY2  "testProperty2"
 
 class ATestObject : public AObject {
+    ACLASS(ATestObject)
+    AREGISTER(ATestObject, Test)
+
 public:
     ATestObject     () {
-        APROPERTY(TPROPERTY1, &m_bSlot, AObject::READ | AObject::WRITE, NONE, -1)
-        APROPERTY(TPROPERTY2, &m_Vector2, AObject::READ | AObject::WRITE, NONE, -1)
+        APROPERTY(TPROPERTY1, &m_bSlot,     AProperty::READ | AProperty::WRITE, AProperty::NONE, -1)
+        APROPERTY(TPROPERTY2, &m_Vector2,   AProperty::READ | AProperty::WRITE, AProperty::NONE, -1)
 
         ASIGNAL(TSIGNAL)
         ASLOT(TSLOT, ATestObject::testSlot)
 
         m_bSlot         = false;
         m_Vector2       = AVector2D(1, 0);
-    }
-
-    static AObject *callbackClassFactory() {
-        return new ATestObject();
-    }
-
-    static void     registerClassFactory() {
-        ATestObject object;
-        AObjectSystem::instance()->factoryAdd(object.typeName(), &ATestObject::callbackClassFactory);
-    }
-
-    string          typeName        () const {
-        return "ATestObject";
     }
 
     static void     testSlot        (AObject *pThis, const AVariant &args) {

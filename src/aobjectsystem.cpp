@@ -1,6 +1,7 @@
 #include "aobjectsystem.h"
 
-#include "aobject.h"
+#include "alazyobject.h"
+#include "auri.h"
 
 AObjectSystem *AObjectSystem::m_pInstance    = 0;
 
@@ -28,11 +29,14 @@ void AObjectSystem::destroy() {
     m_pInstance = 0;
 }
 
-AObject *AObjectSystem::createObject(const string &uri, AObject *parent) {
-    AObject *pObject  = 0;
-    factory_map::iterator it    = mFactories.find(uri);
+AObject *AObjectSystem::createObject(const string &url, AObject *parent) {
+    AObject *pObject        = 0;
+    factoryMap::iterator it = mFactories.find(url);
+    if(it == mFactories.end()) {
+        it  = mFactories.find(mGroups[url]);
+    }
     if(it != mFactories.end()) {
-        pObject = ((*it).second)();
+        pObject = new ALazyObject((*it).second);
         if(pObject) {
             pObject->setParent(parent);
         }
@@ -41,8 +45,12 @@ AObject *AObjectSystem::createObject(const string &uri, AObject *parent) {
     return pObject;
 }
 
-void AObjectSystem::factoryAdd(const string &uri, handler_callback callback) {
-    mFactories[uri] = callback;
+void AObjectSystem::factoryAdd(const string &uri, AObject *prototype) {
+    if(prototype) {
+        AUri group(uri);
+        mGroups[group.name()]   = uri;
+        mFactories[uri]         = prototype;
+    }
 }
 
 void AObjectSystem::factoryRemove(const string &uri) {
@@ -53,22 +61,8 @@ void AObjectSystem::factoryClear() {
     mFactories.clear();
 }
 
-bool AObjectSystem::factoryFirst(string &uri) {
-    fIterator   = mFactories.begin();
-    if(fIterator != mFactories.end()) {
-        uri     = (*fIterator).first;
-        return true;
-    }
-    return false;
-}
-
-bool AObjectSystem::factoryNext(string &uri) {
-    fIterator++;
-    if(fIterator != mFactories.end()) {
-        uri     = (*fIterator).first;
-        return true;
-    }
-    return false;
+groupMap AObjectSystem::factory() const {
+    return mGroups;
 }
 
 unsigned int AObjectSystem::nextId() {

@@ -14,6 +14,7 @@ public:
     string                      path                        () const;
     string                      query                       () const;
     string                      fragment                    () const;
+    string                      name                        () const;
 
 protected:
     string                      mUri;

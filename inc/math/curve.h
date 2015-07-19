@@ -29,6 +29,14 @@ struct ACurvePoint {
         mX  = x; mY = y; mI = i; mO = o;
     }
 
+    bool operator== (const ACurvePoint &v) const {
+        return (mX == v.mX) && (mY == v.mY) && (mI == v.mI) && (mO == v.mO);
+    }
+
+    bool operator!= (const ACurvePoint &v) const {
+        return !(*this == v);
+    }
+
     float           mX;
     AVector3D       mY;
     AVector3D       mI;
@@ -47,6 +55,19 @@ struct ACurve {
 
     inline ACurve (float x, AVector3D &y, AVector3D &in, AVector3D &out) {
         append (x, y, in, out);
+    }
+
+    /// Comparison operators
+    bool operator== (const ACurve &v) const {
+        for(int i = 0; i < mList.size(); i++) {
+            if(mList[i] != v.mList[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    bool operator!= (const ACurve &v) const {
+        return !(*this == v);
     }
 
     inline void append (ACurvePoint &p) {

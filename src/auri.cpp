@@ -25,3 +25,12 @@ string AUri::query() const {
 string AUri::fragment() const {
     return mResult[9];
 }
+
+string AUri::name() const {
+    string str = path();
+    size_t found = str.rfind('/');
+    if(found != string::npos) {
+        str.replace(0, found + 1, "");
+    }
+    return str;
+}

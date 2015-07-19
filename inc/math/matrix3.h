@@ -88,6 +88,19 @@ struct AMatrix3D {
 	AMatrix3D &operator+=(const AMatrix3D &m) { return *this = *this + m; }
 	AMatrix3D &operator-=(const AMatrix3D &m) { return *this = *this - m; }
 	
+    /// Comparison operators
+    bool operator==(const AMatrix3D &v) const {
+        for(int i = 0; i < 9; i++) {
+            if(mat[i] != v.mat[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    bool operator!=(const AMatrix3D &v) const {
+        return !(*this == v);
+    }
+
     operator float*()                   { return mat; }
     operator const float*() const       { return mat; }
 	

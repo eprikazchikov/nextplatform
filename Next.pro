@@ -7,7 +7,8 @@
 QT       -= gui
 
 !tests {
-    TARGET      = anext
+    Debug:TARGET    = anextd
+    Release:TARGET  = anext
     TEMPLATE    = lib
 
     CONFIG      += staticlib
@@ -42,14 +43,16 @@ SOURCES += \
     src/avariant.cpp \
     src/aobjectsystem.cpp \
     src/ajson.cpp \
-    src/auri.cpp
+    src/auri.cpp \
+    src/alazyobject.cpp
 
 HEADERS += \
     inc/aobject.h \
     inc/avariant.h \
     inc/aobjectsystem.h \
     inc/ajson.h \
-    inc/auri.h
+    inc/auri.h \
+    inc/alazyobject.h
 
 INCLUDEPATH += \
     inc

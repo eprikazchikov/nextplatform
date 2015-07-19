@@ -12,4 +12,5 @@ void UriTest::Parse_URI() {
     QCOMPARE(uri.path().c_str(),    "/path/to/uri");
     QCOMPARE(uri.query().c_str(),   "query");
     QCOMPARE(uri.fragment().c_str(),"fragment");
+    QCOMPARE(uri.name().c_str(),    "uri");
 }

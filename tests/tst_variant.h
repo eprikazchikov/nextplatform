@@ -38,7 +38,8 @@ private slots:
     void Convert_Int_to_Bool_Float_String();
     void Convert_Float_to_Bool_Int_String();
     void Convert_String_to_Bool_Int_Float();
-    void Compare_Variants_Check();
+    void Compare_Variants_Basic();
+    void Compare_Variants_Advanced();
 };
 
 #endif // TST_VARIANT_H

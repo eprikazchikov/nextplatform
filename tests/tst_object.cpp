@@ -99,7 +99,9 @@ void ObjectTest::Synchronize_property() {
     AObject::addEventListner(obj1, TPROPERTY1, obj2, TPROPERTY1);
     obj1->setProperty(TPROPERTY1, true);
 
+    QCOMPARE(obj1->property(TPROPERTY1).isShared(), true);
     QCOMPARE(obj1->property(TPROPERTY1).toBool(), true);
+    QCOMPARE(obj2->property(TPROPERTY1).isShared(), true);
     QCOMPARE(obj2->property(TPROPERTY1).toBool(), true);
 
     delete obj1;
@@ -111,8 +113,8 @@ void ObjectTest::Find_object() {
     ATestObject obj2;
     ATestObject obj3;
 
-    obj1.setComponent("TestComponent2", &obj2);
-    obj1.setComponent("TestComponent3", &obj3);
+    obj1.addComponent("TestComponent2", &obj2);
+    obj1.addComponent("TestComponent3", &obj3);
 
     {
         AUri uri(obj2.reference());
@@ -127,35 +129,4 @@ void ObjectTest::Find_object() {
 
         QCOMPARE(&obj3, result);
     }
-}
-
-void ObjectTest::Serialize_Desirialize_Object() {
-    ATestObject::registerClassFactory();
-
-    ATestObject obj1;
-    ATestObject obj2;
-    ATestObject obj3;
-
-    obj1.setComponent("TestComponent2", &obj2);
-    obj1.setComponent("TestComponent3", &obj3);
-    AObject::addEventListner(&obj1, TSIGNAL, &obj2, TSLOT);
-    AObject::addEventListner(&obj1, TSIGNAL, &obj3, TSLOT);
-    AObject::addEventListner(&obj2, TSIGNAL, &obj3, TSLOT);
-    AObject::addEventListner(&obj1, TPROPERTY1, &obj2, TPROPERTY1);
-    AObject::addEventListner(&obj1, TPROPERTY1, &obj3, TPROPERTY1);
-    AObject::addEventListner(&obj2, TPROPERTY1, &obj3, TPROPERTY1);
-    /// \todo: Invalid order of links
-    AVariant data   = AObject::toVariant(obj1);
-    AObject *result = AObject::toObject(data);
-
-    QCOMPARE(*dynamic_cast<AObject*>(&obj1), *result);
-
-    delete result;
-}
-
-void ObjectTest::Object_Instansing() {
-    ATestObject obj1;
-    ATestObject obj2(obj1);
-
-    QCOMPARE(obj1, obj2);
 }

@@ -46,7 +46,7 @@ bool convert(const AVariant::Data &data, AVariant::Type type, void *value) {
         string *r  = static_cast<string *>(value);
         switch(data.type) {
         case AVariant::BOOL:    { *r    = (SHARED(bool) : data.base.b) ? "true" : "false"; } break;
-        case AVariant::FLOAT:   { *r    = to_string(SHARED(float) : data.base.f);   } break;
+        case AVariant::FLOAT:   { string str    = to_string(SHARED(float) : data.base.f); str.erase(str.find_last_not_of('0') + 1, string::npos ); *r    = str; } break;
         case AVariant::INT:     { *r    = to_string(SHARED(int) : data.base.i);     } break;
         case AVariant::STRING:  { *r    = SHARED(string) : data.s; } break;
         default:                { result    = false; } break;
@@ -97,11 +97,6 @@ AVariant::Data::Data() {
 
 AVariant::AVariant() {
 
-}
-
-AVariant::AVariant(const AVariant &copy) {
-    mData.type  = copy.mData.type;
-    *this       = copy;
 }
 
 AVariant::AVariant(Type type) {
@@ -265,6 +260,30 @@ AVariant::AVariant(ACurve *value) {
 AVariant::~AVariant() {
 }
 
+AVariant AVariant::operator*() {
+    AVariant result;
+    result.mData.type  = mData.type;
+    switch(mData.type) {
+        case BOOL:      result.mData.base.b = toBool();     break;
+        case INT:       result.mData.base.i = toInt();      break;
+        case FLOAT:     result.mData.base.f = toFloat();    break;
+        case STRING:    result.mData.s      = toString();   break;
+        case VECTOR2D:
+        case VECTOR3D:
+        case VECTOR4D:
+        case QUATERNION:
+        case MATRIX3D:
+        case MATRIX4D:
+        case CURVE:
+        case LIST:      result.mData.l      = toList();     break;
+        case MAP:       result.mData.m      = toMap();      break;
+        default: {
+            break;
+        }
+    }
+    return result;
+}
+
 AVariant &AVariant::operator=(const AVariant &value) {
     if(mData.shared) {
         switch(mData.type) {
@@ -287,7 +306,7 @@ AVariant &AVariant::operator=(const AVariant &value) {
                 aValueToSharedHelper<AMatrix4D>     (mData, value.mData);
             } break;
             case CURVE: {
-                //aValueToSharedHelper<ACurve *>      (mData, value.mData);
+                //aValueToSharedHelper<ACurve>        (mData, value.mData);
             } break;
             default: {
                 convert(value.mData, mData.type, mData.base.so);
@@ -311,9 +330,9 @@ bool AVariant::operator==(const AVariant &right) const {
         case VECTOR3D:      return toVector3D() == right.toVector3D();
         case VECTOR4D:      return toVector4D() == right.toVector4D();
         case QUATERNION:    return toQuaternion()   == right.toQuaternion();
-        case MATRIX3D:      return true;//toMatrix3D() == right.toMatrix3D();
-        case MATRIX4D:      return true;//toMatrix4D() == right.toMatrix4D();
-        case CURVE:         return true;//toCurve()    == right.toCurve();
+        case MATRIX3D:      return toMatrix3D() == right.toMatrix3D();
+        case MATRIX4D:      return toMatrix4D() == right.toMatrix4D();
+        case CURVE:         return toCurve()    == right.toCurve();
         default: {
             return toList()     == right.toList();
         }
@@ -448,6 +467,7 @@ void AVariant::appendProperty(const AVariant &value, const string &name) {
         } else if(name == DATA) {
             mData.l     = value.toList();
         } else {
+            mData.shared    = value.mData.shared;
             mData.m[name]   = value;
         }
     } else if(mData.type == AVariant::LIST) {

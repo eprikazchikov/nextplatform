@@ -9,23 +9,21 @@ class AVariant;
 
 using namespace std;
 
-// callback_object_factory
-typedef AObject            *(*handler_callback)     ();
-typedef unordered_map<string, handler_callback>     factory_map;
+typedef unordered_map<string, AObject *>    factoryMap;
+typedef unordered_map<string, string>       groupMap;
 
 class AObjectSystem {
 public:
     static AObjectSystem               *instance                ();
     static void                         destroy                 ();
 
-    AObject                            *createObject            (const string &uri, AObject *parent = 0);
+    AObject                            *createObject            (const string &url, AObject *parent = 0);
 
-    void                                factoryAdd              (const string &uri, handler_callback callback);
+    void                                factoryAdd              (const string &uri, AObject *prototype);
     void                                factoryRemove           (const string &uri);
     void                                factoryClear            ();
 
-    bool                                factoryFirst            (string &uri);
-    bool                                factoryNext             (string &uri);
+    groupMap                            factory                 () const;
 
     unsigned int                        nextId                  ();
 
@@ -39,9 +37,8 @@ private:
     static AObjectSystem               *m_pInstance;
 
     /// Container for registered callbacks.
-    factory_map                         mFactories;
-
-    factory_map::iterator               fIterator;
+    factoryMap                          mFactories;
+    groupMap                            mGroups;
 
     unsigned int                        mNextId;
 

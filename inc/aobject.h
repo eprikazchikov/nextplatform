@@ -25,6 +25,20 @@
 #include <list>
 
 #include <avariant.h>
+#include <aobjectsystem.h>
+
+#define ACLASS(name) \
+public: \
+    virtual const string        typeName                    () const { return typeNameS(); } \
+    static const string         typeNameS                   () { return #name; }
+
+#ifndef AREGISTER
+#define AREGISTER(name, group) \
+public: \
+    static void                 registerClassFactory        () { \
+        AObjectSystem::instance()->factoryAdd(string("thor://") + #group + "/" + name::typeNameS(), new name()); \
+    }
+#endif
 
 #define APROPERTY(name, value, flags, type, order) \
 {\
@@ -32,26 +46,20 @@
     setPropertySettings(name, flags, type, order);\
 }
 
-#define ASIGNAL(name) \
-{\
-    m_mSignals.push_back(name);\
-}
-
-#define ASLOT(name, callback) \
-{\
-    m_mSlots[name] = &callback;\
-}
+#define ASIGNAL(name)           m_mSignals.push_back(name);
+#define ASLOT(name, callback)   m_mSlots[name] = &callback;
 
 using namespace std;
 
-class AObject {
+class AProperty {
 public:
     enum AccessTypes {
         NONE                    = 0,
         READ                    = (1<<0),
         WRITE                   = (1<<1),
         SCHEME                  = (1<<2),
-        EDITOR                  = (1<<3)
+        EDITOR                  = (1<<3),
+        NATIVE                  = (1<<4)
     };
 
     enum UserTypes {
@@ -59,6 +67,28 @@ public:
         COLOR
     };
 
+public:
+    AProperty                   () {
+        flags   = (AccessTypes)(READ | WRITE);
+        type    = NONE;
+        order   = -1;
+    }
+
+public:
+    AVariant                    data;
+
+    AccessTypes                 flags;
+
+    int                         type;
+
+    int                         order;
+};
+
+class AObject {
+    ACLASS(AObject)
+    AREGISTER(AObject, General)
+
+public:
     struct link_data {
         AObject                *sender;
 
@@ -69,24 +99,18 @@ public:
         string                  slot;
     };
 
-    struct property_data {
-        AVariant                data;
+    typedef map<string, AObject *>      objectsMap;
+    typedef list<AObject *>             objectsList;
 
-        AccessTypes             flags;
+    typedef list<link_data>             linksList;
 
-        int                     type;
-
-        int                     order;
-    };
-
-    typedef map<string, AObject *>  objects_map;
-    typedef list<link_data>         links_list;
 
     typedef void                (*callback)        (AObject *pThis, const AVariant &args);
 
-    typedef map<string, property_data>  properties_map;
-    typedef map<string, callback>       slots_map;
-    typedef vector<string>              string_vector;
+    typedef map<string, AProperty>      propertiesMap;
+    typedef map<string, callback>       slotsMap;
+    typedef vector<string>              stringVector;
+    typedef list<string>                stringList;
 
 protected:
     /// Enable object flag
@@ -94,23 +118,28 @@ protected:
     /// Remove object flag
     bool                        m_bDelete;
 
+    bool                        m_bNative;
+
     /// Object ID
     unsigned int                m_id;
     /// Object name
     string                      m_sName;
 
-    objects_map                 m_mComponents;
-    links_list                  m_lLinks;
+    objectsMap                  m_mComponents;
+    linksList                   m_lLinks;
 
-    properties_map              m_mProperties;
-    string_vector               m_mSignals;
-    slots_map                   m_mSlots;
+    propertiesMap               m_mProperties;
+    stringVector                m_mSignals;
+    slotsMap                    m_mSlots;
 
     /// Parent object
     AObject                    *m_pParent;
 
+    objectsList                 m_lModels;
+
 public:
     AObject                     ();
+
     virtual ~AObject            ();
 
     unsigned int                id                          () const;
@@ -120,63 +149,77 @@ public:
 
     string                      reference                   () const;
 
+    void                        addModel                    (AObject *model);
+    void                        removeModel                 (const AObject *model);
+
     static void                 addEventListner             (AObject *sender, const string &signal, AObject *receiver, const string &slot);
     static void                 removeEventListner          (AObject *sender, const string &signal, AObject *receiver, const string &slot);
 
-    void                        addLink                     (const link_data &link);
-    void                        removeLink                  (const link_data &link);
-
     void                        deleteLater                 ();
-
-    objects_map                 getComponents               () const;
-    properties_map              getProperties               () const;
-    string_vector               getSignals                  () const;
-    slots_map                   getSlots                    () const;
-    links_list                  getLinks                    () const;
-    AVariant                    getLinks                    (const string &name) const;
-
-    AObject                    *findObject                  (const string &path);
 
     void                        setParent                   (AObject *parent);
     void                        setName                     (const string &value);
-    void                        setComponent                (const string &name, AObject *value);
+    void                        addComponent                (const string &name, AObject *value);
 
     bool                        isEnable                    () const;
+    bool                        isNative                    () const;
+    bool                        isLinkExist                 (const link_data &link) const;
+    bool                        isPropertyExist             (const string &property) const;
+    bool                        isSignalExist               (const string &signal) const;
+    bool                        isSlotExist                 (const string &slot) const;
 
-    static AObject             *callbackClassFactory        ();
-
-    static void                 registerClassFactory        ();
-
-    static AVariant             toVariant                   (const AObject &object);
+    AVariant                    toVariant                   ();
+    void                        fromVariant                 (const AVariant &variant);
 
     static AObject             *toObject                    (const AVariant &variant, AObject *parent = 0);
 
+    AObject                    &operator=                   (AObject &right);
+
     bool                        operator==                  (const AObject &right) const;
     bool                        operator!=                  (const AObject &right) const;
-
-    static string               typeNameS                   () { return "AObject"; }
 
 // Virtual members
 public:
     virtual bool                update                      (float dt);
 
-    virtual void                dispatchEvent               (const string &name, const AVariant &args);
+    virtual void                dispatchEvent               (const string &name, const AVariant &args = AVariant());
 
-    virtual void                onEvent                     (const string &name, const AVariant &args);
+    virtual void                onEvent                     (const string &name, const AVariant &args = AVariant());
 
-    virtual void                emitSignal                  (const string &name, const AVariant &args);
+    virtual void                emitSignal                  (const string &name, const AVariant &args = AVariant());
 
     virtual AVariant            property                    (const string &name);
 
-    virtual string              typeName                    () const;
+    virtual AProperty           propertySettings            (const string &name);
+
+    virtual objectsMap          getComponents               () const;
+    virtual propertiesMap       getProperties               () const;
+    virtual stringVector        getSignals                  () const;
+    virtual slotsMap            getSlots                    () const;
+    virtual linksList           getLinks                    () const;
+
+    virtual void                addLink                     (link_data &link);
+    virtual void                removeLink                  (const link_data &link);
+
+    virtual void                addSignal                   (const string &signal);
+    virtual void                removeSignal                (const string &signal);
+
+    virtual void                addSlot                     (const string &slot, callback ptr);
+    virtual void                removeSlot                  (const string &slot);
+
+    virtual AObject            *findObject                  (const string &path);
 
     virtual void                setEnable                   (bool state);
 
     virtual void                setProperty                 (const string &name, const AVariant &value);
-    inline void                 setPropertySettings         (const string &name, const int flags, const int type = 0, const int order = -1);
+
+    virtual void                setPropertySettings         (const string &name, const int flags, const int type = 0, const int order = -1);
 };
 
-inline bool                     operator==                  (const AObject::property_data &left, const AObject::property_data &right);
+inline bool                     operator==                  (const AProperty &left, const AProperty &right);
+inline bool                     operator!=                  (const AProperty &left, const AProperty &right);
+
 inline bool                     operator==                  (const AObject::link_data &left, const AObject::link_data &right);
+inline bool                     operator!=                  (const AObject::link_data &left, const AObject::link_data &right);
 
 #endif // AOBJECT_H

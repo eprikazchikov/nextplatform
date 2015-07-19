@@ -72,7 +72,6 @@ public:
 
 public:
     AVariant                    ();
-    AVariant                    (const AVariant &copy);
     AVariant                    (Type type);
     AVariant                    (bool value);
     AVariant                    (int value);
@@ -105,6 +104,7 @@ public:
 
     ~AVariant                   ();
 
+    AVariant                    operator*                   ();
     AVariant                   &operator=                   (const AVariant &value);
 
     bool                        operator==                  (const AVariant &right) const;

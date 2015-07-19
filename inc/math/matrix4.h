@@ -107,7 +107,7 @@ struct AMatrix4D {
         ret[3] = mat[3] - m[3]; ret[7] = mat[7] - m[7]; ret[11] = mat[11] - m[11]; ret[15] = mat[15] - m[15];
         return ret;
     }
-	
+
     AMatrix4D &operator*=(float f) {
         return *this = *this * f;
     }
@@ -122,6 +122,19 @@ struct AMatrix4D {
 
     AMatrix4D &operator-=(const AMatrix4D &m) {
         return *this = *this - m;
+    }
+
+    /// Comparison operators
+    bool operator==(const AMatrix4D &v) const {
+        for(int i = 0; i < 16; i++) {
+            if(mat[i] != v.mat[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    bool operator!=(const AMatrix4D &v) const {
+        return !(*this == v);
     }
 	
     operator float*() {

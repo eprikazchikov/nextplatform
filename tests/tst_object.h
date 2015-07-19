@@ -33,8 +33,7 @@ private slots:
     void Emit_signal();
     void Synchronize_property();
     void Find_object();
-    void Serialize_Desirialize_Object();
-    void Object_Instansing();
+
 };
 
 #endif // TST_OBJECT_H
