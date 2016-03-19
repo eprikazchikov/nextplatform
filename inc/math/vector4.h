@@ -26,29 +26,29 @@ struct AVector4D {
     AVector4D(float x, float y, float z, float w) : x(x), y(y), z(z), w(w)          { }
     AVector4D(const AVector2D &v, float z, float w) : x(v.x), y(v.y), z(z), w(w)    { }
     AVector4D(const AVector3D &v, float w) : x(v.x), y(v.y), z(v.z), w(w)           { }
-	AVector4D(const AVector4D &v) : x(v.x), y(v.y), z(v.z), w(v.w)                  { }
+    AVector4D(const AVector4D &v) : x(v.x), y(v.y), z(v.z), w(v.w)                  { }
 	
     /// Comparison operators
     bool operator==(const AVector4D &v) const                   { return (x == v.x) && (y == v.y) && (z == v.z) && (w == v.w); }
     bool operator!=(const AVector4D &v) const                   { return !(*this == v); }
 	
     /// Math operators
-	const AVector4D operator*(float f) const                    { return AVector4D(x * f, y * f, z * f, w * f); }
+    const AVector4D operator*(float f) const                    { return AVector4D(x * f, y * f, z * f, w * f); }
     const AVector4D operator*(const AVector4D &v) const         { return AVector4D(x * v.x, y * v.y, z * v.z, w * v.w); }
-	const AVector4D operator/(float f) const                    { return AVector4D(x / f, y / f, z / f, w / f); }
-	const AVector4D operator+(const AVector4D &v) const         { return AVector4D(x + v.x, y + v.y, z + v.z, w + v.w); }
-	const AVector4D operator-() const                           { return AVector4D(-x, -y, -z, -w); }
-	const AVector4D operator-(const AVector4D &v) const         { return AVector4D(x - v.x, y - v.y, z - v.z, z - v.w); }
+    const AVector4D operator/(float f) const                    { return AVector4D(x / f, y / f, z / f, w / f); }
+    const AVector4D operator+(const AVector4D &v) const         { return AVector4D(x + v.x, y + v.y, z + v.z, w + v.w); }
+    const AVector4D operator-() const                           { return AVector4D(-x, -y, -z, -w); }
+    const AVector4D operator-(const AVector4D &v) const         { return AVector4D(x - v.x, y - v.y, z - v.z, z - v.w); }
 	
     /// Increment operators
-	AVector4D &operator*=(float f)                              { return *this = *this * f; }
-	AVector4D &operator/=(float f)                              { return *this = *this / f; }
-	AVector4D &operator+=(const AVector4D &v)                   { return *this = *this + v; }
-	AVector4D &operator-=(const AVector4D &v)                   { return *this = *this - v; }
+    AVector4D &operator*=(float f)                              { return *this = *this * f; }
+    AVector4D &operator/=(float f)                              { return *this = *this / f; }
+    AVector4D &operator+=(const AVector4D &v)                   { return *this = *this + v; }
+    AVector4D &operator-=(const AVector4D &v)                   { return *this = *this - v; }
 	
     /// Adress operators
-	operator float*()                                           { return (float*)&x; }
-	operator const float*() const                               { return (float*)&x; }
+    operator float*()                                           { return (float*)&x; }
+    operator const float*() const                               { return (float*)&x; }
 	
     /// Data operators
     float &operator[](int i)                                    { return v[i]; }
@@ -72,12 +72,12 @@ struct AVector4D {
         return x * v.x + y * v.y + z * v.z + w * v.w;
     }
 
-	union {
+    union {
         struct {
             float x, y, z, w;
         };
         float v[4];
-	};
+    };
 };
 
 #endif /* MATH_H_HEADER_INCLUDED */

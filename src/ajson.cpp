@@ -4,7 +4,7 @@
 
 #define J_TRUE  "true"
 #define J_FALSE "false"
-#define J_NULL  "null"
+#define J_NULL  "nul"
 
 #define FORMAT (depth > -1) ? "\n" : "";
 
@@ -25,10 +25,10 @@ AVariant AJson::load(const string &data) {
     AVariant result;
 
     stack<AVariant> s;
-    stack<string>   n;
+    stack<string>  n;
     string name;
     States state    = propertyValue;
-    unsigned int it = 0;
+    uint32_t it     = 0;
     while(it < data.length()) {
         skipSpaces(data.c_str(), it);
         switch(data[it]) {
@@ -93,9 +93,9 @@ AVariant AJson::load(const string &data) {
             case '8':
             case '9':
             case '-': {
-                unsigned int st = it;
-                char c          = 0;
-                bool number     = false;
+                uint32_t st = it;
+                char c      = 0;
+                bool number = false;
                 while(it < data.length()) {
                     c = data[++it];
                     if(!isDigit(c) && c != '.') {
@@ -142,7 +142,7 @@ AVariant AJson::load(const string &data) {
     return result;
 }
 
-string AJson::save(const AVariant &data, int depth) {
+string AJson::save(const AVariant &data, int32_t depth) {
     string result;
     switch(data.type()) {
         case AVariant::BOOL:
@@ -156,7 +156,7 @@ string AJson::save(const AVariant &data, int depth) {
         case AVariant::LIST: {
             result += "[";
             result += FORMAT;
-            unsigned int i = 1;
+            uint32_t i = 1;
             AVariant::AVariantList list = data.toList();
             for(auto &it: list) {
                 result.append(depth + 1, '\t');
@@ -173,7 +173,7 @@ string AJson::save(const AVariant &data, int depth) {
         default: {
             result += "{";
             result += FORMAT;
-            unsigned int i = 1;
+            uint32_t i = 1;
             AVariant::AVariantMap map   = data.toMap();
             for(auto &it: map) {
                 result.append(depth + 1, '\t');
@@ -191,8 +191,8 @@ string AJson::save(const AVariant &data, int depth) {
     return result;
 }
 
-inline string AJson::readString(const string &data, unsigned int &it) {
-    unsigned int s  = ++it;
+inline string AJson::readString(const string &data, uint32_t &it) {
+    uint32_t s  = ++it;
     char c          = data[s];
     while(it < data.length() && c != '"') {
         c = data[++it];
@@ -203,16 +203,16 @@ inline string AJson::readString(const string &data, unsigned int &it) {
     return data.substr(s, it - s);
 }
 
-inline void AJson::skipSpaces(const char *data, unsigned int &it) {
+inline void AJson::skipSpaces(const char *data, uint32_t &it) {
     while(isSpace(data[it])) {
         it++;
     }
 }
 
-inline bool AJson::isSpace(char c) {
+inline bool AJson::isSpace(uint8_t c) {
     return c == ' ' || c == '\t' || c == '\r' || c == '\n';
 }
 
-inline bool AJson::isDigit(char c) {
+inline bool AJson::isDigit(uint8_t c) {
     return c >= '0' && c <= '9';
 }

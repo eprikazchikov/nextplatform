@@ -43,11 +43,17 @@ void ObjectTest::Base_add_remove_link() {
 void ObjectTest::Child_destructor() {
     AObject *obj1   = new AObject();
     AObject *obj2   = new AObject();
+    AObject *obj3   = new AObject();
     obj2->setParent(obj1);
+    obj3->setParent(obj1);
 
-    QCOMPARE((int)obj1->getComponents().size(), 1);
+    QCOMPARE((int)obj1->getComponents().size(), 2);
 
     delete obj2;
+    QCOMPARE((int)obj1->getComponents().size(), 1);
+
+    obj3->deleteLater();
+    obj1->update(0);
     QCOMPARE((int)obj1->getComponents().size(), 0);
 
     delete obj1;
@@ -113,6 +119,7 @@ void ObjectTest::Find_object() {
     ATestObject obj2;
     ATestObject obj3;
 
+    obj1.setName("Daddy");
     obj1.addComponent("TestComponent2", &obj2);
     obj1.addComponent("TestComponent3", &obj3);
 

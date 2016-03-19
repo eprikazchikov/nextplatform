@@ -8,12 +8,15 @@ struct AVector3D {
     AVector3D(float x, float y, float z) : x(x), y(y), z(z)         { }
     AVector3D(const AVector2D &v, float z) : x(v.x), y(v.y), z(z)   { }
     AVector3D(const AVector3D &v) : x(v.x), y(v.y), z(v.z)          { }
+    AVector3D(const float *v) : x(v[0]), y(v[1]), z(v[2])           { }
 
     /// Comparison operators
     bool operator==(const AVector3D &v) const                   { return (x == v.x) && (y == v.y) && (z == v.z); }
     bool operator!=(const AVector3D &v) const                   { return !(*this == v); }
     bool operator> (const float v) const                        { return (x > v) || (y > v) || (z > v); }
+    bool operator> (const AVector3D &v) const                   { return (x > v.x) && (y > v.y) && (z > v.z); }
     bool operator< (const float v) const                        { return (x < v) || (y < v) || (z < v); }
+    bool operator< (const AVector3D &v) const                   { return (x < v.x) && (y < v.y) && (z < v.z); }
 
     /// Math operators
     const AVector3D operator*(float f) const                    { return AVector3D(x * f, y * f, z * f); }

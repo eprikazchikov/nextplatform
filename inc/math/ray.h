@@ -8,12 +8,14 @@ struct ARay {
     inline bool intersect(const AVector3D &p, float r, AVector3D *pt) {
         AVector3D l = p - pos;
         float tca   = l.dot(dir);
-        if(tca < 0)
+        if(tca < 0) {
             return false;
+        }
 
         float d2    = l.dot(l) - tca * tca;
-        if(d2 > r * r)
+        if(d2 > r * r) {
             return false;
+        }
 
         if(pt) {
             float thc   = sqrt(r * r - d2);
@@ -29,21 +31,27 @@ struct ARay {
         return true;
     }
 
-    inline bool intersect(APlane &p, AVector3D *pt, bool back = false) {
-        float d = dir.dot(p.normal);
+    inline bool intersect(const APlane &p, AVector3D *pt, bool back = false) {
+        AVector3D n = p.normal;
+        float d     = dir.dot(n);
         if(d >= 0.0f) {
-            if(back)
-                p.normal    = -p.normal;
-            else
+            if(back) {
+                n   = -n;
+                d   = dir.dot(n);
+            } else {
                 return false;
+            }
         }
 
-        float t = p.normal.dot(p.normal * p.d - pos) / d;
-        if(t <= 0.0)
+        //float t = p.normal.dot(p.normal * p.d - pos) / d;
+        float t = -n.dot(pos - p.point) / d;
+        if(t <= 0.0) {
             return false;
+        }
 
-        if(pt)
+        if(pt) {
             *pt = pos + dir * t;
+        }
 
         return true;
     }
@@ -71,48 +79,55 @@ struct ARay {
         }
 
         if(inside)	{
-            if(pt)
+            if(pt) {
                 *pt = pos;
+            }
              return true;
         }
 
         AVector3D maxT;
         for(int i = 0; i < 3; i++) {
-            if(quadrant[i] != 2 && dir[i] != 0.0f)
+            if(quadrant[i] != 2 && dir[i] != 0.0f) {
                 maxT[i] = (candidate[i] - pos[i]) / dir[i];
-            else
+            } else {
                 maxT[i] = -1.0f;
+            }
         }
 
         int whichPlane = 0;
         for(int i = 1; i < 3; i++) {
-            if(maxT[whichPlane] < maxT[i])
+            if(maxT[whichPlane] < maxT[i]) {
                 whichPlane = i;
+            }
         }
 
-        if(maxT[whichPlane] < 0.0f)
+        if(maxT[whichPlane] < 0.0f) {
             return false;
+        }
 
         AVector3D coord;
         for(int i = 0; i < 3; i++) {
             if(whichPlane != i) {
                 coord[i] = pos[i] + maxT[whichPlane] * dir[i];
-                if(coord[i] < min[i] || coord[i] > max[i])
+                if(coord[i] < min[i] || coord[i] > max[i]) {
                     return false;
+                }
             } else {
                 coord[i] = candidate[i];
             }
         }
-        if(pt)
+        if(pt) {
             *pt = coord;
+        }
 
         return true;
     }
 
     inline bool intersect(const AVector3D &v1, const AVector3D &v2, const AVector3D &v3, AVector3D *pt, bool back = false) {
         AVector3D ip;
-        if(!intersect(APlane(v1, v2, v3), &ip, back))
+        if(!intersect(APlane(v1, v2, v3), &ip, back)) {
             return false;
+        }
 
         AVector3D ve0   = v3 - v1;
         AVector3D ve1   = v2 - v1;
@@ -126,8 +141,9 @@ struct ARay {
         AVector2D b     = AVector2D((dot11 * dot02 - dot01 * dot12) * invDenom, (dot00 * dot12 - dot01 * dot02) * invDenom);
 
         if((b.x >= 0) && (b.y >= 0) && (b.x + b.y <= 1.0f)) {
-            if(pt)
+            if(pt) {
                 *pt     = ip;
+            }
             return true;
         }
 
@@ -157,12 +173,12 @@ struct ARay {
 
         return ret;
     }
-    /*
-    inline ARay diffuse(const AVector3D &n, const AVector3D &p, ARange &seed) {
+
+    inline ARay diffuse(const AVector3D &n, const AVector3D &p, float min, float max) {
         ARay ret;
 
-        float r1    = (float)2.0 * PI * seed.frand();
-        float r2    = seed.frand();
+        float r1    = (float)2.0 * PI * RANGE(min, max);
+        float r2    = RANGE(min, max);
         float r2s   = sqrt(r2);
 
         AVector3D u = (fabs(n.x) > .1 ? AVector3D(0, 1, 0) : AVector3D(1)) % n;
@@ -175,7 +191,7 @@ struct ARay {
 
         return ret;
     }
-    */
+
     AVector3D pos;      // Origin of ray
     AVector3D dir;      // Direction of ray
 };

@@ -2,9 +2,12 @@
 
 #include "auri.h"
 
+#include "atools.h"
+
 #define TYPE        "Type"
 #define NAME        "Name"
 #define DATA        "Data"
+#define GROUP       "Group"
 #define FLAGS       "Flags"
 #define ORDER       "Order"
 #define LINKS       "Links"
@@ -19,9 +22,11 @@ AObject::AObject() {
     m_bEnable       = true;
     m_bDelete       = false;
     m_bNative       = false;
+    m_pSystem       = 0;
     m_pParent       = 0;
+    m_pPrototype    = 0;
     m_sName         = "";
-    m_id            = AObjectSystem::instance()->nextId();
+    m_sType         = "";
 }
 
 AObject::~AObject() {
@@ -54,18 +59,22 @@ AObject::~AObject() {
             m_pParent->m_mComponents.erase(it);
         }
     }
-}
 
-unsigned int AObject::id() const {
-    return m_id;
+    if(m_pPrototype) {
+        m_pPrototype->removeModel(this);
+    }
 }
 
 AObject *AObject::parent() const {
     return m_pParent;
 }
 
-AObject *AObject::component(string &name) {
-    return m_mComponents[name];
+AObject *AObject::component(const string &name) {
+    auto it = m_mComponents.find(name);
+    if(it != m_mComponents.end()) {
+        return (*it).second;
+    }
+    return 0;
 }
 
 string AObject::name() const {
@@ -74,6 +83,7 @@ string AObject::name() const {
 
 void AObject::addModel(AObject *model) {
     m_lModels.push_back(model);
+    model->setPrototype(this);
 }
 
 void AObject::removeModel(const AObject *model) {
@@ -81,6 +91,63 @@ void AObject::removeModel(const AObject *model) {
         if(*it == model) {
             m_lModels.erase(it);
             return;
+        }
+    }
+}
+
+void AObject::setPrototype(AObject *prototype) {
+    m_pPrototype    = prototype;
+}
+
+AVariant AObject::linksToVariant(const string &name) const {
+    AVariant result(AVariant::LIST);
+    for(const auto &it : m_lLinks) {
+        if(it.sender == this && it.signal == name) {
+            result.appendProperty(it.receiver->reference() + "?" + it.slot, it.signal);
+        } else if(it.receiver == this && it.slot == name) {
+            result.appendProperty(it.sender->reference() + "#" + it.signal, it.slot);
+        }
+    }
+    return result;
+}
+
+AVariant AObject::propertyToVariant(const string &name) {
+    AVariant result(AVariant::MAP);
+
+    if(isPropertyExist(name)) {
+        AProperty p = propertySettings(name);
+
+        result.appendProperty(name,     NAME);
+        result.appendProperty(p.flags,  FLAGS);
+        result.appendProperty(p.group,  GROUP);
+        result.appendProperty(p.data,   DATA);
+        result.appendProperty(p.type,   TYPE);
+        result.appendProperty(p.order,  ORDER);
+        result.appendProperty(linksToVariant(name), LINKS);
+    }
+
+    return result;
+}
+
+AVariant AObject::slotToVariant(const string &name) {
+    AVariant result(AVariant::MAP);
+
+    if(isSlotExist(name)) {
+        result.appendProperty(name, NAME);
+        result.appendProperty(linksToVariant(name), LINKS);
+    }
+
+    return result;
+}
+
+void AObject::addEventListner(const string &name, const string &reference) {
+    AUri uri(reference);
+    AObject *o  = findObject(uri.path());
+    if(o) {
+        if(uri.fragment().empty()) {
+            addEventListner(this, name, o, uri.query());
+        } else {
+            addEventListner(o, uri.fragment(), this, name);
         }
     }
 }
@@ -112,6 +179,10 @@ void AObject::removeEventListner(AObject *sender, const string &signal, AObject 
 }
 
 void AObject::addLink(link_data &link) {
+    for(auto &it : m_lModels) {
+        it->addLink(link);
+    }
+
     /// \todo: Place for link_mutex
     if(!isLinkExist(link)) {
         m_lLinks.push_back(link);
@@ -119,6 +190,10 @@ void AObject::addLink(link_data &link) {
 }
 
 void AObject::removeLink(const link_data &link) {
+    for(auto &it : m_lModels) {
+        it->removeLink(link);
+    }
+
     for(auto it = m_lLinks.begin(); it != m_lLinks.end(); it++) {
         link_data *data = &(*it);
         if(data->sender == link.sender && data->signal == link.signal && data->receiver == link.receiver && data->slot == link.slot) {
@@ -130,6 +205,10 @@ void AObject::removeLink(const link_data &link) {
 }
 
 void AObject::addSignal(const string &signal) {
+    for(auto &it : m_lModels) {
+        it->addSignal(signal);
+    }
+
     /// \todo: Place for signal_mutex
     if(!isSignalExist(signal)) {
         m_mSignals.push_back(signal);
@@ -137,6 +216,10 @@ void AObject::addSignal(const string &signal) {
 }
 
 void AObject::removeSignal(const string &signal) {
+    for(auto &it : m_lModels) {
+        it->removeSignal(signal);
+    }
+
     for(auto it = m_mSignals.begin(); it != m_mSignals.end(); it++) {
         if(*it == signal) {
             /// \todo: Place for signal_mutex
@@ -147,6 +230,10 @@ void AObject::removeSignal(const string &signal) {
 }
 
 void AObject::addSlot(const string &slot, callback ptr) {
+    for(auto &it : m_lModels) {
+        it->addSlot(slot, ptr);
+    }
+
     /// \todo: Place for slot_mutex
     if(!isSignalExist(slot)) {
         m_mSlots[slot]  = ptr;
@@ -154,6 +241,10 @@ void AObject::addSlot(const string &slot, callback ptr) {
 }
 
 void AObject::removeSlot(const string &slot) {
+    for(auto &it : m_lModels) {
+        it->removeSlot(slot);
+    }
+
     auto it = m_mSlots.find(slot);
     if(it != m_mSlots.end()) {
         /// \todo: Place for slot_mutex
@@ -165,23 +256,23 @@ void AObject::deleteLater() {
     m_bDelete   = true;
 }
 
-AObject::objectsMap AObject::getComponents() const {
+AObject::objectsMap &AObject::getComponents() {
     return m_mComponents;
 }
 
-AObject::propertiesMap AObject::getProperties() const {
+AObject::propertiesMap &AObject::getProperties() {
     return m_mProperties;
 }
 
-AObject::stringVector AObject::getSignals() const {
+const AObject::stringVector &AObject::getSignals() {
     return m_mSignals;
 }
 
-AObject::slotsMap AObject::getSlots() const {
+AObject::slotsMap &AObject::getSlots() {
     return m_mSlots;
 }
 
-AObject::linksList AObject::getLinks() const {
+AObject::linksList &AObject::getLinks() {
     return m_lLinks;
 }
 
@@ -209,6 +300,10 @@ AObject *AObject::findObject(const string &path) {
     return 0;
 }
 
+void AObject::setSystem(AObjectSystem *system) {
+    m_pSystem   = system;
+}
+
 void AObject::setParent(AObject *parent) {
     if(parent) {
         parent->addComponent(m_sName, this);
@@ -229,6 +324,10 @@ void AObject::setName(const string &value) {
         }
         m_sName = value;
     }
+}
+
+void AObject::setType(const string &value) {
+    m_sType = value;
 }
 
 void AObject::addComponent(const string &name, AObject *value) {
@@ -274,7 +373,7 @@ bool AObject::isLinkExist(const link_data &link) const {
 }
 
 bool AObject::isPropertyExist(const string &property) const {
-    return (m_mSlots.find(property) != m_mSlots.end());
+    return (m_mProperties.find(property) != m_mProperties.end());
 }
 
 bool AObject::isSignalExist(const string &signal) const {
@@ -292,11 +391,15 @@ bool AObject::isSlotExist(const string &slot) const {
 
 bool AObject::update(float dt) {
     auto it = m_mComponents.begin();
-    for(it; it != m_mComponents.end(); it++) {
+    while(it != m_mComponents.end()) {
         AObject *c  = it->second;
         if(c && c->update(dt)) {
+            it  = m_mComponents.erase(it);
+            c->setParent(0);
             delete c;
+            continue;
         }
+        it++;
     }
 
     return m_bDelete;
@@ -339,7 +442,17 @@ string AObject::reference() const {
     if(m_pParent) {
         return m_pParent->reference() + "/" + m_sName;
     }
-    return string("thor://" + AObjectSystem::instance()->systemName() + "/" + m_sName);
+    return string("thor://") + ((m_pSystem) ? m_pSystem->systemName() : "system") + "/" + m_sName;
+}
+
+AObject *AObject::createInstance() {
+    AObject *result = objectFactory();
+    if(result) {
+        result->setSystem(m_pSystem);
+        addModel(result);
+        *result = *this;
+    }
+    return result;
 }
 
 void AObject::setEnable(bool state) {
@@ -347,7 +460,14 @@ void AObject::setEnable(bool state) {
 }
 
 void AObject::setProperty(const string &name, const AVariant &value) {
-    m_mProperties[name].data = value;
+    AProperty &left = m_mProperties[name];
+    for(auto &it : m_lModels) {
+        AProperty &right    = it->m_mProperties[name];
+        if(left == right) {
+            it->setProperty(name, value);
+        }
+    }
+    left.data = value;
 
     emitSignal(name, value);
 }
@@ -356,10 +476,11 @@ AProperty AObject::propertySettings(const string &name) {
     return m_mProperties[name];
 }
 
-void AObject::setPropertySettings(const string &name, const int flags, const int type, const int order) {
+void AObject::setPropertySettings(const string &name, const int flags, const string &group, const string &type, const int order) {
     auto &it    = m_mProperties[name];
     if(!(it.flags & AProperty::NATIVE)) {
         it.flags    = (AProperty::AccessTypes)flags;
+        it.group    = group;
         it.type     = type;
         it.order    = order;
     }
@@ -376,17 +497,12 @@ AVariant AObject::toVariant() {
     {
         AVariant s(AVariant::LIST);
         for(const auto &it : m_mProperties) {
-            AVariant v(AVariant::MAP);
+            AVariant left   = propertyToVariant(it.first);
+            if(m_pPrototype && left == m_pPrototype->propertyToVariant(it.first)) {
+                continue;
+            }
 
-            AProperty p = propertySettings(it.first);
-
-            v.appendProperty(it.first,  NAME);
-            v.appendProperty(p.flags,   FLAGS);
-            v.appendProperty(p.data,    DATA);
-            v.appendProperty(p.type,    TYPE);
-            v.appendProperty(p.order,   ORDER);
-
-            s.appendProperty(v);
+            s.appendProperty(left);
         }
         result.appendProperty(s, PROPERTIES);
     }
@@ -394,7 +510,23 @@ AVariant AObject::toVariant() {
     {
         AVariant s(AVariant::LIST);
         for(const auto &it : m_mSignals) {
-            s.appendProperty(it);
+            AVariant left(AVariant::MAP);
+
+            left.appendProperty(it, NAME);
+            left.appendProperty(linksToVariant(it), LINKS);
+
+            if(m_pPrototype) {
+                AVariant right(AVariant::MAP);
+                /// \todo: Should we find this signal at first?
+                right.appendProperty(it, NAME);
+                right.appendProperty(m_pPrototype->linksToVariant(it), LINKS);
+
+                if(left == right) {
+                    continue;
+                }
+            }
+
+            s.appendProperty(left);
         }
         result.appendProperty(s, SIGNALS);
     }
@@ -402,7 +534,12 @@ AVariant AObject::toVariant() {
     {
         AVariant s(AVariant::LIST);
         for(const auto &it : m_mSlots) {
-            s.appendProperty(it.first);
+            AVariant left   = slotToVariant(it.first);
+            if(m_pPrototype && left == m_pPrototype->slotToVariant(it.first)) {
+                continue;
+            }
+
+            s.appendProperty(left);
         }
         result.appendProperty(s, SLOTS);
     }
@@ -411,24 +548,20 @@ AVariant AObject::toVariant() {
         AVariant components(AVariant::MAP);
         for(const auto &it : m_mComponents) {
             if(it.second) {
-                components.appendProperty(*it.second->toVariant(), it.first);
+                AVariant left   = *it.second->toVariant();
+                if(m_pPrototype) {
+                    AObject *c  = m_pPrototype->component(it.first);
+                    if(c && left == c->toVariant()) {
+                        continue;
+                    }
+                }
+
+                components.appendProperty(left, it.first);
             } else {
                 components.appendProperty(NULL, it.first);
             }
         }
         result.appendProperty(components, COMPONENTS);
-    }
-
-    {
-        AVariant s(AVariant::MAP);
-        for(const auto &it : m_lLinks) {
-            if(it.sender == this) {
-                s.appendProperty(it.receiver->reference() + "?" + it.slot, it.signal);
-            } else if(it.receiver == this) {
-                s.appendProperty(it.sender->reference() + "#" + it.signal, it.slot);
-            }
-        }
-        result.appendProperty(s, LINKS);
     }
 
     return result;
@@ -439,58 +572,59 @@ void AObject::fromVariant(const AVariant &variant) {
 
     setName(map[NAME].toString());
     setEnable(map[ENABLE].toBool());
+    setType(map[TYPE].toString());
 
     {
         for(const auto &it : map[PROPERTIES].toList()) {
-            AVariant::AVariantMap p = it.toMap();
-            setProperty(p[NAME].toString(), p[DATA]);
-            setPropertySettings(p[NAME].toString(), p[FLAGS].toInt(), p[TYPE].toInt(), p[ORDER].toInt());
+            auto m      = it.toMap();
+
+            setProperty(m[NAME].toString(), m[DATA]);
+            setPropertySettings(m[NAME].toString(), m[FLAGS].toInt(), m[GROUP].toString(), m[TYPE].toString(), m[ORDER].toInt());
+
+            for(const auto &link : m[LINKS].toList()) {
+                addEventListner(m[NAME].toString(), link.toString());
+            }
         }
     }
 
 
     {
         for(const auto &it : map[SLOTS].toList()) {
-            auto m  = it.toMap();
+            auto m      = it.toMap();
+
             addSlot(m[NAME].toString(), NULL);
+
+            for(const auto &link : m[LINKS].toList()) {
+                addEventListner(m[NAME].toString(), link.toString());
+            }
         }
     }
 
     {
         for(const auto &it : map[SIGNALS].toList()) {
             auto m      = it.toMap();
+
             addSignal(m[NAME].toString());
+
+            for(const auto &link : m[LINKS].toList()) {
+                addEventListner(m[NAME].toString(), link.toString());
+            }
         }
     }
 
     {
         for(const auto &it : map[COMPONENTS].toMap()) {
             if(m_mComponents.find(it.first) == m_mComponents.end()) {
-                toObject(it.second, this);
+                toObject(it.second, m_pSystem, this);
             }
-        }
-    }
-
-    {
-        for(const auto &it : map[LINKS].toMap()) {
-            AUri uri(it.second.toString());
-            AObject *o  = findObject(uri.path());
-            if(o) {
-                if(uri.fragment().empty()) {
-                    addEventListner(this, it.first, o, uri.query());
-                } else {
-                    addEventListner(o, uri.fragment(), this, it.first);
-                }
-            }
-
         }
     }
 }
 
-AObject *AObject::toObject(const AVariant &variant, AObject *parent) {
+AObject *AObject::toObject(const AVariant &variant, AObjectSystem *system, AObject *parent) {
     AVariant::AVariantMap map   = variant.toMap();
 
-    AObject *result = AObjectSystem::instance()->createObject(map[TYPE].toString(), parent);
+    AObject *result = system->objectCreate(map[TYPE].toString(), parent);
     if(result) {
         result->fromVariant(variant);
     }
@@ -502,24 +636,23 @@ AObject &AObject::operator=(AObject &right) {
     return *this;
 }
 
-bool AObject::operator==(const AObject &right) const {
+bool AObject::operator==(const AObject &right) {
     bool result = true;
 
     result &= m_bEnable         == right.m_bEnable;
-    result &= getSignals()      == right.getSignals();
-    result &= getProperties()   == right.getProperties();
+    result &= m_mSignals        == right.m_mSignals;
+    result &= m_mProperties     == right.m_mProperties;
+    result &= m_sType           == right.m_sType;
 
     if(!result) {
         return result;
     }
 
     {
-        auto l  = getLinks();
-        auto r  = right.getLinks();
-        if(l.size() == r.size()) {
-            for(const auto &li : l) {
+        if(m_lLinks.size() == right.m_lLinks.size()) {
+            for(const auto &li : m_lLinks) {
                 result  = false;
-                for(const auto &ri : r) {
+                for(const auto &ri : right.m_lLinks) {
                     if(li == ri) {
                         result  = true;
                         break;
@@ -535,11 +668,9 @@ bool AObject::operator==(const AObject &right) const {
     }
 
     {
-        auto l  = getSlots();
-        auto r  = right.getSlots();
-        if(l.size()  == r.size()) {
-            for(const auto &it : l) {
-                if(r.find(it.first) == r.end()) {
+        if(m_mSlots.size() == right.m_mSlots.size()) {
+            for(const auto &it : m_mSlots) {
+                if(right.m_mSlots.find(it.first) == right.m_mSlots.end()) {
                     return false;
                 }
             }
@@ -548,12 +679,10 @@ bool AObject::operator==(const AObject &right) const {
         }
     }
     {
-        auto l  = getComponents();
-        auto r  = right.getComponents();
-        if(l.size()  == r.size()) {
-            for(const auto &it : l) {
-                const auto &c   = r.find(it.first);
-                if(c != r.end()) {
+        if(m_mComponents.size()  == right.m_mComponents.size()) {
+            for(const auto &it : m_mComponents) {
+                const auto &c   = right.m_mComponents.find(it.first);
+                if(c != right.m_mComponents.end()) {
                     if(*(it.second) != *(c->second)) {
                         return false;
                     }
@@ -562,14 +691,14 @@ bool AObject::operator==(const AObject &right) const {
                 }
             }
         } else {
-             return false;
+            return false;
         }
     }
 
     return true;
 }
 
-bool AObject::operator!=(const AObject &right) const {
+inline bool AObject::operator!=(const AObject &right) {
     return !(*this == right);
 }
 

@@ -2,7 +2,7 @@
 #define AABB_H_HEADER_INCLUDED
 
 struct AABox {
-    AABox() : pos(0), size(1)                                       { }
+    AABox() : pos(0.0f), size(1.0f)                                 { }
     AABox(const AVector3D &p, const AVector3D &s) : pos(p), size(s) { }
 
     bool intersect(const AVector3D &p, float r) {
@@ -70,8 +70,8 @@ struct AABox {
         return res;
     }
 
-    AVector3D pos;      // Delta position from AABB center
-    AVector3D size;     // Size of AABB
+    AVector3D pos;
+    AVector3D size;
 };
 
 #endif /* AABB_H_HEADER_INCLUDED */

@@ -5,27 +5,24 @@
 #include <list>
 #include <map>
 #include <stack>
+#include <cstdint>
 
 #include "avariant.h"
-
-using namespace std;
-
-class AObject;
 
 class AJson {
 public:
     AJson                       ();
 
     static AVariant             load                        (const string &data);
-    static string               save                        (const AVariant &data, int depth = -1);
+    static string               save                        (const AVariant &data, int32_t depth = -1);
 
-    static inline string        readString                  (const string &data, unsigned int &it);
+    static inline string        readString                  (const string &data, uint32_t &it);
 
 protected:
-    static inline void          skipSpaces                  (const char *data, unsigned int &it);
+    static inline void          skipSpaces                  (const char *data, uint32_t &it);
 
-    static inline bool          isSpace                     (char c);
-    static inline bool          isDigit                     (char c);
+    static inline bool          isSpace                     (uint8_t c);
+    static inline bool          isDigit                     (uint8_t c);
 
 };
 

@@ -1,5 +1,7 @@
 #include "avariant.h"
 
+#include "atools.h"
+
 #define SHARED(type) (data.shared) ? *static_cast<type *>(data.base.so)
 
 #define STRUCTURE "__S__"
@@ -15,40 +17,40 @@ bool convert(const AVariant::Data &data, AVariant::Type type, void *value) {
     case AVariant::BOOL: {
         bool *r     = static_cast<bool *>(value);
         switch(data.type) {
-        case AVariant::BOOL:    { *r    = SHARED(bool) : data.base.b; } break;
-        case AVariant::INT:     { *r    = (SHARED(int) : data.base.i) != 0; } break;
-        case AVariant::FLOAT:   { *r    = (SHARED(float) : data.base.f) != 0; } break;
-        case AVariant::STRING:  { string s  = (SHARED(string) : data.s); *r = (s != "false" || s != "0" || !s.empty()); }  break;
+        case AVariant::BOOL:    { *r        = SHARED(bool) : data.base.b; } break;
+        case AVariant::INT:     { *r        = (SHARED(int) : data.base.i) != 0; } break;
+        case AVariant::FLOAT:   { *r        = (SHARED(float) : data.base.f) != 0; } break;
+        case AVariant::STRING:  { string s = (SHARED(string) : data.s); *r = (s != "false" || s != "0" || !s.empty()); }  break;
         default:                { result    = false; } break;
         }
     } break;
     case AVariant::INT: {
         int *r      = static_cast<int *>(value);
         switch(data.type) {
-        case AVariant::BOOL:    { *r    = (SHARED(bool) : data.base.b) ? 1 : 0; } break;
+        case AVariant::BOOL:    { *r        = (SHARED(bool) : data.base.b) ? 1 : 0; } break;
         case AVariant::FLOAT:   { float f   = SHARED(float) : data.base.f; *r = int(f); f -= *r; *r += (f >= 0.5f) ? 1 : 0; } break;
-        case AVariant::INT:     { *r    = SHARED(int) : data.base.i; } break;
-        case AVariant::STRING:  { *r    = stoi(SHARED(string) : data.s); } break;
+        case AVariant::INT:     { *r        = SHARED(int) : data.base.i; } break;
+        case AVariant::STRING:  { *r        = stoi(SHARED(string) : data.s); } break;
         default:                { result    = false; } break;
         }
     } break;
     case AVariant::FLOAT: {
         float *r    = static_cast<float *>(value);
         switch(data.type) {
-        case AVariant::BOOL:    { *r    = float(SHARED(bool) : data.base.b); } break;
-        case AVariant::FLOAT:   { *r    = SHARED(float) : data.base.f; } break;
-        case AVariant::INT:     { *r    = float(SHARED(int) : data.base.i); } break;
-        case AVariant::STRING:  { *r    = stof(SHARED(string) : data.s); } break;
+        case AVariant::BOOL:    { *r        = float(SHARED(bool) : data.base.b); } break;
+        case AVariant::FLOAT:   { *r        = SHARED(float) : data.base.f; } break;
+        case AVariant::INT:     { *r        = float(SHARED(int) : data.base.i); } break;
+        case AVariant::STRING:  { *r        = stof(SHARED(string) : data.s); } break;
         default:                { result    = false; } break;
         }
     } break;
     case AVariant::STRING: {
         string *r  = static_cast<string *>(value);
         switch(data.type) {
-        case AVariant::BOOL:    { *r    = (SHARED(bool) : data.base.b) ? "true" : "false"; } break;
-        case AVariant::FLOAT:   { string str    = to_string(SHARED(float) : data.base.f); str.erase(str.find_last_not_of('0') + 1, string::npos ); *r    = str; } break;
-        case AVariant::INT:     { *r    = to_string(SHARED(int) : data.base.i);     } break;
-        case AVariant::STRING:  { *r    = SHARED(string) : data.s; } break;
+        case AVariant::BOOL:    { *r        = (SHARED(bool) : data.base.b) ? "true" : "false"; } break;
+        case AVariant::FLOAT:   { string s = to_string(SHARED(float) : data.base.f); s.erase(s.find_last_not_of('0') + 1, string::npos ); *r = s; } break;
+        case AVariant::INT:     { *r        = to_string(SHARED(int) : data.base.i); } break;
+        case AVariant::STRING:  { *r        = SHARED(string) : data.s; } break;
         default:                { result    = false; } break;
         }
     } break;
@@ -353,15 +355,15 @@ bool AVariant::isShared() const {
 }
 
 // Conversion and getters
-const bool AVariant::toBool() const {
+bool AVariant::toBool() const {
     return aConversionHelper<bool>(mData, BOOL, false);
 }
 
-const int AVariant::toInt() const {
+int AVariant::toInt() const {
     return aConversionHelper<int>(mData, INT, 0);
 }
 
-const float AVariant::toFloat() const {
+float AVariant::toFloat() const {
     return aConversionHelper<float>(mData, FLOAT, 0.0f);
 }
 

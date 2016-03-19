@@ -17,14 +17,15 @@ class ATestObject : public AObject {
 
 public:
     ATestObject     () {
-        APROPERTY(TPROPERTY1, &m_bSlot,     AProperty::READ | AProperty::WRITE, AProperty::NONE, -1)
-        APROPERTY(TPROPERTY2, &m_Vector2,   AProperty::READ | AProperty::WRITE, AProperty::NONE, -1)
+        APROPERTY(bool,     TPROPERTY1, "", &m_bSlot,   AProperty::READ | AProperty::WRITE, -1)
+        APROPERTY(AVector2D,TPROPERTY2, "", &m_Vector2, AProperty::READ | AProperty::WRITE, -1)
 
         ASIGNAL(TSIGNAL)
         ASLOT(TSLOT, ATestObject::testSlot)
 
-        m_bSlot         = false;
-        m_Vector2       = AVector2D(1, 0);
+        m_bSlot     = false;
+        m_Vector2   = AVector2D(1.0f, 0.0f);
+        m_sType     = ATestObject::typeNameS();
     }
 
     static void     testSlot        (AObject *pThis, const AVariant &args) {

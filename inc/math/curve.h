@@ -25,7 +25,7 @@ struct ACurvePoint {
 
     }
 
-    inline ACurvePoint (float x, AVector3D &y, AVector3D &i, AVector3D &o) {
+    inline ACurvePoint (float x, const AVector3D &y, const AVector3D &i, const AVector3D &o) {
         mX  = x; mY = y; mI = i; mO = o;
     }
 
@@ -59,7 +59,7 @@ struct ACurve {
 
     /// Comparison operators
     bool operator== (const ACurve &v) const {
-        for(int i = 0; i < mList.size(); i++) {
+        for(unsigned int i = 0; i < mList.size(); i++) {
             if(mList[i] != v.mList[i]) {
                 return false;
             }
@@ -74,7 +74,7 @@ struct ACurve {
         mList.push_back(p);
     }
 
-    inline void append (float x, AVector3D &y, AVector3D &in, AVector3D &out) {
+    inline void append (float x, const AVector3D &y, const AVector3D &in, const AVector3D &out) {
         ACurvePoint p(x, y, in, out);
         append(p);
     }
@@ -83,7 +83,7 @@ struct ACurve {
         mList.insert(mList.begin() + index, p);
     }
 
-    inline void insert (size_t index, float x, AVector3D &y, AVector3D &in, AVector3D &out) {
+    inline void insert (size_t index, float x, const AVector3D &y, const AVector3D &in, const AVector3D &out) {
         ACurvePoint p(x, y, in, out);
         insert(index, p);
     }
@@ -96,10 +96,11 @@ struct ACurve {
         return mList.size();
     }
 
-    inline ACurvePoint &point (size_t index) {
+    inline ACurvePoint point (size_t index) {
         if(index < mList.size()) {
             return mList[index];
         }
+        return ACurvePoint();
     }
 
     inline void point (float pos, size_t &index, AVector3D &value) {

@@ -20,6 +20,7 @@
 #ifndef AOBJECT_H
 #define AOBJECT_H
 
+#include <cstdint>
 #include <string>
 #include <map>
 #include <list>
@@ -27,23 +28,28 @@
 #include <avariant.h>
 #include <aobjectsystem.h>
 
+#ifndef ACLASS
 #define ACLASS(name) \
 public: \
-    virtual const string        typeName                    () const { return typeNameS(); } \
-    static const string         typeNameS                   () { return #name; }
+    virtual const string       typeName                    () const { return (!m_sType.empty()) ? m_sType : typeNameS(); } \
+    static const string        typeNameS                   () { return #name; }
+#endif
 
 #ifndef AREGISTER
 #define AREGISTER(name, group) \
+private: \
+    static AObject             *objectFactoryS              () { return new name(); } \
 public: \
-    static void                 registerClassFactory        () { \
-        AObjectSystem::instance()->factoryAdd(string("thor://") + #group + "/" + name::typeNameS(), new name()); \
+    virtual AObject            *objectFactory               () { return objectFactoryS(); } \
+    static void                 registerClassFactory        (AObjectSystem *system) { \
+        system->factoryAdd(string("thor://") + #group + "/" + name::typeNameS(), objectFactoryS()); \
     }
 #endif
 
-#define APROPERTY(name, value, flags, type, order) \
+#define APROPERTY(type, name, group, value, flags, order) \
 {\
     setProperty(name, value);\
-    setPropertySettings(name, flags, type, order);\
+    setPropertySettings(name, AProperty::NATIVE | flags, group, #type, order);\
 }
 
 #define ASIGNAL(name)           m_mSignals.push_back(name);
@@ -59,19 +65,16 @@ public:
         WRITE                   = (1<<1),
         SCHEME                  = (1<<2),
         EDITOR                  = (1<<3),
-        NATIVE                  = (1<<4)
-    };
-
-    enum UserTypes {
-        FILEPATH                = 1,
-        COLOR
+        NATIVE                  = (1<<4),
+        ALL                     = READ | WRITE | SCHEME | EDITOR | NATIVE
     };
 
 public:
     AProperty                   () {
         flags   = (AccessTypes)(READ | WRITE);
-        type    = NONE;
         order   = -1;
+        group.clear();
+        type.clear();
     }
 
 public:
@@ -79,9 +82,11 @@ public:
 
     AccessTypes                 flags;
 
-    int                         type;
+    string                      group;
 
-    int                         order;
+    string                      type;
+
+    int32_t                     order;
 };
 
 class AObject {
@@ -92,14 +97,14 @@ public:
     struct link_data {
         AObject                *sender;
 
-        string                  signal;
+        string                 signal;
 
         AObject                *receiver;
 
-        string                  slot;
+        string                 slot;
     };
 
-    typedef map<string, AObject *>      objectsMap;
+    typedef map<string, AObject *>     objectsMap;
     typedef list<AObject *>             objectsList;
 
     typedef list<link_data>             linksList;
@@ -107,10 +112,10 @@ public:
 
     typedef void                (*callback)        (AObject *pThis, const AVariant &args);
 
-    typedef map<string, AProperty>      propertiesMap;
-    typedef map<string, callback>       slotsMap;
-    typedef vector<string>              stringVector;
-    typedef list<string>                stringList;
+    typedef map<string, AProperty>     propertiesMap;
+    typedef map<string, callback>      slotsMap;
+    typedef vector<string>             stringVector;
+    typedef list<string>               stringList;
 
 protected:
     /// Enable object flag
@@ -120,10 +125,9 @@ protected:
 
     bool                        m_bNative;
 
-    /// Object ID
-    unsigned int                m_id;
     /// Object name
     string                      m_sName;
+    string                      m_sType;
 
     objectsMap                  m_mComponents;
     linksList                   m_lLinks;
@@ -142,23 +146,23 @@ public:
 
     virtual ~AObject            ();
 
-    unsigned int                id                          () const;
     AObject                    *parent                      () const;
-    AObject                    *component                   (string &name);
+    AObject                    *component                   (const string &name);
     string                      name                        () const;
 
     string                      reference                   () const;
 
-    void                        addModel                    (AObject *model);
-    void                        removeModel                 (const AObject *model);
+    AObject                    *createInstance              ();
 
     static void                 addEventListner             (AObject *sender, const string &signal, AObject *receiver, const string &slot);
     static void                 removeEventListner          (AObject *sender, const string &signal, AObject *receiver, const string &slot);
 
     void                        deleteLater                 ();
 
+    void                        setSystem                   (AObjectSystem *system);
     void                        setParent                   (AObject *parent);
     void                        setName                     (const string &value);
+    void                        setType                     (const string &value);
     void                        addComponent                (const string &name, AObject *value);
 
     bool                        isEnable                    () const;
@@ -171,12 +175,12 @@ public:
     AVariant                    toVariant                   ();
     void                        fromVariant                 (const AVariant &variant);
 
-    static AObject             *toObject                    (const AVariant &variant, AObject *parent = 0);
+    static AObject             *toObject                    (const AVariant &variant, AObjectSystem *system, AObject *parent = 0);
 
     AObject                    &operator=                   (AObject &right);
 
-    bool                        operator==                  (const AObject &right) const;
-    bool                        operator!=                  (const AObject &right) const;
+    bool                        operator==                  (const AObject &right);
+    bool                        operator!=                  (const AObject &right);
 
 // Virtual members
 public:
@@ -192,11 +196,11 @@ public:
 
     virtual AProperty           propertySettings            (const string &name);
 
-    virtual objectsMap          getComponents               () const;
-    virtual propertiesMap       getProperties               () const;
-    virtual stringVector        getSignals                  () const;
-    virtual slotsMap            getSlots                    () const;
-    virtual linksList           getLinks                    () const;
+    virtual objectsMap         &getComponents               ();
+    virtual propertiesMap      &getProperties               ();
+    virtual const stringVector &getSignals                  ();
+    virtual slotsMap           &getSlots                    ();
+    virtual linksList          &getLinks                    ();
 
     virtual void                addLink                     (link_data &link);
     virtual void                removeLink                  (const link_data &link);
@@ -213,7 +217,24 @@ public:
 
     virtual void                setProperty                 (const string &name, const AVariant &value);
 
-    virtual void                setPropertySettings         (const string &name, const int flags, const int type = 0, const int order = -1);
+    virtual void                setPropertySettings         (const string &name, const int flags, const string &group = string(), const string &type = 0, const int order = -1);
+
+private:
+    void                        addModel                    (AObject *model);
+    void                        removeModel                 (const AObject *model);
+
+    void                        setPrototype                (AObject *prototype);
+
+    AVariant                    linksToVariant              (const string &name) const;
+    AVariant                    propertyToVariant           (const string &name);
+    AVariant                    slotToVariant               (const string &name);
+
+    void                        addEventListner             (const string &name, const string &reference);
+
+    AObject                    *m_pPrototype;
+
+    AObjectSystem              *m_pSystem;
+
 };
 
 inline bool                     operator==                  (const AProperty &left, const AProperty &right);

@@ -20,7 +20,6 @@
 #ifndef AVARIANT_H
 #define AVARIANT_H
 
-#include <string>
 #include <map>
 #include <list>
 
@@ -30,7 +29,7 @@ using namespace std;
 
 class AVariant {
 public:
-    typedef map<string, AVariant>   AVariantMap;
+    typedef map<string, AVariant>  AVariantMap;
     typedef list<AVariant>          AVariantList;
 
     /*! \enum Type */
@@ -65,7 +64,7 @@ public:
             void               *so;
         } base;
 
-        std::string             s;
+        string                  s;
         AVariantMap             m;
         AVariantList            l;
     };
@@ -114,10 +113,10 @@ public:
     bool                        isShared                    () const;
 
     // Conversion and getters
-    const bool                  toBool                      () const;
-    const int                   toInt                       () const;
-    const float                 toFloat                     () const;
-    const std::string           toString                    () const;
+    bool                        toBool                      () const;
+    int                         toInt                       () const;
+    float                       toFloat                     () const;
+    const string                toString                    () const;
 
     const AVariantMap           toMap                       () const;
     const AVariantList          toList                      () const;

@@ -2,7 +2,17 @@
 
 #include "avariant.h"
 
+#include "atools.h"
+
 #include <QTest>
+#include <QDebug>
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <locale>
+#include <iomanip>
+#include <codecvt>
 
 void VariantTest::Set_Get_Basic_Check() {
     {
@@ -22,12 +32,12 @@ void VariantTest::Set_Get_Basic_Check() {
     }
     {
         AVariant value  = "5";
-        string result   = value.toString();
+        string result  = value.toString();
         QCOMPARE(result.c_str(), "5");
     }
     {
         AVariant value  = string("5");
-        string result   = value.toString();
+        string result  = value.toString();
         QCOMPARE(result.c_str(), "5");
     }
 }
@@ -218,7 +228,7 @@ void VariantTest::Shared_Copy_to_Value_Basic() {
         QCOMPARE(value2.toFloat(),      2.0f);
     }
     {
-        string result   = "string";
+        string result  = "string";
         AVariant value1 = &result;
         AVariant value2 = *value1;
         QCOMPARE(value2.isShared(),     false);
@@ -283,8 +293,8 @@ void VariantTest::Shared_Copy_to_Shared_Basic() {
         QCOMPARE(value1.toFloat(),      2.0f);
     }
     {
-        string result1  = "";
-        string result2  = "string";
+        string result1 = "";
+        string result2 = "string";
         AVariant value1 = &result1;
         AVariant value2 = &result2;
         value1  = value2;
@@ -437,13 +447,13 @@ void VariantTest::Compare_Variants_Advanced() {
     }
     {
         AVariant value1(AVariant::MAP);
-        value1.appendProperty("Test",   "NAME");
-        value1.appendProperty(true,     "VALUE");
+        value1.appendProperty("Test", "NAME");
+        value1.appendProperty(true,    "VALUE");
         /// \todo: Shared map?
         bool flag   = false;
         AVariant value2(AVariant::MAP);
-        value2.appendProperty("Test",   "NAME");
-        value2.appendProperty(&flag,    "VALUE"); /// \todo: Need to keep shared
+        value2.appendProperty("Test", "NAME");
+        value2.appendProperty(&flag,   "VALUE"); /// \todo: Need to keep shared
 
         QCOMPARE((value1 == value1),    true);
         QCOMPARE((value1 == value2),    false);

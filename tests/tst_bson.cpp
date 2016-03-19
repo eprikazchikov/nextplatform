@@ -1,10 +1,10 @@
-#include "tst_json.h"
+#include "tst_bson.h"
 
-#include "ajson.h"
+#include "abson.h"
 
 #include <QtTest>
 
-void JsonTest::Serialize_Desirialize() {
+void BsonTest::Serialize_Desirialize() {
     AVariant var1(AVariant::MAP);
 
     var1.appendProperty(true,   "bool");
@@ -57,6 +57,8 @@ void JsonTest::Serialize_Desirialize() {
     AMatrix3D mat4;
     var1.appendProperty(&mat4,  "* mat4");
 
+    var1.appendProperty(&curve, "* curve");
 
-    QCOMPARE(var1, AJson::load(AJson::save(var1)));
+    QCOMPARE(var1, ABson::load(ABson::save(var1)));
+
 }

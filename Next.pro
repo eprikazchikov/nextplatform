@@ -1,50 +1,26 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2014-01-30T19:54:33
-#
-#-------------------------------------------------
+QT       -= core gui
 
-QT       -= gui
-
-!tests {
+win32: {
     Debug:TARGET    = anextd
     Release:TARGET  = anext
-    TEMPLATE    = lib
-
-    CONFIG      += staticlib
-} else {
-    QT          += testlib
-
-    TARGET      = ../bin/tst_next
-    TEMPLATE    = app
-
-    CONFIG      += console
-    CONFIG      -= app_bundle
-
-    SOURCES += \
-        tests/main.cpp \
-        tests/tst_object.cpp \
-        tests/tst_variant.cpp \
-        tests/tst_objectsystem.cpp \
-        tests/tst_json.cpp \
-        tests/tst_uri.cpp
-
-    HEADERS += \
-        tests/tst_common.h \
-        tests/tst_object.h \
-        tests/tst_variant.h \
-        tests/tst_objectsystem.h \
-        tests/tst_json.h \
-        tests/tst_uri.h
 }
 
+android: {
+    TARGET = anext
+}
+
+TEMPLATE = lib
+
+CONFIG += staticlib
+
 SOURCES += \
-    src/aobject.cpp \
     src/avariant.cpp \
+    src/aobject.cpp \
     src/aobjectsystem.cpp \
     src/ajson.cpp \
     src/auri.cpp \
-    src/alazyobject.cpp
+    src/atools.cpp \
+    src/abson.cpp
 
 HEADERS += \
     inc/aobject.h \
@@ -52,7 +28,8 @@ HEADERS += \
     inc/aobjectsystem.h \
     inc/ajson.h \
     inc/auri.h \
-    inc/alazyobject.h
+    inc/atools.h \
+    inc/abson.h
 
 INCLUDEPATH += \
     inc

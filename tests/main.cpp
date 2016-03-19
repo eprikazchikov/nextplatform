@@ -1,9 +1,11 @@
 #include <QtTest>
 
+#include "tst_math.h"
 #include "tst_variant.h"
 #include "tst_object.h"
 #include "tst_objectsystem.h"
 #include "tst_json.h"
+#include "tst_bson.h"
 #include "tst_uri.h"
 
 inline int aExec(QObject &ts, int argc, char *argv[]) {
@@ -47,6 +49,10 @@ int main(int argc, char *argv[]) {
         status |= aExec(ts, argc, argv);
     }
     {
+        BsonTest ts;
+        status |= aExec(ts, argc, argv);
+    }
+    {
         UriTest ts;
         status |= aExec(ts, argc, argv);
     }
@@ -56,6 +62,10 @@ int main(int argc, char *argv[]) {
     }
     {
         ObjectSystemTest ts;
+        status |= aExec(ts, argc, argv);
+    }
+    {
+        MathTest ts;
         status |= aExec(ts, argc, argv);
     }
 

@@ -227,36 +227,44 @@ struct AMatrix4D {
         mat[3] = 0.0; mat[7] = 0.0; mat[11] = 0.0; mat[15] = 1.0;
     }
 
-    void direction(AVector3D &dir, AVector3D &up) {
-        AVector3D f = dir;
-        f.normalize();
-        AVector3D r = f.cross(up);
-        r.normalize();
-        AVector3D u = r.cross(f);
-        u.normalize();
+    void direction(const AVector3D &dir, AVector3D &up) {
+        AVector3D z = dir;
+        z.normalize();
+        AVector3D x = up.cross(z);
+        x.normalize();
+        AVector3D y = z.cross(x);
+        y.normalize();
 
-        mat[0 ] = r.x; mat[4 ] = f.x; mat[8 ] = u.x; mat[12] = 0.0;
-        mat[1 ] = r.y; mat[5 ] = f.y; mat[9 ] = u.y; mat[13] = 0.0;
-        mat[2 ] = r.z; mat[6 ] = f.z; mat[10] = u.z; mat[14] = 0.0;
+        mat[0 ] = x.x; mat[4 ] = x.y; mat[8 ] = x.z; mat[12] = 0.0;
+        mat[1 ] = y.x; mat[5 ] = y.y; mat[9 ] = y.z; mat[13] = 0.0;
+        mat[2 ] = z.x; mat[6 ] = z.y; mat[10] = z.z; mat[14] = 0.0;
         mat[3 ] = 0.0; mat[7 ] = 0.0; mat[11] = 0.0; mat[15] = 1.0;
     }
 
-    void rotate(float angle, const AVector3D &axis) {
+    void rotate(float angle, const AVector3D &v) {
         float rad   = angle * DEG2RAD;
         float c     = (float)cos(rad);
         float s     = (float)sin(rad);
-        AVector3D v = axis;
-        v.normalize();
         float xy    = v.x * v.y;
         float yz    = v.y * v.z;
         float zx    = v.z * v.x;
         float xs    = v.x * s;
         float ys    = v.y * s;
         float zs    = v.z * s;
-        mat[0] = (1.0f - c) * v.x * v.x + c;    mat[4] = (1.0f - c) * xy - zs;          mat[8] = (1.0f - c) * zx + ys;          mat[12] = 0.0;
-        mat[1] = (1.0f - c) * xy + zs;          mat[5] = (1.0f - c) * v.y * v.y + c;    mat[9] = mat[6] = (1.0f - c) * yz - xs; mat[13] = 0.0;
+        mat[0] = (1.0f - c) * v.x * v.x + c;    mat[4] = (1.0f - c) * xy - zs;          mat[8]  = (1.0f - c) * zx + ys;         mat[12] = 0.0;
+        mat[1] = (1.0f - c) * xy + zs;          mat[5] = (1.0f - c) * v.y * v.y + c;    mat[9]  = (1.0f - c) * yz - xs;         mat[13] = 0.0;
         mat[2] = (1.0f - c) * zx - ys;          mat[6] = (1.0f - c) * yz + xs;          mat[10] = (1.0f - c) * v.z * v.z + c;   mat[14] = 0.0;
         mat[3] = 0.0;                           mat[7] = 0.0;                           mat[11] = 0.0;                          mat[15] = 1.0;
+    }
+
+    void rotate(const AVector3D &angles) {
+        AMatrix4D m;
+        m.rotate(angles.x, AVector3D(1.0f, 0.0f, 0.0f));
+        *this   *= m;
+        m.rotate(angles.y, AVector3D(0.0f, 1.0f, 0.0f));
+        *this   *= m;
+        m.rotate(angles.z, AVector3D(0.0f, 0.0f, 1.0f));
+        *this   *= m;
     }
 
     void rotate(float angle, float x, float y, float z) {
@@ -336,7 +344,7 @@ struct AMatrix4D {
         float sine, cotangent, deltaZ;
         float radians   = fov / 2 * DEG2RAD;
 
-        deltaZ          = zfar - znear;
+        deltaZ          = znear - zfar;
         sine            = sin(radians);
         if ((deltaZ == 0) || (sine == 0) || (aspect == 0)) {
             return;
@@ -345,30 +353,54 @@ struct AMatrix4D {
 
         mat[0]          = cotangent / aspect;
         mat[5]          = cotangent;
-        mat[10]         = -(zfar + znear) / deltaZ;
+
+        mat[10]         = zfar / deltaZ;
         mat[11]         = -1;
-        mat[14]         = -2 * znear * zfar / deltaZ;
+        mat[14]         = znear * zfar / deltaZ;
         mat[15]         = 0;
     }
 
-    void look_at(AVector3D &eye, AVector3D &dir, AVector3D &up) {
-        AVector3D x, y, z;
+    void perspective2(float fov, float aspect, float znear, float zfar) {
+        float sine, cotangent, deltaZ;
+        float radians   = fov / 2 * DEG2RAD;
+
+        deltaZ          = znear - zfar;
+        sine            = sin(radians);
+        if ((deltaZ == 0) || (sine == 0) || (aspect == 0)) {
+            return;
+        }
+        cotangent       = cos(radians) / sine;
+
+        mat[0]          = cotangent / aspect;
+        mat[5]          = cotangent;
+        mat[10]         = - zfar / deltaZ - 1;
+        mat[11]         = -1;
+        mat[14]         = - znear * zfar / deltaZ;
+        mat[15]         = 0;
+    }
+
+    void ortho(float left, float right, float bottom, float top, float znear, float zfar) {
+        mat[0]          =  2.0f / (right - left);
+        mat[5]          =  2.0f / (top - bottom);
+        mat[10]         = -2.0f / (zfar - znear);
+        mat[12]         = -((right + left) / (right - left));
+        mat[13]         = -((top + bottom) / (top - bottom));
+        mat[14]         = -((zfar + znear) / (zfar - znear));
+    }
+
+    void lookAt(AVector3D &eye, AVector3D &target, AVector3D &up) {
         AMatrix4D m0, m1;
 
-        z = eye - dir;
-        z.normalize();
-        x = up.cross(z);
-        x.normalize();
-        y = z.cross(x);
-        y.normalize();
-
-        m0[0 ] = x.x; m0[4 ] = x.y; m0[8 ] = x.z; m0[12] = 0.0;
-        m0[1 ] = y.x; m0[5 ] = y.y; m0[9 ] = y.z; m0[13] = 0.0;
-        m0[2 ] = z.x; m0[6 ] = z.y; m0[10] = z.z; m0[14] = 0.0;
-        m0[3 ] = 0.0; m0[7 ] = 0.0; m0[11] = 0.0; m0[15] = 1.0;
+        m0.direction(eye - target, up);
 
         m1.translate(-eye);
         *this = m0 * m1;
+    }
+
+    AVector3D euler() {
+        return AVector3D(RAD2DEG * atan2(-mat[ 9], mat[10]),
+                         RAD2DEG * atan2( mat[ 8], sqrt(mat[ 9] * mat[ 9] + mat[10] * mat[10])),
+                         RAD2DEG * atan2(-mat[ 4], mat[ 0]));
     }
 
     void set(float  m0, float  m1, float  m2, float  m3,

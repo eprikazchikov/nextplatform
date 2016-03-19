@@ -35,7 +35,7 @@ struct APlane {
         aux1    = v2 - v1;
         aux2    = v3 - v1;
         normal  = aux1.cross(aux2);
-        normal.normalize();
+        //normal.normalize();
         point   = v1;
         d       = normal.dot(point);
     }

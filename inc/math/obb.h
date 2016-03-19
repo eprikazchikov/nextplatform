@@ -21,7 +21,7 @@
 #define OBB_H_HEADER_INCLUDED
 
 struct AOBox {
-    AOBox() : pos(0), size(1)                                                                   { }
+    AOBox() : pos(0.0f), size(1.0f)                                                                   { }
     AOBox(const AVector3D &p, const AVector3D &s) : pos(p), size(s)                             { }
     AOBox(const AVector3D &p, const AVector3D &s, const AMatrix3D &r) : pos(p), size(s), rot(r) { }
 

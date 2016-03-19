@@ -1,12 +1,9 @@
 #include "aobjectsystem.h"
 
-#include "alazyobject.h"
+#include "aobject.h"
 #include "auri.h"
 
-AObjectSystem *AObjectSystem::m_pInstance    = 0;
-
 AObjectSystem::AObjectSystem() {
-    mNextId     = 0;
     mSystemName = "system";
 }
 
@@ -14,30 +11,16 @@ AObjectSystem::~AObjectSystem() {
     factoryClear();
 }
 
-AObjectSystem *AObjectSystem::instance() {
-    if(!m_pInstance) {
-        m_pInstance = new AObjectSystem;
-        AObject::registerClassFactory();
-    }
-    return m_pInstance;
-}
-
-void AObjectSystem::destroy() {
-    if(m_pInstance) {
-        delete m_pInstance;
-    }
-    m_pInstance = 0;
-}
-
-AObject *AObjectSystem::createObject(const string &url, AObject *parent) {
-    AObject *pObject        = 0;
-    factoryMap::iterator it = mFactories.find(url);
+AObject *AObjectSystem::objectCreate(const string &uri, AObject *parent) {
+    AObject *pObject  = 0;
+    factoryMap::iterator it = mFactories.find(uri);
     if(it == mFactories.end()) {
-        it  = mFactories.find(mGroups[url]);
+        it  = mFactories.find(mGroups[uri]);
     }
     if(it != mFactories.end()) {
-        pObject = new ALazyObject((*it).second);
+        pObject = (*it).second->createInstance();
         if(pObject) {
+            pObject->setSystem(this);
             pObject->setParent(parent);
         }
     }
@@ -46,11 +29,9 @@ AObject *AObjectSystem::createObject(const string &url, AObject *parent) {
 }
 
 void AObjectSystem::factoryAdd(const string &uri, AObject *prototype) {
-    if(prototype) {
-        AUri group(uri);
-        mGroups[group.name()]   = uri;
-        mFactories[uri]         = prototype;
-    }
+    AUri group(uri);
+    mGroups[group.name()]   = uri;
+    mFactories[uri]         = prototype;
 }
 
 void AObjectSystem::factoryRemove(const string &uri) {
@@ -63,10 +44,6 @@ void AObjectSystem::factoryClear() {
 
 groupMap AObjectSystem::factory() const {
     return mGroups;
-}
-
-unsigned int AObjectSystem::nextId() {
-    return ++mNextId;
 }
 
 const string &AObjectSystem::systemName() const {

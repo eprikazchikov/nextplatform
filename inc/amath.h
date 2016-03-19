@@ -87,9 +87,7 @@ namespace amath {
         AVector3D c		= p - a;
         AVector3D v		= b - a;
         float d			= v.normalize();
-        // скалярное произведение векторов
         float t			= v.dot(c);
-        // проверка на выход за границы отрезка
         if ( t < 0.0f )
             return a;
         if ( t > d )
