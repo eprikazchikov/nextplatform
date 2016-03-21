@@ -130,7 +130,7 @@ AVariant AJson::load(const string &data) {
             case 'n': {
                 if(data.substr(it, 4) == J_NULL) {
                     if(state == propertyValue) {
-                        s.top().appendProperty(NULL, name);
+                        s.top().appendProperty(static_cast<void *>(NULL), name);
                     }
                     it  += 3;
                 }

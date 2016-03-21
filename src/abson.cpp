@@ -18,7 +18,7 @@ AVariant ABson::load(const AByteVector &data, AVariant::Type type) {
         offset++;
 
         string name;
-        for(offset; offset < size; offset++) {
+        for(; offset < size; offset++) {
             if(data[offset] == 0) {
                 offset++;
                 break;

@@ -420,7 +420,7 @@ void AObject::dispatchEvent(const string &name, const AVariant &args) {
     }
 }
 
-void AObject::onEvent(const string &name, const AVariant &args) {
+void AObject::onEvent(const string &, const AVariant &) {
 
 }
 
@@ -558,7 +558,7 @@ AVariant AObject::toVariant() {
 
                 components.appendProperty(left, it.first);
             } else {
-                components.appendProperty(NULL, it.first);
+                components.appendProperty(static_cast<void *>(NULL), it.first);
             }
         }
         result.appendProperty(components, COMPONENTS);

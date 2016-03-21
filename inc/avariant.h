@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with Thunder Next.  If not, see <http://www.gnu.org/licenses/>.
 
-    © Copyright: 2008-2014 Evgeny Prikazchikov
+    ï¿½ Copyright: 2008-2014 Evgeny Prikazchikov
 */
 
 #ifndef AVARIANT_H
@@ -22,6 +22,7 @@
 
 #include <map>
 #include <list>
+#include <string>
 
 #include <amath.h>
 
@@ -129,7 +130,7 @@ public:
     const AMatrix4D             toMatrix4D                  () const;
     const ACurve                toCurve                     () const;
 
-    void                        appendProperty              (const AVariant &value, const string &name = "");
+    void                        appendProperty              (const AVariant &value, const string &name = string());
 
 protected:
     Data                        mData;
