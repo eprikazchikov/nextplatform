@@ -34,6 +34,7 @@
 #include "math/range.h"
 #include "math/range3.h"
 */
+#include "math/gaussian.h"
 #include "math/perlin.h"
 
 #include "math/plane.h"
@@ -61,17 +62,17 @@ namespace amath {
     inline void rotate(AVector3D &v, float sinTheta, float cosTheta, float x, float y, float z) {
         AVector3D vNewPos;
 
-        vNewPos.x   = (cosTheta + (1 - cosTheta) * x * x)		* v.x;
-        vNewPos.x  += ((1 - cosTheta) * x * y - z * sinTheta)	* v.y;
-        vNewPos.x  += ((1 - cosTheta) * x * z + y * sinTheta)	* v.z;
+        vNewPos.x   = (cosTheta + (1 - cosTheta) * x * x)       * v.x;
+        vNewPos.x  += ((1 - cosTheta) * x * y - z * sinTheta)   * v.y;
+        vNewPos.x  += ((1 - cosTheta) * x * z + y * sinTheta)   * v.z;
 
-        vNewPos.y   = ((1 - cosTheta) * x * y + z * sinTheta)	* v.x;
-        vNewPos.y  += (cosTheta + (1 - cosTheta) * y * y)		* v.y;
-        vNewPos.y  += ((1 - cosTheta) * y * z - x * sinTheta)	* v.z;
+        vNewPos.y   = ((1 - cosTheta) * x * y + z * sinTheta)   * v.x;
+        vNewPos.y  += (cosTheta + (1 - cosTheta) * y * y)       * v.y;
+        vNewPos.y  += ((1 - cosTheta) * y * z - x * sinTheta)   * v.z;
 
-        vNewPos.z   = ((1 - cosTheta) * x * z - y * sinTheta)	* v.x;
-        vNewPos.z  += ((1 - cosTheta) * y * z + x * sinTheta)	* v.y;
-        vNewPos.z  += (cosTheta + (1 - cosTheta) * z * z)		* v.z;
+        vNewPos.z   = ((1 - cosTheta) * x * z - y * sinTheta)   * v.x;
+        vNewPos.z  += ((1 - cosTheta) * y * z + x * sinTheta)   * v.y;
+        vNewPos.z  += (cosTheta + (1 - cosTheta) * z * z)       * v.z;
 
         v           = vNewPos;
     }
@@ -92,7 +93,7 @@ namespace amath {
             return a;
         if ( t > d )
             return b;
-        // Вернем точку между a и b
+
         v *= t;
         return ( a + v );
     }

@@ -105,9 +105,9 @@ public:
     };
 
     typedef map<string, AObject *>     objectsMap;
-    typedef list<AObject *>             objectsList;
+    typedef list<AObject *>            objectsList;
 
-    typedef list<link_data>             linksList;
+    typedef list<link_data>            linksList;
 
 
     typedef void                (*callback)        (AObject *pThis, const AVariant &args);
@@ -138,6 +138,7 @@ protected:
 
     /// Parent object
     AObject                    *m_pParent;
+    AObjectSystem              *m_pSystem;
 
     objectsList                 m_lModels;
 
@@ -146,6 +147,7 @@ public:
 
     virtual ~AObject            ();
 
+    AObjectSystem              *system                      () const;
     AObject                    *parent                      () const;
     AObject                    *component                   (const string &name);
     string                      name                        () const;
@@ -184,7 +186,7 @@ public:
 
 // Virtual members
 public:
-    virtual bool                update                      (float dt);
+    virtual bool                update                      ();
 
     virtual void                dispatchEvent               (const string &name, const AVariant &args = AVariant());
 
@@ -219,6 +221,9 @@ public:
 
     virtual void                setPropertySettings         (const string &name, const int flags, const string &group = string(), const string &type = 0, const int order = -1);
 
+    virtual void                onCreated                   ();
+    virtual void                onDestroyed                 ();
+
 private:
     void                        addModel                    (AObject *model);
     void                        removeModel                 (const AObject *model);
@@ -232,8 +237,6 @@ private:
     void                        addEventListner             (const string &name, const string &reference);
 
     AObject                    *m_pPrototype;
-
-    AObjectSystem              *m_pSystem;
 
 };
 

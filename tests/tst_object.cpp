@@ -26,8 +26,8 @@
 #include <QtTest>
 
 void ObjectTest::Base_add_remove_link() {
-    AObject *obj1   = new AObject();
-    AObject *obj2   = new AObject();
+    AObject *obj1   = new AObject;
+    AObject *obj2   = new AObject;
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
@@ -41,9 +41,9 @@ void ObjectTest::Base_add_remove_link() {
 }
 
 void ObjectTest::Child_destructor() {
-    AObject *obj1   = new AObject();
-    AObject *obj2   = new AObject();
-    AObject *obj3   = new AObject();
+    AObject *obj1   = new AObject;
+    AObject *obj2   = new AObject;
+    AObject *obj3   = new AObject;
     obj2->setParent(obj1);
     obj3->setParent(obj1);
 
@@ -53,15 +53,15 @@ void ObjectTest::Child_destructor() {
     QCOMPARE((int)obj1->getComponents().size(), 1);
 
     obj3->deleteLater();
-    obj1->update(0);
+    obj1->update();
     QCOMPARE((int)obj1->getComponents().size(), 0);
 
     delete obj1;
 }
 
 void ObjectTest::Reciever_destructor() {
-    AObject *obj1   = new AObject();
-    AObject *obj2   = new AObject();
+    AObject *obj1   = new AObject;
+    AObject *obj2   = new AObject;
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
     QCOMPARE((int)obj1->getLinks().size(), 1);
@@ -73,8 +73,8 @@ void ObjectTest::Reciever_destructor() {
 }
 
 void ObjectTest::Sender_destructor() {
-    AObject *obj1   = new AObject();
-    AObject *obj2   = new AObject();
+    AObject *obj1   = new AObject;
+    AObject *obj2   = new AObject;
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
     QCOMPARE((int)obj1->getLinks().size(), 1);
@@ -86,8 +86,8 @@ void ObjectTest::Sender_destructor() {
 }
 
 void ObjectTest::Emit_signal() {
-    ATestObject *obj1   = new ATestObject();
-    ATestObject *obj2   = new ATestObject();
+    ATestObject *obj1   = new ATestObject;
+    ATestObject *obj2   = new ATestObject;
 
     AObject::addEventListner(obj1, TSIGNAL, obj2, TSLOT);
     obj1->emitSignal(TSIGNAL, TVALUE);
@@ -99,8 +99,8 @@ void ObjectTest::Emit_signal() {
 }
 
 void ObjectTest::Synchronize_property() {
-    ATestObject *obj1   = new ATestObject();
-    ATestObject *obj2   = new ATestObject();
+    ATestObject *obj1   = new ATestObject;
+    ATestObject *obj2   = new ATestObject;
 
     AObject::addEventListner(obj1, TPROPERTY1, obj2, TPROPERTY1);
     obj1->setProperty(TPROPERTY1, true);

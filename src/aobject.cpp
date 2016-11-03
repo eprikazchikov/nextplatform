@@ -30,6 +30,8 @@ AObject::AObject() {
 }
 
 AObject::~AObject() {
+    onDestroyed();
+
     for(const auto &it : m_lModels) {
         delete it;
     }
@@ -63,6 +65,10 @@ AObject::~AObject() {
     if(m_pPrototype) {
         m_pPrototype->removeModel(this);
     }
+}
+
+AObjectSystem *AObject::system() const {
+    return m_pSystem;
 }
 
 AObject *AObject::parent() const {
@@ -389,11 +395,11 @@ bool AObject::isSlotExist(const string &slot) const {
     return (m_mSlots.find(slot) != m_mSlots.end());
 }
 
-bool AObject::update(float dt) {
+bool AObject::update() {
     auto it = m_mComponents.begin();
     while(it != m_mComponents.end()) {
         AObject *c  = it->second;
-        if(c && c->update(dt)) {
+        if(c && c->update()) {
             it  = m_mComponents.erase(it);
             c->setParent(0);
             delete c;
@@ -451,6 +457,8 @@ AObject *AObject::createInstance() {
         result->setSystem(m_pSystem);
         addModel(result);
         *result = *this;
+
+        result->onCreated();
     }
     return result;
 }
@@ -484,6 +492,14 @@ void AObject::setPropertySettings(const string &name, const int flags, const str
         it.type     = type;
         it.order    = order;
     }
+}
+
+void AObject::onCreated() {
+
+}
+
+void AObject::onDestroyed() {
+
 }
 
 AVariant AObject::toVariant() {

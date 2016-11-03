@@ -16,3 +16,10 @@ void MathTest::Rotate_to_Matrix() {
 
     QCOMPARE(result, rot);
 }
+
+void MathTest::Generate_Gaussian_Kernel() {
+    float kernel[7];
+    AGausian::computeKernel(8.0f, kernel, 7);
+
+    qDebug() << kernel[0] << kernel[1] << kernel[2] << kernel[3] << kernel[4] << kernel[5] << kernel[6];
+}

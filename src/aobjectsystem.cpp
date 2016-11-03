@@ -20,7 +20,6 @@ AObject *AObjectSystem::objectCreate(const string &uri, AObject *parent) {
     if(it != mFactories.end()) {
         pObject = (*it).second->createInstance();
         if(pObject) {
-            pObject->setSystem(this);
             pObject->setParent(parent);
         }
     }
@@ -30,6 +29,7 @@ AObject *AObjectSystem::objectCreate(const string &uri, AObject *parent) {
 
 void AObjectSystem::factoryAdd(const string &uri, AObject *prototype) {
     AUri group(uri);
+    prototype->setSystem(this);
     mGroups[group.name()]   = uri;
     mFactories[uri]         = prototype;
 }

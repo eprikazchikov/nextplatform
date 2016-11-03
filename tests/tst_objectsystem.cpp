@@ -77,11 +77,9 @@ void ObjectSystemTest::Delta_Serialize_Desirialize_Object() {
 
 void ObjectSystemTest::Virtual_Inheritance() {
     AObject *prototype  = m_pSystem->objectCreate(ATestObject::typeNameS());
-    prototype->setSystem(m_pSystem);
     prototype->setName("PrototypeObject");
 
     AObject *obj1       = m_pSystem->objectCreate(ATestObject::typeNameS());
-    obj1->setSystem(m_pSystem);
     prototype->addComponent("TestComponent1", obj1);
     prototype->setType("InheritedClass");
 
