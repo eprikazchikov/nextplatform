@@ -5,32 +5,46 @@
 
 #include "aobjectsystem.h"
 
-#define TSLOT       "testSlot"
-#define TVALUE      "testValue"
-#define TSIGNAL     "testSignal"
-#define TPROPERTY1  "testProperty1"
-#define TPROPERTY2  "testProperty2"
+#include <QTest>
 
 class ATestObject : public AObject {
-    ACLASS(ATestObject)
-    AREGISTER(ATestObject, Test)
+    A_OBJECT(ATestObject, AObject)
+    A_REGISTER(ATestObject, Test)
+
+    A_METHODS(
+        A_SLOT(setSlot),
+        A_SIGNAL(signal)
+    )
+
+    A_PROPERTIES(
+        A_PROPERTY(bool, slot, getSlot, setSlot, General),
+        A_PROPERTY(AVector2D, vec, getVector, setVector, General)
+    )
 
 public:
-    ATestObject     () {
-        APROPERTY(bool,     TPROPERTY1, "", &m_bSlot,   AProperty::READ | AProperty::WRITE, -1)
-        APROPERTY(AVector2D,TPROPERTY2, "", &m_Vector2, AProperty::READ | AProperty::WRITE, -1)
-
-        ASIGNAL(TSIGNAL)
-        ASLOT(TSLOT, ATestObject::testSlot)
-
+    explicit ATestObject     (AObject *parent = nullptr) :
+            AObject(parent) {
         m_bSlot     = false;
         m_Vector2   = AVector2D(1.0f, 0.0f);
-        m_sType     = ATestObject::typeNameS();
     }
 
-    static void     testSlot        (AObject *pThis, const AVariant &args) {
-        (static_cast<ATestObject *>(pThis))->m_bSlot  = true;
+    bool            getSlot         () const {
+        return m_bSlot;
     }
+
+    void            setSlot         (const bool value) {
+        m_bSlot     = value;
+    }
+
+    AVector2D       getVector       () const {
+        return m_Vector2;
+    }
+
+    void            setVector       (const AVector2D &value) {
+        m_Vector2   = value;
+    }
+
+    void            signal          (const bool value);
 
     bool            m_bSlot;
     AVector2D       m_Vector2;

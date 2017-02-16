@@ -4,9 +4,47 @@
 
 #define J_TRUE  "true"
 #define J_FALSE "false"
-#define J_NULL  "nul"
+#define J_NULL  "null"
 
 #define FORMAT (depth > -1) ? "\n" : "";
+
+typedef stack<AVariant> VariantStack;
+typedef stack<string>   NameStack;
+
+void appendProperty(VariantStack &s, NameStack &n, const AVariant &data, const string &name) {
+    AVariant v  = s.top();
+    s.pop();
+    switch(v.type()) {
+        case AMetaType::VariantList: {
+            AVariant::AVariantList list = v.toList();
+            list.push_back(data);
+            s.push(list);
+            return;
+        }
+        case AMetaType::VariantMap: {
+            AVariant::AVariantMap map   = v.toMap();
+            if(name == STRUCTURE) {
+                auto d = map.find(DATA);
+                if(d != map.end()) {
+                    AVariant::AVariantList list = d->second.toList();
+
+                    AMetaType::Type type    = (AMetaType::Type)data.toInt();
+                    void *object    = AMetaType::create(type);
+                    AMetaType::convert(&list, AMetaType::VariantList, object, type);
+
+                    s.push(AVariant(type, object));
+                    return;
+                }
+            } else {
+                map[name]    = data;
+                s.push(map);
+                return;
+            }
+        } break;
+        default: break;
+    }
+    s.push(v);
+}
 
 enum States {
     objectBegin = 1,
@@ -24,8 +62,8 @@ AJson::AJson() {
 AVariant AJson::load(const string &data) {
     AVariant result;
 
-    stack<AVariant> s;
-    stack<string>  n;
+    VariantStack    s;
+    NameStack       n;
     string name;
     States state    = propertyValue;
     uint32_t it     = 0;
@@ -33,7 +71,8 @@ AVariant AJson::load(const string &data) {
         skipSpaces(data.c_str(), it);
         switch(data[it]) {
             case '{': {
-                s.push(AVariant(AVariant::MAP));
+                AVariant::AVariantMap map;
+                s.push(map);
                 n.push(name);
                 name    = "";
                 state   = propertyName;
@@ -42,14 +81,15 @@ AVariant AJson::load(const string &data) {
                 result  = s.top();
                 s.pop();
                 if(s.size()) {
-                    s.top().appendProperty(result, n.top());
+                    appendProperty(s, n, result, n.top());
                 }
                 n.pop();
                 state   = propertyName;
             } break;
             case '[': {
                 if(state == propertyValue) {
-                    s.push(AVariant(AVariant::LIST));
+                    AVariant::AVariantList list;
+                    s.push(list);
                     n.push(name);
                     name    = "";
                 }
@@ -58,7 +98,7 @@ AVariant AJson::load(const string &data) {
                 result  = s.top();
                 s.pop();
                 if(s.size()) {
-                    s.top().appendProperty(result, n.top());
+                    appendProperty(s, n, result, n.top());
                 }
                 n.pop();
                 state   = propertyName;
@@ -67,7 +107,7 @@ AVariant AJson::load(const string &data) {
                 state   = propertyValue;
             } break;
             case ',': {
-                if(s.top().type() == AVariant::LIST) {
+                if(s.top().type() == AMetaType::VariantList) {
                     state   = propertyValue;
                 } else {
                     state   = propertyName;
@@ -79,7 +119,7 @@ AVariant AJson::load(const string &data) {
                 if(state == propertyName) {
                     name    = str;
                 } else {
-                    s.top().appendProperty(str, name);
+                    appendProperty(s, n, str, name);
                 }
             } break;
             case '0':
@@ -94,10 +134,9 @@ AVariant AJson::load(const string &data) {
             case '9':
             case '-': {
                 uint32_t st = it;
-                char c      = 0;
                 bool number = false;
                 while(it < data.length()) {
-                    c = data[++it];
+                    char c  = data[++it];
                     if(!isDigit(c) && c != '.') {
                         break;
                     }
@@ -107,14 +146,14 @@ AVariant AJson::load(const string &data) {
                 }
                 if(state == propertyValue) {
                     AVariant v(data.substr(st, it - st));
-                    s.top().appendProperty((number) ? AVariant(v.toFloat()) : AVariant(v.toInt()), name);
+                    appendProperty(s, n, (number) ? AVariant(v.toDouble()) : AVariant(v.toInt()), name);
                 }
                 it--;
             } break;
             case 't': {
                 if(data.substr(it, 4) == J_TRUE) {
                     if(state == propertyValue) {
-                        s.top().appendProperty(true, name);
+                        appendProperty(s, n, true, name);
                     }
                     it  += 3;
                 }
@@ -122,7 +161,7 @@ AVariant AJson::load(const string &data) {
             case 'f': {
                 if(data.substr(it, 5) == J_FALSE) {
                     if(state == propertyValue) {
-                        s.top().appendProperty(false, name);
+                        appendProperty(s, n, false, name);
                     }
                     it  += 4;
                 }
@@ -130,7 +169,7 @@ AVariant AJson::load(const string &data) {
             case 'n': {
                 if(data.substr(it, 4) == J_NULL) {
                     if(state == propertyValue) {
-                        s.top().appendProperty(static_cast<void *>(NULL), name);
+                        appendProperty(s, n, static_cast<void *>(nullptr), name);
                     }
                     it  += 3;
                 }
@@ -145,15 +184,15 @@ AVariant AJson::load(const string &data) {
 string AJson::save(const AVariant &data, int32_t depth) {
     string result;
     switch(data.type()) {
-        case AVariant::BOOL:
-        case AVariant::FLOAT:
-        case AVariant::INT: {
+        case AMetaType::Bool:
+        case AMetaType::Double:
+        case AMetaType::Int: {
             result += data.toString();
         } break;
-        case AVariant::STRING: {
+        case AMetaType::String: {
             result += '"' + data.toString() + '"';
         } break;
-        case AVariant::LIST: {
+        case AMetaType::VariantList: {
             result += "[";
             result += FORMAT;
             uint32_t i = 1;

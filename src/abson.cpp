@@ -4,7 +4,36 @@
 
 #include "atools.h"
 
-AVariant ABson::load(const AByteVector &data, AVariant::Type type) {
+AVariant appendProperty(const AVariant &container, const AVariant &data, const string &name) {
+    switch(container.type()) {
+        case AMetaType::VariantList: {
+            AVariant::AVariantList list = container.toList();
+            list.push_back(data);
+            return list;
+        } break;
+        case AMetaType::VariantMap: {
+            AVariant::AVariantMap map   = container.toMap();
+            if(name == STRUCTURE) {
+                auto d = map.find(DATA);
+                if(d != map.end()) {
+                    AVariant::AVariantList list = d->second.toList();
+
+                    AMetaType::Type type    = (AMetaType::Type)data.toInt();
+                    void *object    = AMetaType::create(type);
+                    AMetaType::convert(&list, AMetaType::VariantList, object, type);
+                    return AVariant(type, object);
+                }
+            }
+            map[name]    = data;
+            return map;
+        } break;
+        default: break;
+    }
+
+    return container;
+}
+
+AVariant ABson::load(const AByteVector &data, AMetaType::Type type) {
     AVariant result(type);
 
     uint32_t offset = 0;
@@ -31,14 +60,14 @@ AVariant ABson::load(const AByteVector &data, AVariant::Type type) {
                 uint8_t value   = data[offset];
                 offset++;
 
-                result.appendProperty((value) ? true : false, name);
+                result  = appendProperty(result, (value) ? true : false, name);
             } break;
             case DOUBLE: {
                 double value;
                 memcpy(&value, &data[offset], sizeof(double));
                 offset += sizeof(double);
 
-                result.appendProperty((float)value, name); /// \todo: double type support
+                result  = appendProperty(result, value, name);
             } break;
             case STRING: {
                 int32_t length;
@@ -49,7 +78,7 @@ AVariant ABson::load(const AByteVector &data, AVariant::Type type) {
                 memcpy(value, &data[offset], length);
                 offset += length;
 
-                result.appendProperty(value, name);
+                result  = appendProperty(result, value, name);
                 delete []value;
             } break;
             case INT32: {
@@ -57,7 +86,7 @@ AVariant ABson::load(const AByteVector &data, AVariant::Type type) {
                 memcpy(&value, &data[offset], sizeof(uint32_t));
                 offset += sizeof(uint32_t);
 
-                result.appendProperty(value, name);
+                result  = appendProperty(result, value, name);
             } break;
             case OBJECT:
             case ARRAY: {
@@ -65,8 +94,8 @@ AVariant ABson::load(const AByteVector &data, AVariant::Type type) {
                 memcpy(&length, &data[offset], sizeof(uint32_t));
 
                 AByteVector sub(data.begin() + offset, data.begin() + offset + length);
-                AVariant array  = load(sub, (t == ARRAY) ? AVariant::LIST : AVariant::MAP);
-                result.appendProperty(array, name);
+                AVariant array  = load(sub, (t == ARRAY) ? AMetaType::VariantList : AMetaType::VariantMap);
+                result  = appendProperty(result, array, name);
 
                 offset += length;
             } break;
@@ -82,18 +111,18 @@ AByteVector ABson::save(const AVariant &data) {
     AByteVector result;
 
     switch(data.type()) {
-        case AVariant::BOOL: {
+        case AMetaType::Bool: {
             result.push_back( (data.toBool()) ? 0x01 : 0x00 );
         } break;
-        case AVariant::FLOAT: {
-            double value    = data.toFloat();
+        case AMetaType::Double: {
+            double value    = data.toDouble();
             result.assign( reinterpret_cast<char *>( &value ), reinterpret_cast<char *>( &value ) + sizeof( value ) );
         } break;
-        case AVariant::INT: {
+        case AMetaType::Int: {
             int32_t value   = data.toInt();
             result.assign( reinterpret_cast<char *>( &value ), reinterpret_cast<char *>( &value ) + sizeof( value ) );
         } break;
-        case AVariant::STRING: {
+        case AMetaType::String: {
             string value    = data.toString();
             uint32_t size   = value.size() + 1;
             result.resize(size + sizeof(uint32_t));
@@ -101,7 +130,7 @@ AByteVector ABson::save(const AVariant &data) {
             memcpy(&result[0], &size, sizeof(uint32_t));
             memcpy(&result[sizeof(uint32_t)], value.c_str(), size);
         } break;
-        case AVariant::LIST: {
+        case AMetaType::VariantList: {
             uint32_t size   = sizeof(uint32_t);
             result.resize(size);
             uint32_t offset = size;
@@ -155,27 +184,13 @@ AByteVector ABson::save(const AVariant &data) {
 uint8_t ABson::type(const AVariant &data) {
     uint8_t result;
     switch (data.type()) {
-        case AVariant::NONE: {
-            result  = NONE;
-        } break;
-        case AVariant::BOOL: {
-            result  = BOOL;
-        } break;
-        case AVariant::FLOAT: {
-            result  = DOUBLE;
-        } break;
-        case AVariant::INT: {
-            result  = INT32;
-        } break;
-        case AVariant::STRING: {
-            result  = STRING;
-        } break;
-        case AVariant::LIST: {
-            result  = ARRAY;
-        } break;
-        default: {
-            result  = OBJECT;
-        } break;
+        case AMetaType::Invalid:        result  = NONE; break;
+        case AMetaType::Bool:           result  = BOOL; break;
+        case AMetaType::Double:         result  = DOUBLE; break;
+        case AMetaType::Int:            result  = INT32; break;
+        case AMetaType::String:         result  = STRING; break;
+        case AMetaType::VariantList:    result  = ARRAY; break;
+        default:                        result  = OBJECT; break;
     }
     return result;
 }

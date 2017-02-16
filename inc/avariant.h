@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with Thunder Next.  If not, see <http://www.gnu.org/licenses/>.
 
-    � Copyright: 2008-2014 Evgeny Prikazchikov
+    Copyright: 2008-2014 Evgeniy Prikazchikov
 */
 
 #ifndef AVARIANT_H
@@ -26,56 +26,32 @@
 
 #include <amath.h>
 
+#include "ametatype.h"
+
+#define STRUCTURE "__S__"
+#define DATA "__D__"
+
 using namespace std;
 
 class AVariant {
 public:
     typedef map<string, AVariant>  AVariantMap;
-    typedef list<AVariant>          AVariantList;
+    typedef list<AVariant>         AVariantList;
 
-    /*! \enum Type */
-    enum Type {
-        NONE                    = 0,
-        BOOL,
-        INT,
-        FLOAT,
-        STRING,
-        MAP,
-        LIST,
-
-        VECTOR2D                = 10,
-        VECTOR3D,
-        VECTOR4D,
-        QUATERNION,
-        MATRIX3D,
-        MATRIX4D,
-        CURVE
-    };
 
     struct Data {
         Data                    ();
-        Type                    type;
 
-        bool                    shared;
-
-        union Union {
-            bool                b;
-            int                 i;
-            float               f;
-            void               *so;
-        } base;
-
-        string                  s;
-        AVariantMap             m;
-        AVariantList            l;
+        uint32_t                type;
+        void                   *so;
     };
 
 public:
     AVariant                    ();
-    AVariant                    (Type type);
+    AVariant                    (AMetaType::Type type);
     AVariant                    (bool value);
     AVariant                    (int value);
-    AVariant                    (float value);
+    AVariant                    (double value);
     AVariant                    (const char *value);
     AVariant                    (const string &value);
     AVariant                    (const AVariantMap &value);
@@ -89,34 +65,56 @@ public:
     AVariant                    (const AMatrix4D &value);
     AVariant                    (const ACurve &value);
 
-    AVariant                    (bool *value);
-    AVariant                    (int *value);
-    AVariant                    (float *value);
-    AVariant                    (string *value);
-
-    AVariant                    (AVector2D *value);
-    AVariant                    (AVector3D *value);
-    AVariant                    (AVector4D *value);
-    AVariant                    (AQuaternion *value);
-    AVariant                    (AMatrix3D *value);
-    AVariant                    (AMatrix4D *value);
-    AVariant                    (ACurve *value);
+    AVariant                    (uint32_t type, void *copy);
 
     ~AVariant                   ();
 
-    AVariant                    operator*                   ();
     AVariant                   &operator=                   (const AVariant &value);
 
     bool                        operator==                  (const AVariant &right) const;
     bool                        operator!=                  (const AVariant &right) const;
 
-    Type                        type                        () const;
-    bool                        isShared                    () const;
+    uint32_t                    type                        () const;
+    void                       *data                        () const;
+
+    bool                        canConvert                  (uint32_t type) const;
+
+    template<typename T>
+    bool                        canConvert                  () const {
+        return AVariant::canConvert(AMetaType::type<T>());
+    }
+
+    template<typename T>
+    T                           value                       () const {
+        uint32_t type   = AMetaType::type<T>();
+        if(mData.so) {
+            if(mData.type == type) {
+                return *(reinterpret_cast<const T *>(mData.so));
+            } else if(canConvert(type)) {
+                T result;
+
+                AMetaType::convert(mData.so, mData.type, &result, type);
+
+                return result;
+            }
+        }
+        return T();
+    }
+
+    template<typename T>
+    static AVariant             fromValue                   (const T &value) {
+        AVariant result;
+        result.mData.type   = AMetaType::type<T>();
+        if(result.mData.type != AMetaType::Invalid) {
+            result.mData.so = AMetaType::create(result.mData.type, reinterpret_cast<const void *>(&value));
+        }
+        return result;
+    }
 
     // Conversion and getters
     bool                        toBool                      () const;
     int                         toInt                       () const;
-    float                       toFloat                     () const;
+    double                      toDouble                    () const;
     const string                toString                    () const;
 
     const AVariantMap           toMap                       () const;
@@ -129,8 +127,6 @@ public:
     const AMatrix3D             toMatrix3D                  () const;
     const AMatrix4D             toMatrix4D                  () const;
     const ACurve                toCurve                     () const;
-
-    void                        appendProperty              (const AVariant &value, const string &name = string());
 
 protected:
     Data                        mData;

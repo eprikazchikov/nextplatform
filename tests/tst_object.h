@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with Thunder Next.  If not, see <http://www.gnu.org/licenses/>.
 
-    © Copyright: 2008-2014 Evgeny Prikazchikov
+    Copyright: 2008-2016 Evgeniy Prikazchikov
 */
 
 #ifndef TST_OBJECT_H
@@ -26,14 +26,17 @@ class ObjectTest : public QObject {
     Q_OBJECT
 
 private slots:
-    void Base_add_remove_link();
+    void Meta_property();
+    void Meta_methods();
+    void Disconnect_base();
+    void Disconnect_all();
+    void Disconnect_by_signal();
+    void Disconnect_by_receiver();
     void Child_destructor();
     void Reciever_destructor();
     void Sender_destructor();
     void Emit_signal();
-    void Synchronize_property();
     void Find_object();
-
 };
 
 #endif // TST_OBJECT_H

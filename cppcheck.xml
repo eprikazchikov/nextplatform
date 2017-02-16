@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+    <cppcheck version="1.69"/>
+    <errors>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="box2d\src\aactorlist.cpp" line="31"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="box2d\src\aactorlist.cpp" line="52"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="box2d\src\aactorlist.cpp" line="89"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="box2d\src\aactorlist.cpp" line="103"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="box2d\src\aactorlist.cpp" line="113"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one.">
+            <location file="box2d\src\aactorlist.cpp" line="0"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one.">
+            <location file="box2d\src\aphysactor.cpp" line="0"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;proxy&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;proxy&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file="common\src\aanimation.cpp" line="18"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;i&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;i&amp;#039; is assigned a value that is never used.">
+            <location file="common\src\aanimation.cpp" line="17"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;proxy&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;proxy&amp;#039; is assigned a value that is never used.">
+            <location file="common\src\aanimation.cpp" line="22"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one.">
+            <location file="common\src\aatlas.cpp" line="0"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;sig&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;sig&amp;#039; is assigned a value that is never used.">
+            <location file="common\src\amesh.cpp" line="68"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;bone&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;bone&amp;#039; is assigned a value that is never used.">
+            <location file="converter\src\main.cpp" line="229"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one.">
+            <location file="engine\src\logic\alogicmisc.cpp" line="0"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="gui\src\agroup.cpp" line="90"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="gui\src\agroup.cpp" line="121"/>
+        </error>
+        <error id="unusedVariable" severity="style" msg="Unused variable: text" verbose="Unused variable: text">
+            <location file="gui\src\agui.cpp" line="172"/>
+        </error>
+        <error id="unusedVariable" severity="style" msg="Unused variable: aPrint" verbose="Unused variable: aPrint">
+            <location file="gui\src\agui.cpp" line="173"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="input\src\ainput.cpp" line="45"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="input\src\ainput.cpp" line="88"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="input\src\ainput.cpp" line="150"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="input\src\ainput.cpp" line="162"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="input\src\ainput.cpp" line="233"/>
+        </error>
+        <error id="uninitvar" severity="error" msg="Uninitialized variable: result" verbose="Uninitialized variable: result">
+            <location file="lightbuilder\res\kernel.c" line="299"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;RenderProgress&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;RenderProgress&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="lightbuilder\src\renderprogress.h" line="13"/>
+        </error>
+        <error id="uninitMemberVar" severity="warning" msg="Member variable &amp;#039;GraphWidget::x&amp;#039; is not initialized in the constructor." verbose="Member variable &amp;#039;GraphWidget::x&amp;#039; is not initialized in the constructor.">
+            <location file="lightbuilder\src\graph\graphwidget.cpp" line="6"/>
+        </error>
+        <error id="uninitMemberVar" severity="warning" msg="Member variable &amp;#039;GraphWidget::y&amp;#039; is not initialized in the constructor." verbose="Member variable &amp;#039;GraphWidget::y&amp;#039; is not initialized in the constructor.">
+            <location file="lightbuilder\src\graph\graphwidget.cpp" line="6"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;ResultView&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;ResultView&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="lightbuilder\src\graph\viewers\resultview.h" line="13"/>
+        </error>
+        <error id="memsetFloat" severity="portability" msg="The 2nd memset() argument &amp;#039;CLAMP(v.x,0.0,255.0)&amp;#039; is a float, its representation is implementation defined." verbose="The 2nd memset() argument &amp;#039;CLAMP(v.x,0.0,255.0)&amp;#039; is a float, its representation is implementation defined. memset() is used to set each byte of a block of memory to a specific value and the actual representation of a floating-point value is implementation defined.">
+            <location file="lightbuilder\src\graph\viewers\resultview.cpp" line="79"/>
+        </error>
+        <error id="memsetFloat" severity="portability" msg="The 2nd memset() argument &amp;#039;CLAMP(v.y,0.0,255.0)&amp;#039; is a float, its representation is implementation defined." verbose="The 2nd memset() argument &amp;#039;CLAMP(v.y,0.0,255.0)&amp;#039; is a float, its representation is implementation defined. memset() is used to set each byte of a block of memory to a specific value and the actual representation of a floating-point value is implementation defined.">
+            <location file="lightbuilder\src\graph\viewers\resultview.cpp" line="80"/>
+        </error>
+        <error id="memsetFloat" severity="portability" msg="The 2nd memset() argument &amp;#039;CLAMP(v.z,0.0,255.0)&amp;#039; is a float, its representation is implementation defined." verbose="The 2nd memset() argument &amp;#039;CLAMP(v.z,0.0,255.0)&amp;#039; is a float, its representation is implementation defined. memset() is used to set each byte of a block of memory to a specific value and the actual representation of a floating-point value is implementation defined.">
+            <location file="lightbuilder\src\graph\viewers\resultview.cpp" line="81"/>
+        </error>
+        <error id="redundantAssignment" severity="performance" msg="Variable &amp;#039;error&amp;#039; is reassigned a value before the old one has been used." verbose="Variable &amp;#039;error&amp;#039; is reassigned a value before the old one has been used.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="86"/>
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="89"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;ior&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;ior&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="551"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="210"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="224"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="249"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="262"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="314"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="316"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="332"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="507"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="594"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="697"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\scheduler.cpp" line="734"/>
+        </error>
+        <error id="charBitOp" severity="warning" msg="When using &amp;#039;char&amp;#039; variables in bit operations, sign extension can generate unexpected results." verbose="When using &amp;#039;char&amp;#039; variables in bit operations, sign extension can generate unexpected results. For example:&#10;    char c = 0x80;&#10;    int i = 0 | c;&#10;    if (i &amp;amp; 0x8000)&#10;        printf(&amp;quot;not expected&amp;quot;);&#10;The &amp;quot;not expected&amp;quot; will be printed on the screen.">
+            <location file="lightbuilder\src\tracer\worker.cpp" line="77"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\worker.cpp" line="318"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\worker.cpp" line="347"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\worker.cpp" line="358"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="lightbuilder\src\tracer\worker.cpp" line="632"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;location&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;location&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file="render\src\amaterialgl.cpp" line="191"/>
+        </error>
+        <error id="nullPointer" severity="warning" msg="Possible null pointer dereference: material - otherwise it is redundant to check it against null." verbose="Possible null pointer dereference: material - otherwise it is redundant to check it against null.">
+            <location file="render\src\arender.cpp" line="249"/>
+            <location file="render\src\arender.cpp" line="251"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;vCoords&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;vCoords&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file="render\src\arender.cpp" line="326"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;vVertices&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;vVertices&amp;#039; is assigned a value that is never used.">
+            <location file="render\src\arender.cpp" line="319"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;vCoords&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;vCoords&amp;#039; is assigned a value that is never used.">
+            <location file="render\src\arender.cpp" line="344"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="render\src\arender.cpp" line="236"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;result&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;result&amp;#039; is assigned a value that is never used.">
+            <location file="render\src\ashader.cpp" line="66"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="render\src\ashader.cpp" line="102"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="render\src\atexturegl.cpp" line="136"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="render\src\nv_dds.cpp" line="1036"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="render\src\nv_dds.cpp" line="1135"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;offset&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;offset&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file="render\src\nv_dds.cpp" line="922"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;top&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;top&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file="render\src\nv_dds.cpp" line="973"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;bottom&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;bottom&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file="render\src\nv_dds.cpp" line="974"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;alphablock&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;alphablock&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file="render\src\nv_dds.cpp" line="1131"/>
+        </error>
+        <error id="unsignedLessThanZero" severity="style" msg="Checking if unsigned variable &amp;#039;size&amp;#039; is less than zero." verbose="The unsigned variable &amp;#039;size&amp;#039; will never be negative so it is either pointless or an error to check if it is.">
+            <location file="render\src\nv_dds.cpp" line="878"/>
+        </error>
+        <error id="assertWithSideEffect" severity="warning" msg="Assert statement calls a function which may have desired side effects: &amp;#039;get_num_mipmaps&amp;#039;." verbose="Non-pure function: &amp;#039;get_num_mipmaps&amp;#039; is called inside assert statement. Assert statements are removed from release builds so the code inside assert statement is not executed. If the code is needed also in release builds, this is a bug.">
+            <location file="render\src\nv_dds.cpp" line="479"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;NVDDS_PROJECT&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;NVDDS_PROJECT&amp;#039; was not checked because its code equals another one.">
+            <location file="render\src\nv_dds.cpp" line="0"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;iPhone&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;iPhone&amp;#039; was not checked because its code equals another one.">
+            <location file="render\src\nv_dds.cpp" line="0"/>
+        </error>
+        <error id="noCopyConstructor" severity="style" msg="&amp;#039;class AListener&amp;#039; does not have a copy constructor which is recommended since the class contains a pointer to allocated memory." verbose="&amp;#039;class AListener&amp;#039; does not have a copy constructor which is recommended since the class contains a pointer to allocated memory.">
+            <location file="sound\includes\alistener.h" line="10"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;AListener&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;AListener&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="sound\includes\alistener.h" line="12"/>
+        </error>
+        <error id="noCopyConstructor" severity="style" msg="&amp;#039;class ASound&amp;#039; does not have a copy constructor which is recommended since the class contains a pointer to allocated memory." verbose="&amp;#039;class ASound&amp;#039; does not have a copy constructor which is recommended since the class contains a pointer to allocated memory.">
+            <location file="sound\includes\asound.h" line="41"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;ASourceList&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;ASourceList&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="sound\includes\asourcelist.h" line="12"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;SOUND_LIBRARY;_WIN32&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;SOUND_LIBRARY;_WIN32&amp;#039; was not checked because its code equals another one.">
+            <location file="sound\src\asound.cpp" line="0"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;_WIN32&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;_WIN32&amp;#039; was not checked because its code equals another one.">
+            <location file="sound\src\asound.cpp" line="0"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;SOUND_LIBRARY;_WIN32&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;SOUND_LIBRARY;_WIN32&amp;#039; was not checked because its code equals another one.">
+            <location file="sound\src\asourcelist.cpp" line="0"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one.">
+            <location file="sound\src\asourcelist.cpp" line="0"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;_WIN32&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;_WIN32&amp;#039; was not checked because its code equals another one.">
+            <location file="sound\src\asourcelist.cpp" line="0"/>
+        </error>
+        <error id="unsignedLessThanZero" severity="style" msg="Checking if unsigned variable &amp;#039;size&amp;#039; is less than zero." verbose="The unsigned variable &amp;#039;size&amp;#039; will never be negative so it is either pointless or an error to check if it is.">
+            <location file="sound\src\atrack.cpp" line="199"/>
+        </error>
+        <error id="unsignedLessThanZero" severity="style" msg="Checking if unsigned variable &amp;#039;offset&amp;#039; is less than zero." verbose="The unsigned variable &amp;#039;offset&amp;#039; will never be negative so it is either pointless or an error to check if it is.">
+            <location file="sound\src\atrack.cpp" line="241"/>
+        </error>
+        <error id="unsignedLessThanZero" severity="style" msg="Checking if unsigned variable &amp;#039;size&amp;#039; is less than zero." verbose="The unsigned variable &amp;#039;size&amp;#039; will never be negative so it is either pointless or an error to check if it is.">
+            <location file="sound\src\atrack.cpp" line="321"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;FSFile&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;FSFile&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\FSFile.h" line="10"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;all&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;all&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\importqueue.cpp" line="43"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;QtLog&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;QtLog&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\qtlog.h" line="10"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="worldbuilder\src\controllers\objectctrl.cpp" line="60"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="worldbuilder\src\controllers\objectctrl.cpp" line="152"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;pControl&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;pControl&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\controllers\objectctrl.cpp" line="60"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;pControl&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;pControl&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\controllers\objectctrl.cpp" line="152"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;data&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;data&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\controllers\objectctrl.cpp" line="348"/>
+        </error>
+        <error id="uninitMemberVar" severity="warning" msg="Member variable &amp;#039;ObjectCtrl::rot&amp;#039; is not initialized in the constructor." verbose="Member variable &amp;#039;ObjectCtrl::rot&amp;#039; is not initialized in the constructor.">
+            <location file="worldbuilder\src\controllers\objectctrl.cpp" line="48"/>
+        </error>
+        <error id="uninitMemberVar" severity="warning" msg="Member variable &amp;#039;ObjectCtrl::pParent&amp;#039; is not initialized in the constructor." verbose="Member variable &amp;#039;ObjectCtrl::pParent&amp;#039; is not initialized in the constructor.">
+            <location file="worldbuilder\src\controllers\objectctrl.cpp" line="48"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="worldbuilder\src\controllers\objectctrl.cpp" line="288"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="worldbuilder\src\controllers\objectctrl.cpp" line="328"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="worldbuilder\src\controllers\objectctrl.cpp" line="350"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one.">
+            <location file="worldbuilder\src\controllers\objectctrl.cpp" line="0"/>
+        </error>
+        <error id="unusedPrivateFunction" severity="style" msg="Unused private function: &amp;#039;ObjectCtrl::draw_translate&amp;#039;" verbose="Unused private function: &amp;#039;ObjectCtrl::draw_translate&amp;#039;">
+            <location file="worldbuilder\src\controllers\objectctrl.h" line="70"/>
+        </error>
+        <error id="unusedPrivateFunction" severity="style" msg="Unused private function: &amp;#039;ObjectCtrl::draw_rotate&amp;#039;" verbose="Unused private function: &amp;#039;ObjectCtrl::draw_rotate&amp;#039;">
+            <location file="worldbuilder\src\controllers\objectctrl.h" line="71"/>
+        </error>
+        <error id="unusedPrivateFunction" severity="style" msg="Unused private function: &amp;#039;ObjectCtrl::draw_circle&amp;#039;" verbose="Unused private function: &amp;#039;ObjectCtrl::draw_circle&amp;#039;">
+            <location file="worldbuilder\src\controllers\objectctrl.h" line="73"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="worldbuilder\src\controllers\widgetctrl.cpp" line="22"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="worldbuilder\src\controllers\widgetctrl.cpp" line="72"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="worldbuilder\src\controllers\widgetctrl.cpp" line="147"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;pControl&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;pControl&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\controllers\widgetctrl.cpp" line="22"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;pControl&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;pControl&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\controllers\widgetctrl.cpp" line="72"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;data&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;data&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\controllers\widgetctrl.cpp" line="138"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="worldbuilder\src\controllers\widgetctrl.cpp" line="142"/>
+        </error>
+        <error id="purgedConfiguration" severity="information" msg="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one." verbose="The configuration &amp;#039;_QT&amp;#039; was not checked because its code equals another one.">
+            <location file="worldbuilder\src\controllers\widgetctrl.cpp" line="0"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;current&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;current&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\graph\screen3d.cpp" line="179"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="worldbuilder\src\graph\editors\chartview.cpp" line="49"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;CurveEditor&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;CurveEditor&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\graph\editors\curveeditor.h" line="18"/>
+        </error>
+        <error id="duplicateExpression" severity="style" msg="Same expression on both sides of &amp;#039;||&amp;#039;." verbose="Finding the same expression on both sides of an operator is suspicious and might indicate a cut and paste or logic error. Please examine this code carefully to determine if it is correct.">
+            <location file="worldbuilder\src\graph\editors\schemeeditor.cpp" line="476"/>
+            <location file="worldbuilder\src\graph\editors\schemeeditor.cpp" line="476"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="worldbuilder\src\graph\editors\schemeeditor.cpp" line="293"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="worldbuilder\src\graph\editors\schemeeditor.cpp" line="635"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Struct &amp;#039;FilePath&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Struct &amp;#039;FilePath&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\property\custom\FilePathProperty.h" line="8"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;ParticleEdit&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;ParticleEdit&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\ui\particleedit.h" line="25"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;QPropertyEditorWidget&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;QPropertyEditorWidget&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\property\widget\QPropertyEditorWidget.h" line="49"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;QPropertyModel&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;QPropertyModel&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\property\widget\QPropertyModel.h" line="21"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;QVariantDelegate&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;QVariantDelegate&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\property\widget\QVariantDelegate.h" line="19"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="worldbuilder\src\property\widget\QPropertyModel.cpp" line="178"/>
+        </error>
+        <error id="postfixOperator" severity="performance" msg="Prefer prefix ++/-- operators for non-primitive types." verbose="Prefix ++/-- operators should be preferred for non-primitive types. Pre-increment/decrement can be more efficient than post-increment/decrement. Post-increment/decrement usually involves keeping a copy of the previous value around and adds a little extra code.">
+            <location file="worldbuilder\src\property\widget\QPropertyModel.cpp" line="199"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="worldbuilder\src\ui\atlasbuilder.cpp" line="88"/>
+        </error>
+        <error id="unusedVariable" severity="style" msg="Unused variable: size" verbose="Unused variable: size">
+            <location file="worldbuilder\src\ui\logicschemeedit.cpp" line="148"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;LogicSchemeEdit&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;LogicSchemeEdit&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\ui\logicschemeedit.h" line="25"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;MaterialEdit&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;MaterialEdit&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\ui\materialedit.h" line="26"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;MeshEdit&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;MeshEdit&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\ui\meshedit.h" line="27"/>
+        </error>
+        <error id="uselessAssignmentPtrArg" severity="warning" msg="Assignment of function parameter has no effect outside the function. Did you forget dereferencing it?" verbose="Assignment of function parameter has no effect outside the function. Did you forget dereferencing it?">
+            <location file="worldbuilder\src\ui\uiedit.cpp" line="46"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="worldbuilder\src\ui\uiedit.cpp" line="155"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="worldbuilder\src\ui\uiedit.cpp" line="550"/>
+        </error>
+        <error id="selfAssignment" severity="warning" msg="Redundant assignment of &amp;#039;pGui&amp;#039; to itself." verbose="Redundant assignment of &amp;#039;pGui&amp;#039; to itself.">
+            <location file="worldbuilder\src\ui\uiedit.cpp" line="46"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;pItem&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;pItem&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file="worldbuilder\src\ui\uiedit.cpp" line="481"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;Color&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;Color&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\ui\uiedit.cpp" line="66"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;pUi&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;pUi&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\ui\uiedit.cpp" line="155"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;data&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;data&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\ui\uiedit.cpp" line="190"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="worldbuilder\src\ui\worldbuilder.cpp" line="429"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected. See also: https://www.securecoding.cert.org/confluence/display/cplusplus/EXP05-CPP.+Do+not+use+C-style+casts.">
+            <location file="worldbuilder\src\ui\worldbuilder.cpp" line="508"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;size&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;size&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file="worldbuilder\src\ui\worldbuilder.cpp" line="551"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;pParent&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;pParent&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\ui\worldbuilder.cpp" line="429"/>
+        </error>
+        <error id="unusedVariable" severity="style" msg="Unused variable: pItem" verbose="Unused variable: pItem">
+            <location file="worldbuilder\src\ui\worldbuilder.cpp" line="477"/>
+        </error>
+        <error id="unassignedVariable" severity="style" msg="Variable &amp;#039;size&amp;#039; is not assigned a value." verbose="Variable &amp;#039;size&amp;#039; is not assigned a value.">
+            <location file="worldbuilder\src\ui\worldbuilder.cpp" line="551"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;pos_x&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;pos_x&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\ui\worldbuilder.cpp" line="722"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;pos_y&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;pos_y&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\ui\worldbuilder.cpp" line="723"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;mode&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;mode&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\ui\worldbuilder.cpp" line="767"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;count&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;count&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\ui\worldbuilder.cpp" line="1539"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;count&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;count&amp;#039; is assigned a value that is never used.">
+            <location file="worldbuilder\src\ui\worldbuilder.cpp" line="1577"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;ComponentsBrowser&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;ComponentsBrowser&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided.">
+            <location file="worldbuilder\src\widgets\componentsbrowser.h" line="9"/>
+        </error>
+        <error id="arithOperationsOnVoidPointer" severity="portability" msg="&amp;#039;ptr&amp;#039; is of type &amp;#039;void *&amp;#039;. When using void pointers in calculations, the behaviour is undefined." verbose="&amp;#039;ptr&amp;#039; is of type &amp;#039;void *&amp;#039;. When using void pointers in calculations, the behaviour is undefined. Arithmetic operations on &amp;#039;void *&amp;#039; is a GNU C extension, which defines the &amp;#039;sizeof(void)&amp;#039; to be 1.">
+            <location file="wrappers\android\sources\androidfile.cpp" line="59"/>
+        </error>
+        <error id="uninitMemberVar" severity="warning" msg="Member variable &amp;#039;AndroidFile::pathname&amp;#039; is not initialized in the constructor." verbose="Member variable &amp;#039;AndroidFile::pathname&amp;#039; is not initialized in the constructor.">
+            <location file="wrappers\android\sources\androidfile.cpp" line="6"/>
+        </error>
+        <error id="redundantCopy" severity="performance" msg="Buffer &amp;#039;pathname&amp;#039; is being written before its old content has been used." verbose="Buffer &amp;#039;pathname&amp;#039; is being written before its old content has been used.">
+            <location file="wrappers\ios\Src\afile.cpp" line="9"/>
+            <location file="wrappers\ios\Src\afile.cpp" line="10"/>
+        </error>
+        <error id="redundantCopy" severity="performance" msg="Buffer &amp;#039;filepath&amp;#039; is being written before its old content has been used." verbose="Buffer &amp;#039;filepath&amp;#039; is being written before its old content has been used.">
+            <location file="wrappers\ios\Src\afile.cpp" line="25"/>
+            <location file="wrappers\ios\Src\afile.cpp" line="27"/>
+        </error>
+        <error id="uninitMemberVar" severity="warning" msg="Member variable &amp;#039;AFile::pathlength&amp;#039; is not initialized in the constructor." verbose="Member variable &amp;#039;AFile::pathlength&amp;#039; is not initialized in the constructor.">
+            <location file="wrappers\ios\Src\afile.h" line="11"/>
+        </error>
+        <error id="uninitMemberVar" severity="warning" msg="Member variable &amp;#039;AFile::pathname&amp;#039; is not initialized in the constructor." verbose="Member variable &amp;#039;AFile::pathname&amp;#039; is not initialized in the constructor.">
+            <location file="wrappers\ios\Src\afile.h" line="11"/>
+        </error>
+        <error id="unsafeClassCanLeak" severity="style" msg="Class &amp;#039;AFile&amp;#039; is unsafe, &amp;#039;AFile::pathname&amp;#039; can leak by wrong usage." verbose="The class &amp;#039;AFile&amp;#039; is unsafe, wrong usage can cause memory/resource leaks for &amp;#039;AFile::pathname&amp;#039;. This can for instance be fixed by adding proper cleanup in the destructor.">
+            <location file="wrappers\ios\Src\afile.h" line="28"/>
+        </error>
+    </errors>
+</results>

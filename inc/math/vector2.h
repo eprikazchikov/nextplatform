@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with Thunder Next.  If not, see <http://www.gnu.org/licenses/>.
 
-    © Copyright: 2008-2014 Evgeny Prikazchikov
+    Copyright: 2008-2014 Evgeny Prikazchikov
 */
 
 #ifndef VECTOR2_H_HEADER_INCLUDED
@@ -28,7 +28,9 @@ struct AVector2D {
     AVector2D(const AVector2D &v) : x(v.x), y(v.y)              { }
 
     /// Comparison operators
-    bool operator==(const AVector2D &v) const                   { return (x == v.x) && (y == v.y); }
+    bool operator==(const AVector2D &v) const                   {
+        return (x == v.x) && (y == v.y);
+    }
     bool operator!=(const AVector2D &v) const                   { return !(*this == v); }
 
     /// Math operators

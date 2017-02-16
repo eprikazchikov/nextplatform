@@ -3,53 +3,56 @@
 #include "aobject.h"
 #include "auri.h"
 
-AObjectSystem::AObjectSystem() {
-    mSystemName = "system";
+AObjectSystem *AObjectSystem::s_Instance    = nullptr;
+
+AObjectSystem::AObjectSystem(const string &name) {
+    if(AObjectSystem::s_Instance != nullptr) {
+        throw "There should be only one ObjectSystem object";
+    }
+    AObjectSystem::s_Instance   = this;
+    m_sName     = name;
 }
 
 AObjectSystem::~AObjectSystem() {
     factoryClear();
+    AObjectSystem::s_Instance   = nullptr;
+}
+
+int32_t AObjectSystem::exec() {
+    return 0;
+}
+
+AObjectSystem *AObjectSystem::instance() {
+    return AObjectSystem::s_Instance;
 }
 
 AObject *AObjectSystem::objectCreate(const string &uri, AObject *parent) {
-    AObject *pObject  = 0;
-    factoryMap::iterator it = mFactories.find(uri);
-    if(it == mFactories.end()) {
-        it  = mFactories.find(mGroups[uri]);
+    AObject *object = 0;
+    FactoryMap::iterator it = AObjectSystem::s_Instance->m_Factories.find(uri);
+    if(it == AObjectSystem::s_Instance->m_Factories.end()) {
+        it  = AObjectSystem::s_Instance->m_Factories.find(AObjectSystem::s_Instance->m_Groups[uri]);
     }
-    if(it != mFactories.end()) {
-        pObject = (*it).second->createInstance();
-        if(pObject) {
-            pObject->setParent(parent);
-        }
+    if(it != AObjectSystem::s_Instance->m_Factories.end()) {
+        object = (*it).second->createInstance(parent);
     }
 
-    return pObject;
+    return object;
 }
 
-void AObjectSystem::factoryAdd(const string &uri, AObject *prototype) {
+void AObjectSystem::factoryAdd(const string &uri, const AMetaObject *meta) {
     AUri group(uri);
-    prototype->setSystem(this);
-    mGroups[group.name()]   = uri;
-    mFactories[uri]         = prototype;
+    AObjectSystem::s_Instance->m_Groups[group.name()]   = uri;
+    AObjectSystem::s_Instance->m_Factories[uri]         = meta;
 }
 
 void AObjectSystem::factoryRemove(const string &uri) {
-    mFactories.erase(uri);
+    AObjectSystem::s_Instance->m_Factories.erase(uri);
 }
 
 void AObjectSystem::factoryClear() {
-    mFactories.clear();
+    m_Factories.clear();
 }
 
-groupMap AObjectSystem::factory() const {
-    return mGroups;
-}
-
-const string &AObjectSystem::systemName() const {
-    return mSystemName;
-}
-
-void AObjectSystem::setSytemName(const string &name) {
-    mSystemName = name;
+AObjectSystem::GroupMap AObjectSystem::factories() const {
+    return m_Groups;
 }

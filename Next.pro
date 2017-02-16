@@ -11,7 +11,7 @@ android: {
 
 TEMPLATE = lib
 
-CONFIG += staticlib
+CONFIG += c++11
 
 SOURCES += \
     src/avariant.cpp \
@@ -20,7 +20,13 @@ SOURCES += \
     src/ajson.cpp \
     src/auri.cpp \
     src/atools.cpp \
-    src/abson.cpp
+    src/abson.cpp \
+    src/ametaobject.cpp \
+    src/ametatype.cpp \
+    src/ametaproperty.cpp \
+    src/ametamethod.cpp \
+    src/aevent.cpp \
+    src/athreadpool.cpp
 
 HEADERS += \
     inc/aobject.h \
@@ -29,7 +35,13 @@ HEADERS += \
     inc/ajson.h \
     inc/auri.h \
     inc/atools.h \
-    inc/abson.h
+    inc/abson.h \
+    inc/ametaobject.h \
+    inc/ametatype.h \
+    inc/ametaproperty.h \
+    inc/ametamethod.h \
+    inc/aevent.h \
+    inc/athreadpool.h
 
 INCLUDEPATH += \
     inc

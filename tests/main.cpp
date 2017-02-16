@@ -1,11 +1,12 @@
 #include <QtTest>
 
+#include "tst_common.h"
 #include "tst_math.h"
 #include "tst_variant.h"
 #include "tst_object.h"
 #include "tst_objectsystem.h"
-#include "tst_json.h"
-#include "tst_bson.h"
+#include "tst_serialization.h"
+#include "tst_threadpool.h"
 #include "tst_uri.h"
 
 inline int aExec(QObject &ts, int argc, char *argv[]) {
@@ -40,16 +41,20 @@ inline int aExec(QObject &ts, int argc, char *argv[]) {
 
 int main(int argc, char *argv[]) {
     int status = 0;
+
+    AObjectSystem system;
+    ATestObject::registerClassFactory();
+
+    {
+        MathTest ts;
+        status |= aExec(ts, argc, argv);
+    }
     {
         VariantTest ts;
         status |= aExec(ts, argc, argv);
     }
     {
-        JsonTest ts;
-        status |= aExec(ts, argc, argv);
-    }
-    {
-        BsonTest ts;
+        SerializationTest ts;
         status |= aExec(ts, argc, argv);
     }
     {
@@ -65,7 +70,7 @@ int main(int argc, char *argv[]) {
         status |= aExec(ts, argc, argv);
     }
     {
-        MathTest ts;
+        ThreadPoolTest ts;
         status |= aExec(ts, argc, argv);
     }
 

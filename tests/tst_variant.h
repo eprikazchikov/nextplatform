@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with Thunder Next.  If not, see <http://www.gnu.org/licenses/>.
 
-    © Copyright: 2008-2014 Evgeny Prikazchikov
+    Copyright: 2008-2014 Evgeniy Prikazchikov
 */
 
 #ifndef TST_VARIANT_H
@@ -28,12 +28,6 @@ class VariantTest : public QObject {
 private slots:
     void Set_Get_Basic_Check();
     void Set_Get_Advanced_Check();
-    void Value_Copy_to_Shared_Basic();
-    void Value_Copy_to_Shared_Advanced();
-    void Shared_Copy_to_Value_Basic();
-    void Shared_Copy_to_Value_Advanced();
-    void Shared_Copy_to_Shared_Basic();
-    void Shared_Copy_to_Shared_Advanced();
     void Convert_Bool_to_Int_Float_String();
     void Convert_Int_to_Bool_Float_String();
     void Convert_Float_to_Bool_Int_String();

@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with Thunder Next.  If not, see <http://www.gnu.org/licenses/>.
 
-    © Copyright: 2008-2014 Evgeny Prikazchikov
+    Copyright: 2008-2014 Evgeniy Prikazchikov
 */
 
 #include "tst_object.h"
@@ -25,27 +25,126 @@
 
 #include <QtTest>
 
-void ObjectTest::Base_add_remove_link() {
-    AObject *obj1   = new AObject;
-    AObject *obj2   = new AObject;
+void ObjectTest::Meta_property() {
+    ATestObject obj;
+    const AMetaObject *meta = obj.metaObject();
+    QVERIFY(meta != nullptr);
 
-    AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
-    AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
-    QCOMPARE((int)obj1->getLinks().size(), 1);
+    QCOMPARE(meta->name(), "ATestObject");
 
-    AObject::removeEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
-    QCOMPARE((int)obj1->getLinks().size(), 0);
+    QCOMPARE(meta->propertyCount(), 2);
+    QCOMPARE(meta->property(0).isValid(), true);
+    QCOMPARE(meta->property(1).isValid(), true);
 
-    delete obj2;
-    delete obj1;
+    QCOMPARE(meta->property(0).read(&obj).toBool(), obj.getSlot());
+    obj.setSlot(true);
+    QCOMPARE(meta->property(0).read(&obj).toBool(), obj.getSlot());
+
+    {
+        bool value  = false;
+        meta->property(0).write(&obj, value);
+        QCOMPARE(obj.getSlot(), value);
+    }
+    {
+        AVector2D value(1.0, 2.0);
+        meta->property(1).write(&obj, value);
+        QCOMPARE(obj.getVector().x, value.x);
+        QCOMPARE(obj.getVector().y, value.y);
+    }
+}
+
+void ObjectTest::Meta_methods() {
+    ATestObject obj;
+    const AMetaObject *meta = obj.metaObject();
+    QVERIFY(meta != nullptr);
+
+    QCOMPARE(meta->methodCount(), 2);
+
+    int index   = meta->indexOfMethod("setSlot");
+    if(index > -1) {
+        AMetaMethod method = meta->method(index);
+
+        QCOMPARE(method.isValid(), true);
+        AVariant value;
+        QCOMPARE(obj.getSlot(), false);
+
+        AVariant arg(true);
+        QCOMPARE(method.invoke(&obj, value, 1, &arg), true);
+        QCOMPARE(obj.getSlot(), true);
+    }
+
+    QCOMPARE(meta->indexOfSignal("setSlot"), -1);
+
+    index   = meta->indexOfSignal("signal");
+    if(index > -1) {
+        qDebug() << meta->method(index).signature().c_str();
+    }
+}
+
+void ObjectTest::Disconnect_base() {
+    ATestObject obj1;
+    ATestObject obj2;
+    ATestObject obj3;
+
+    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
+    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    QCOMPARE((int)obj1.getReceivers().size(), 2);
+
+    AObject::disconnect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    QCOMPARE((int)obj1.getReceivers().size(), 1);
+}
+
+void ObjectTest::Disconnect_all() {
+    ATestObject obj1;
+    ATestObject obj2;
+    ATestObject obj3;
+
+    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
+    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    QCOMPARE((int)obj1.getReceivers().size(), 2);
+    QCOMPARE((int)obj3.getSenders().size(), 1);
+
+    AObject::disconnect(&obj1, 0, 0, 0);
+    QCOMPARE((int)obj1.getReceivers().size(), 0);
+    QCOMPARE((int)obj2.getSenders().size(), 0);
+    QCOMPARE((int)obj3.getSenders().size(), 0);
+}
+
+void ObjectTest::Disconnect_by_signal() {
+    ATestObject obj1;
+    ATestObject obj2;
+    ATestObject obj3;
+
+    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
+    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    QCOMPARE((int)obj1.getReceivers().size(), 2);
+    QCOMPARE((int)obj3.getSenders().size(), 1);
+
+    AObject::disconnect(&obj1, _SIGNAL(signal(bool)), 0, 0);
+    QCOMPARE((int)obj1.getReceivers().size(), 0);
+    QCOMPARE((int)obj2.getSenders().size(), 0);
+    QCOMPARE((int)obj3.getSenders().size(), 0);
+}
+
+void ObjectTest::Disconnect_by_receiver() {
+    ATestObject obj1;
+    ATestObject obj2;
+    ATestObject obj3;
+
+    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
+    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    QCOMPARE((int)obj1.getReceivers().size(), 2);
+    QCOMPARE((int)obj3.getSenders().size(), 1);
+
+    AObject::disconnect(&obj1, 0, &obj3, 0);
+    QCOMPARE((int)obj1.getReceivers().size(), 1);
+    QCOMPARE((int)obj3.getSenders().size(), 0);
 }
 
 void ObjectTest::Child_destructor() {
     AObject *obj1   = new AObject;
-    AObject *obj2   = new AObject;
-    AObject *obj3   = new AObject;
-    obj2->setParent(obj1);
-    obj3->setParent(obj1);
+    AObject *obj2   = new AObject(obj1);
+    AObject *obj3   = new AObject(obj1);
 
     QCOMPARE((int)obj1->getComponents().size(), 2);
 
@@ -53,87 +152,98 @@ void ObjectTest::Child_destructor() {
     QCOMPARE((int)obj1->getComponents().size(), 1);
 
     obj3->deleteLater();
-    obj1->update();
+    obj3->processEvents();
     QCOMPARE((int)obj1->getComponents().size(), 0);
 
     delete obj1;
 }
 
 void ObjectTest::Reciever_destructor() {
-    AObject *obj1   = new AObject;
-    AObject *obj2   = new AObject;
+    ATestObject *obj1   = new ATestObject;
+    ATestObject *obj2   = new ATestObject;
 
-    AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
-    QCOMPARE((int)obj1->getLinks().size(), 1);
+    AObject::connect(obj1, _SIGNAL(signal(bool)), obj2, _SIGNAL(signal(bool)));
+    QCOMPARE((int)obj1->getReceivers().size(),  1);
+    QCOMPARE((int)obj2->getSenders().size(),  1);
 
     delete obj2;
-    QCOMPARE((int)obj1->getLinks().size(),      0);
+    QCOMPARE((int)obj1->getReceivers().size(),  0);
 
     delete obj1;
 }
 
 void ObjectTest::Sender_destructor() {
-    AObject *obj1   = new AObject;
-    AObject *obj2   = new AObject;
+    ATestObject *obj1   = new ATestObject;
+    ATestObject *obj2   = new ATestObject;
 
-    AObject::addEventListner(obj1, TSIGNAL, obj2, TSIGNAL);
-    QCOMPARE((int)obj1->getLinks().size(), 1);
+    AObject::connect(obj1, _SIGNAL(signal(bool)), obj2, _SIGNAL(signal(bool)));
+    QCOMPARE((int)obj1->getReceivers().size(),  1);
+    QCOMPARE((int)obj2->getSenders().size(),  1);
 
     delete obj1;
-    QCOMPARE((int)obj2->getLinks().size(), 0);
+    QCOMPARE((int)obj2->getSenders().size(),  0);
 
     delete obj2;
 }
 
 void ObjectTest::Emit_signal() {
-    ATestObject *obj1   = new ATestObject;
-    ATestObject *obj2   = new ATestObject;
+    ATestObject obj1;
+    ATestObject obj2;
+    ATestObject obj3;
 
-    AObject::addEventListner(obj1, TSIGNAL, obj2, TSLOT);
-    obj1->emitSignal(TSIGNAL, TVALUE);
+    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SIGNAL(signal(bool)));
+    AObject::connect(&obj2, _SIGNAL(signal(bool)), &obj3, _SLOT(setSlot(bool)));
 
-    QCOMPARE(obj2->m_bSlot, true);
+    {
+        QCOMPARE(obj3.m_bSlot, false);
+        obj2.emitSignal(_SIGNAL(signal(bool)), true);
+        obj1.processEvents();
+        obj2.processEvents();
+        obj3.processEvents();
 
-    delete obj1;
-    delete obj2;
-}
+        QCOMPARE(obj3.m_bSlot, true);
+    }
+    {
+        QCOMPARE(obj3.m_bSlot, true);
+        obj1.emitSignal(_SIGNAL(signal(bool)), false);
+        obj1.processEvents();
+        obj2.processEvents();
+        obj3.processEvents();
 
-void ObjectTest::Synchronize_property() {
-    ATestObject *obj1   = new ATestObject;
-    ATestObject *obj2   = new ATestObject;
-
-    AObject::addEventListner(obj1, TPROPERTY1, obj2, TPROPERTY1);
-    obj1->setProperty(TPROPERTY1, true);
-
-    QCOMPARE(obj1->property(TPROPERTY1).isShared(), true);
-    QCOMPARE(obj1->property(TPROPERTY1).toBool(), true);
-    QCOMPARE(obj2->property(TPROPERTY1).isShared(), true);
-    QCOMPARE(obj2->property(TPROPERTY1).toBool(), true);
-
-    delete obj1;
-    delete obj2;
+        QCOMPARE(obj3.m_bSlot, false);
+    }
 }
 
 void ObjectTest::Find_object() {
-    ATestObject obj1;
+    AObject obj1;
     ATestObject obj2;
     ATestObject obj3;
 
     obj1.setName("Daddy");
     obj1.addComponent("TestComponent2", &obj2);
-    obj1.addComponent("TestComponent3", &obj3);
+    obj2.addComponent("TestComponent3", &obj3);
 
     {
         AUri uri(obj2.reference());
-        AObject *result = obj1.findObject(uri.path());
+        AObject *result = obj1.find(uri.path());
 
-        QCOMPARE(&obj2, result);
+        QCOMPARE(result, &obj2);
     }
 
     {
         AUri uri(obj3.reference());
-        AObject *result = obj1.findObject(uri.path());
+        AObject *result = obj1.find(uri.path());
 
         QCOMPARE(&obj3, result);
+    }
+
+    {
+        ATestObject *result = obj1.findChild<ATestObject *>();
+        QCOMPARE(&obj2, result);
+    }
+
+    {
+        list<ATestObject *> result = obj1.findChildren<ATestObject *>();
+        QCOMPARE(int(result.size()), 2);
     }
 }

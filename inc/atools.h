@@ -45,5 +45,6 @@ inline float stof(const string& _Str, size_t *_Idx = 0) {	// convert string to f
 
 #endif
 
+
 #endif // ATOOLS
 

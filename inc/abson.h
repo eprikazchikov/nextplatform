@@ -12,7 +12,7 @@ class ABson {
 public:
     ABson                       ();
 
-    static AVariant             load                        (const AByteVector &data, AVariant::Type type = AVariant::MAP);
+    static AVariant             load                        (const AByteVector &data, AMetaType::Type type = AMetaType::VariantMap);
     static AByteVector          save                        (const AVariant &data);
 
 protected:

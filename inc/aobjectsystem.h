@@ -3,37 +3,45 @@
 
 #include <unordered_map>
 #include <string>
+#include <memory>
 
-class AObject;
-class AVariant;
+#include "aobject.h"
+
+class AMetaObject;
 
 using namespace std;
 
-typedef unordered_map<string, AObject *>   factoryMap;
-typedef unordered_map<string, string>     groupMap;
-
-class AObjectSystem {
+class AObjectSystem : public AObject{
 public:
-    AObjectSystem                       ();
+    typedef unordered_map<string, const AMetaObject *>  FactoryMap;
+    typedef unordered_map<string, string>               GroupMap;
+
+public:
+    AObjectSystem                       (const string &name = "system");
     ~AObjectSystem                      ();
 
-    AObject                            *objectCreate            (const string &url, AObject *parent = 0);
+    virtual int32_t                     exec                    ();
 
-    void                                factoryAdd              (const string &uri, AObject *prototype);
-    void                                factoryRemove           (const string &uri);
-    void                                factoryClear            ();
+    static AObjectSystem               *instance                ();
 
-    groupMap                            factory                 () const;
+    static AObject                     *objectCreate            (const string &url, AObject *parent = 0);
 
-    const string                       &systemName              () const;
-    void                                setSytemName            (const string &name);
+    static void                         factoryAdd              (const string &uri, const AMetaObject *meta);
+    static void                         factoryRemove           (const string &uri);
+
+    GroupMap                            factories               () const;
 
 private:
-    /// Container for registered callbacks.
-    factoryMap                          mFactories;
-    groupMap                            mGroups;
+    friend class ObjectSystemTest;
 
-    string                              mSystemName;
+    void                                factoryClear            ();
+
+    /// Container for registered callbacks.
+    FactoryMap                          m_Factories;
+    GroupMap                            m_Groups;
+
+    static AObjectSystem               *s_Instance;
+
 };
 
 #endif // AOBJECTSYSTEM_H
