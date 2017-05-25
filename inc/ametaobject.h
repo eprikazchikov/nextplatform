@@ -12,7 +12,7 @@
 
 #define A_OBJECT(Class, Super) \
 private: \
-    static AObject *createObject(AObject *parent = nullptr) { return new Class(parent); } \
+    static AObject *createObject() { return new Class(); } \
 public: \
     static const AMetaObject *metaClass() { \
         OBJECT_CHECK(Class) \
@@ -87,9 +87,9 @@ public: \
 
 class AObject;
 
-class AMetaObject {
+class NEXT_LIBRARY_EXPORT AMetaObject {
 public:
-    typedef AObject            *(*Constructor)              (AObject *parent);
+    typedef AObject            *(*Constructor)              ();
 
 public:
     AMetaObject                 (const char *, const AMetaObject *, const Constructor, const AMetaMethod::Table *, const AMetaProperty::Table *);
@@ -97,7 +97,7 @@ public:
     const char                 *name                        () const;
     const AMetaObject          *super                       () const;
 
-    AObject                    *createInstance              (AObject *parent = nullptr) const;
+    AObject                    *createInstance              () const;
 
     int                         indexOfMethod               (const char *) const;
     int                         indexOfSignal               (const char *) const;

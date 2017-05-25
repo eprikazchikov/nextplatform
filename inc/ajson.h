@@ -9,7 +9,7 @@
 
 #include "avariant.h"
 
-class AJson {
+class NEXT_LIBRARY_EXPORT AJson {
 public:
     AJson                       ();
 

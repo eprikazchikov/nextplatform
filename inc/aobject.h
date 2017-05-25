@@ -27,6 +27,8 @@
 #include <list>
 #include <mutex>
 
+#include <acommon.h>
+
 #include <avariant.h>
 
 #include <ametaobject.h>
@@ -40,7 +42,7 @@ public: \
 
 using namespace std;
 
-class AObject {
+class NEXT_LIBRARY_EXPORT AObject {
 public:
     struct Link {
         AObject                *sender;
@@ -65,7 +67,7 @@ protected:
     /// Object name
     string                      m_sName;
 
-    ObjectMap                   m_mComponents;
+    ObjectMap                   m_mChildren;
     LinkList                    m_lRecievers;
     LinkList                    m_lSenders;
 
@@ -74,14 +76,16 @@ protected:
     AObject                    *m_pParent;
 
 public:
-    AObject                     (AObject *parent = nullptr);
+    AObject                     ();
 
     virtual ~AObject            ();
 
-    static AObject             *createObject                (AObject *parent);
+    static AObject             *createObject                ();
 
     static const AMetaObject   *metaClass                   ();
     virtual const AMetaObject  *metaObject                  () const;
+
+    virtual AObject            *clone                       ();
 
     AObject                    *parent                      () const;
     string                      name                        () const;
@@ -96,7 +100,6 @@ public:
 
     void                        setParent                   (AObject *parent);
     void                        setName                     (const string &value);
-    void                        addComponent                (const string &name, AObject *value);
 
     bool                        isEnable                    () const;
 
@@ -105,14 +108,11 @@ public:
 
     static AObject             *toObject                    (const AVariant &variant, AObject *parent = 0);
 
-    bool                        operator==                  (const AObject &right);
-    bool                        operator!=                  (const AObject &right);
-
     AObject                    *find                        (const string &path);
 
     template<typename T>
     T                           findChild                   (bool recursive = true) {
-        for(auto it : m_mComponents) {
+        for(auto it : m_mChildren) {
             AObject *object = it.second;
             T result    = dynamic_cast<T>(object);
             if(result) {
@@ -130,7 +130,7 @@ public:
     template<typename T>
     list<T>                     findChildren                (bool recursive = true) {
         list<T> result;
-        for(auto it : m_mComponents) {
+        for(auto it : m_mChildren) {
             AObject *component = it.second;
             T object    = dynamic_cast<T>(component);
             if(object) {
@@ -147,9 +147,10 @@ public:
 
 // Virtual members
 public:
-    virtual ObjectMap          &getComponents               ();
-    virtual LinkList           &getReceivers                ();
-    virtual LinkList           &getSenders                  ();
+    virtual const ObjectMap    &getChildren                 () const;
+    virtual const LinkList     &getReceivers                () const;
+    virtual const LinkList     &getSenders                  () const;
+    virtual const PropertyMap  &getDynamicProperties        () const;
 
     virtual AVariant            property                    (const char *name) const;
     virtual void                setProperty                 (const char *name, const AVariant &value);
@@ -159,6 +160,9 @@ public:
     virtual bool                event                       (AEvent *e);
 
 protected:
+    void                        addChild                    (AObject *value, const string &name);
+    void                        removeChild                 (const string &name);
+
     void                        emitSignal                  (const char *signal, const AVariant &args = AVariant());
     bool                        postEvent                   (AEvent *e);
     void                        processEvents               ();
@@ -182,13 +186,12 @@ private:
 private:
     bool                        isLinkExist                 (const Link &link) const;
 
+    bool                        operator==                  (const AObject &) const { return false; }
+    bool                        operator!=                  (const AObject &) const { return false; }
+
     AObject                    &operator=                   (AObject &);
 
     AObject                     (const AObject &);
-
 };
-
-inline bool                     operator==                  (const AObject::Link &left, const AObject::Link &right);
-inline bool                     operator!=                  (const AObject::Link &left, const AObject::Link &right);
 
 #endif // AOBJECT_H

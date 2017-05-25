@@ -7,7 +7,7 @@
 
 #include "aobject.h"
 
-class AThreadPool {
+class NEXT_LIBRARY_EXPORT AThreadPool {
 public:
     AThreadPool                 ();
 

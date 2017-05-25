@@ -42,6 +42,8 @@ inline int aExec(QObject &ts, int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     int status = 0;
 
+    PROFILE_START
+
     AObjectSystem system;
     ATestObject::registerClassFactory();
 
@@ -73,6 +75,8 @@ int main(int argc, char *argv[]) {
         ThreadPoolTest ts;
         status |= aExec(ts, argc, argv);
     }
+
+    PROFILE_STOP
 
     return status;
 }

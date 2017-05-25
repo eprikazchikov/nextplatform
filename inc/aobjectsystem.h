@@ -11,7 +11,7 @@ class AMetaObject;
 
 using namespace std;
 
-class AObjectSystem : public AObject{
+class NEXT_LIBRARY_EXPORT AObjectSystem : public AObject{
 public:
     typedef unordered_map<string, const AMetaObject *>  FactoryMap;
     typedef unordered_map<string, string>               GroupMap;
@@ -24,7 +24,12 @@ public:
 
     static AObjectSystem               *instance                ();
 
-    static AObject                     *objectCreate            (const string &url, AObject *parent = 0);
+    static AObject                     *objectCreate            (const string &url, const string &name = string(), AObject *parent = 0);
+
+    template<typename T>
+    static AObject                     *objectCreate            (const string &name = string(), AObject *parent = 0) {
+        return objectCreate(T::metaClass()->name(), name, parent);
+    }
 
     static void                         factoryAdd              (const string &uri, const AMetaObject *meta);
     static void                         factoryRemove           (const string &uri);
@@ -39,6 +44,8 @@ private:
     /// Container for registered callbacks.
     FactoryMap                          m_Factories;
     GroupMap                            m_Groups;
+
+    bool                                m_Exit;
 
     static AObjectSystem               *s_Instance;
 

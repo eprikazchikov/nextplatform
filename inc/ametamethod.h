@@ -11,7 +11,7 @@ using namespace std;
 
 class AObject;
 
-class AMetaMethod {
+class NEXT_LIBRARY_EXPORT AMetaMethod {
 public:
     typedef AVariant            (*InvokeMem)                (AObject *, int argc, const AVariant *);
 

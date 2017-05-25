@@ -19,7 +19,8 @@ win32: {
         tests/tst_objectsystem.cpp \
         tests/tst_math.cpp \
         tests/tst_uri.cpp \
-        tests/tst_serialization.cpp
+        tests/tst_serialization.cpp \
+        tests/tst_threadpool.cpp
 
     HEADERS += \
         tests/tst_common.h \
@@ -28,17 +29,17 @@ win32: {
         tests/tst_objectsystem.h \
         tests/tst_math.h \
         tests/tst_uri.h \
-        tests/tst_serialization.h
+        tests/tst_serialization.h \
+        tests/tst_threadpool.h
 
     Debug:LIBS   += debug/anextd.lib
     Release:LIBS += release/anext.lib
 
     INCLUDEPATH  += \
-        inc
+        inc \
+        ../easy_profiler-1.0.2/include
+
+    LIBS += \
+        -L"../../external/easy_profiler-1.0.2/bin" \
+        -leasy_profiler
 }
-
-HEADERS += \
-    tests/tst_threadpool.h
-
-SOURCES += \
-    tests/tst_threadpool.cpp

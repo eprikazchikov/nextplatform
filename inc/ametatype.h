@@ -5,9 +5,11 @@
 #include <typeinfo>
 #include <typeindex>
 
+#include <acommon.h>
+
 using namespace std;
 
-class AMetaType {
+class NEXT_LIBRARY_EXPORT AMetaType {
 public:
     /*! \enum Type */
     enum Type {

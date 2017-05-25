@@ -3,9 +3,11 @@
 
 #include <regex>
 
+#include <acommon.h>
+
 using namespace std;
 
-class AUri {
+class NEXT_LIBRARY_EXPORT AUri {
 public:
     AUri                        (const string &uri);
 

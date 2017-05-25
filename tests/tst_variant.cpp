@@ -2,8 +2,6 @@
 
 #include "avariant.h"
 
-#include "atools.h"
-
 #include <QTest>
 #include <QDebug>
 

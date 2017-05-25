@@ -143,17 +143,22 @@ void ObjectTest::Disconnect_by_receiver() {
 
 void ObjectTest::Child_destructor() {
     AObject *obj1   = new AObject;
-    AObject *obj2   = new AObject(obj1);
-    AObject *obj3   = new AObject(obj1);
+    AObject *obj2   = new AObject();
+    obj2->setName("TestComponent2");
+    obj2->setParent(obj1);
 
-    QCOMPARE((int)obj1->getComponents().size(), 2);
+    AObject *obj3   = new AObject();
+    obj3->setName("TestComponent3");
+    obj3->setParent(obj1);
+
+    QCOMPARE((int)obj1->getChildren().size(), 2);
 
     delete obj2;
-    QCOMPARE((int)obj1->getComponents().size(), 1);
+    QCOMPARE((int)obj1->getChildren().size(), 1);
 
     obj3->deleteLater();
     obj3->processEvents();
-    QCOMPARE((int)obj1->getComponents().size(), 0);
+    QCOMPARE((int)obj1->getChildren().size(), 0);
 
     delete obj1;
 }
@@ -219,31 +224,46 @@ void ObjectTest::Find_object() {
     ATestObject obj2;
     ATestObject obj3;
 
-    obj1.setName("Daddy");
-    obj1.addComponent("TestComponent2", &obj2);
-    obj2.addComponent("TestComponent3", &obj3);
-
+    obj1.setName("MainObject");
+    obj2.setName("TestComponent2");
+    obj3.setName("TestComponent3");
+    obj2.setParent(&obj1);
+    obj3.setParent(&obj1);
     {
         AUri uri(obj2.reference());
         AObject *result = obj1.find(uri.path());
-
         QCOMPARE(result, &obj2);
     }
-
     {
         AUri uri(obj3.reference());
         AObject *result = obj1.find(uri.path());
-
         QCOMPARE(&obj3, result);
     }
-
     {
         ATestObject *result = obj1.findChild<ATestObject *>();
         QCOMPARE(&obj2, result);
     }
-
     {
         list<ATestObject *> result = obj1.findChildren<ATestObject *>();
         QCOMPARE(int(result.size()), 2);
     }
+}
+
+void ObjectTest::Clone_object() {
+    ATestObject obj1;
+    ATestObject obj2;
+    obj1.setName("MainObject");
+    obj2.setName("TestComponent2");
+    obj2.setParent(&obj1);
+    obj1.setVector(AVector2D(10.0, 20.0));
+    obj1.setProperty("dynamic1", 100);
+    obj2.setProperty("dynamic2", true);
+
+    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
+    AObject::connect(&obj2, _SIGNAL(signal(bool)), &obj1, _SLOT(setSlot(bool)));
+
+    AObject *clone  = obj1.clone();
+    QCOMPARE((clone != nullptr), true);
+    QCOMPARE(compare(*clone, obj1), true);
+    delete clone;
 }

@@ -24,16 +24,17 @@
 #include <list>
 #include <string>
 
-#include <amath.h>
+#include <acommon.h>
 
-#include "ametatype.h"
+#include <amath.h>
+#include <ametatype.h>
 
 #define STRUCTURE "__S__"
 #define DATA "__D__"
 
 using namespace std;
 
-class AVariant {
+class NEXT_LIBRARY_EXPORT AVariant {
 public:
     typedef map<string, AVariant>  AVariantMap;
     typedef list<AVariant>         AVariantList;

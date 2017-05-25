@@ -11,12 +11,12 @@
 void ObjectSystemTest::Object_Instansing() {
     ATestObject obj1;
 
-    AObject *result = AObjectSystem::objectCreate(ATestObject::metaClass()->name());
+    AObject *result = AObjectSystem::objectCreate<ATestObject>();
     AObject *object = dynamic_cast<AObject*>(&obj1);
 
     QCOMPARE((result != 0), true);
     QCOMPARE((object != 0), true);
-    QCOMPARE((*object == *result), true);
+    QCOMPARE(compare(*object, *result), true);
 
     delete result;
 }
@@ -27,8 +27,10 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
     ATestObject obj3;
 
     obj1.setName("MainObject");
-    obj1.addComponent("TestComponent2", &obj2);
-    obj1.addComponent("TestComponent3", &obj3);
+    obj2.setName("TestComponent2");
+    obj3.setName("TestComponent3");
+    obj2.setParent(&obj1);
+    obj3.setParent(&obj1);
     obj1.setProperty("DynamicProperty", true);
 
     AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
@@ -41,7 +43,7 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
 
     QCOMPARE((result != 0), true);
     QCOMPARE((object != 0), true);
-    QCOMPARE((*object == *result), true);
+    QCOMPARE(compare(*object, *result), true);
 
     delete result;
 }

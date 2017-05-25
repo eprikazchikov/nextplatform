@@ -41,7 +41,16 @@ HEADERS += \
     inc/ametaproperty.h \
     inc/ametamethod.h \
     inc/aevent.h \
-    inc/athreadpool.h
+    inc/athreadpool.h \
+    inc/acommon.h
 
 INCLUDEPATH += \
-    inc
+    inc \
+    ../easy_profiler-1.0.2/include
+
+DEFINES += NEXT_LIBRARY
+
+LIBS += \
+    -L"../../external/easy_profiler-1.0.2/bin" \
+    -leasy_profiler
+

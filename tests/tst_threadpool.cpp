@@ -9,8 +9,8 @@
 
 class AThreadObject : public AObject {
 public:
-    explicit AThreadObject     (AObject *parent = nullptr) :
-            AObject(parent) {
+    explicit AThreadObject     () :
+            AObject() {
         m_Counter   = 0;
     }
 
@@ -46,8 +46,11 @@ void ThreadPoolTest::cleanupTestCase() {
 
 void ThreadPoolTest::Multi_Task() {
     AThreadObject obj;
+    obj.setName("MainObject");
     for(int i = 0; i < 16; i++) {
-        AThreadObject *object = new AThreadObject(&obj);
+        AThreadObject *object = new AThreadObject();
+        object->setName(string("TestComponent") + to_string(i));
+        object->setParent(&obj);
         object->post();
         m_pPool->start(*object);
     }

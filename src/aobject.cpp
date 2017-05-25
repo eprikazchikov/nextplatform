@@ -2,7 +2,6 @@
 
 #include "aobjectsystem.h"
 #include "auri.h"
-#include "atools.h"
 
 #define TYPE        "Type"
 #define NAME        "Name"
@@ -11,23 +10,34 @@
 #define PROPERTIES  "Properties"
 #define COMPONENTS  "Components"
 
-AObject::AObject(AObject *parent) :
+inline bool operator==(const AObject::Link &left, const AObject::Link &right) {
+    bool result = true;
+    result &= (left.sender      == right.sender);
+    result &= (left.receiver    == right.receiver);
+    result &= (left.signal      == right.signal);
+    result &= (left.method      == right.method);
+    return result;
+}
+
+AObject::AObject() :
         m_bEnable(true),
         m_pParent(nullptr),
         m_pCurrentSender(nullptr) {
-
-    setParent(parent);
+    PROFILE_FUNCTION()
 
     onCreated();
 }
 
 AObject::~AObject() {
+    PROFILE_FUNCTION()
     onDestroyed();
 
-    unique_lock<mutex> locker(m_Mutex);
-    while(!m_EventQueue.empty()) {
-        delete m_EventQueue.front();
-        m_EventQueue.pop();
+    {
+        unique_lock<mutex> locker(m_Mutex);
+        while(!m_EventQueue.empty()) {
+            delete m_EventQueue.front();
+            m_EventQueue.pop();
+        }
     }
 
     while(!m_lSenders.empty()) {
@@ -35,49 +45,84 @@ AObject::~AObject() {
     }
     disconnect(this, 0, 0, 0);
 
-    for(const auto &it : m_mComponents) {
+    for(const auto &it : m_mChildren) {
         AObject *c  = it.second;
         if(c) {
             c->m_pParent    = 0;
             delete c;
         }
     }
-    m_mComponents.clear();
+    m_mChildren.clear();
 
     if(m_pParent) {
-        const auto it   = m_pParent->m_mComponents.find(m_sName);
-        if(it != m_pParent->m_mComponents.end()) {
-            m_pParent->m_mComponents.erase(it);
-        }
+        m_pParent->removeChild(m_sName);
     }
 }
 
-AObject *AObject::createObject(AObject *parent) {
-    return new AObject(parent);
+AObject *AObject::createObject() {
+    PROFILE_FUNCTION()
+    return new AObject();
 }
 
 const AMetaObject *AObject::metaClass() {
+    PROFILE_FUNCTION()
     static const AMetaObject staticMetaData("AObject", nullptr, &createObject, nullptr, nullptr);
     return &staticMetaData;
 }
 
 const AMetaObject *AObject::metaObject() const {
+    PROFILE_FUNCTION()
     return AObject::metaClass();
 }
 
+AObject *AObject::clone() {
+    PROFILE_FUNCTION()
+    AObject *result = metaObject()->createInstance();
+    for(auto it : getDynamicProperties()) {
+        result->setProperty(it.first.c_str(), it.second);
+    }
+    for(int i = 0; i < metaObject()->propertyCount(); i++) {
+        AMetaProperty lp    = result->metaObject()->property(i);
+        AMetaProperty rp    = metaObject()->property(i);
+        lp.write(result, rp.read(this));
+    }
+    for(auto it : getChildren()) {
+        AObject *clone  = it.second->clone();
+        clone->setName(it.first);
+        clone->setParent(result);
+    }
+    for(auto it : getSenders()) {
+        AMetaMethod signal  = it.sender->metaObject()->method(it.signal);
+        AMetaMethod method  = result->metaObject()->method(it.method);
+        connect(it.sender, (to_string(1) + signal.signature()).c_str(),
+                result, (to_string((method.type() == AMetaMethod::Signal) ? 1 : 2) + method.signature()).c_str());
+    }
+    for(auto it : getReceivers()) {
+        AMetaMethod signal  = result->metaObject()->method(it.signal);
+        AMetaMethod method  = it.receiver->metaObject()->method(it.method);
+        connect(result, (to_string(1) + signal.signature()).c_str(),
+                it.receiver, (to_string((method.type() == AMetaMethod::Signal) ? 1 : 2) + method.signature()).c_str());
+    }
+    return result;
+}
+
 AObject *AObject::parent() const {
+    PROFILE_FUNCTION()
     return m_pParent;
 }
 
 string AObject::name() const {
+    PROFILE_FUNCTION()
     return m_sName;
 }
 
 string AObject::typeName() const {
+    PROFILE_FUNCTION()
     return metaObject()->name();
 }
 
 void AObject::connect(AObject *sender, const char *signal, AObject *receiver, const char *method) {
+    PROFILE_FUNCTION()
     if(sender && receiver) {
         int32_t snd = sender->metaObject()->indexOfSignal(&signal[1]);
 
@@ -101,23 +146,22 @@ void AObject::connect(AObject *sender, const char *signal, AObject *receiver, co
             sender->reference() + "#" + char(method.type() + 0x30) + method.signature();
 */
             if(!sender->isLinkExist(link)) {
-                //sender->m_Mutex.lock();
+                {
+                    unique_lock<mutex> locker(sender->m_Mutex);
                     sender->m_lRecievers.push_back(link);
-                //sender->m_Mutex.unlock();
-
-                //receiver->m_Mutex.lock();
+                }
+                {
+                    unique_lock<mutex> locker(receiver->m_Mutex);
                     receiver->m_lSenders.push_back(link);
-                //receiver->m_Mutex.unlock();
+                }
             }
-        } else {
-            // Can't connect Signal to Slot
         }
     }
-    /// \todo: Should be thread safe
 }
 
 void AObject::disconnect(AObject *sender, const char *signal, AObject *receiver, const char *method) {
-    if(sender) {
+    PROFILE_FUNCTION()
+    if(sender && !sender->m_lRecievers.empty()) {
         for(auto snd = sender->m_lRecievers.begin(); snd != sender->m_lRecievers.end(); snd) {
             Link *data = &(*snd);
 
@@ -128,13 +172,13 @@ void AObject::disconnect(AObject *sender, const char *signal, AObject *receiver,
 
                             for(auto rcv = data->receiver->m_lSenders.begin(); rcv != data->receiver->m_lSenders.end(); rcv) {
                                 if(*rcv == *data) {
-                                    //unique_lock<mutex> locker(data->receiver->m_Mutex);
+                                    unique_lock<mutex> locker(data->receiver->m_Mutex);
                                     rcv = data->receiver->m_lSenders.erase(rcv);
                                 } else {
                                     rcv++;
                                 }
                             }
-                            //unique_lock<mutex> locker(sender->m_Mutex);
+                            unique_lock<mutex> locker(sender->m_Mutex);
                             snd = sender->m_lRecievers.erase(snd);
 
                             continue;
@@ -142,30 +186,38 @@ void AObject::disconnect(AObject *sender, const char *signal, AObject *receiver,
                     }
                 }
             }
-
             snd++;
         }
     }
-    /// \todo: Should be thread safe
 }
 
 void AObject::deleteLater() {
+    PROFILE_FUNCTION()
     postEvent(new AEvent(AEvent::Delete));
 }
 
-AObject::ObjectMap &AObject::getComponents() {
-    return m_mComponents;
+const AObject::ObjectMap &AObject::getChildren() const {
+    PROFILE_FUNCTION()
+    return m_mChildren;
 }
 
-AObject::LinkList &AObject::getReceivers() {
+const AObject::LinkList &AObject::getReceivers() const {
+    PROFILE_FUNCTION()
     return m_lRecievers;
 }
 
-AObject::LinkList &AObject::getSenders() {
+const AObject::LinkList &AObject::getSenders() const {
+    PROFILE_FUNCTION()
     return m_lSenders;
 }
 
+const AObject::PropertyMap &AObject::getDynamicProperties() const {
+    PROFILE_FUNCTION()
+    return m_mDynamicProperties;
+}
+
 AObject *AObject::find(const string &path) {
+    PROFILE_FUNCTION()
     if(m_pParent && path[0] == '/') {
         return m_pParent->find(path);
     }
@@ -176,7 +228,7 @@ AObject *AObject::find(const string &path) {
     }
     int index  = path.find('/', 1);
     if(index > -1) {
-        for(const auto &it : m_mComponents) {
+        for(const auto &it : m_mChildren) {
             AObject *o  = it.second->find(path.substr(index + 1));
             if(o) {
                 return o;
@@ -190,53 +242,53 @@ AObject *AObject::find(const string &path) {
 }
 
 void AObject::setParent(AObject *parent) {
+    PROFILE_FUNCTION()
+    if(m_pParent) {
+        m_pParent->removeChild(m_sName);
+    }
     if(parent) {
-        parent->addComponent(m_sName, this);
+        parent->addChild(this, m_sName);
     }
     m_pParent   = parent;
 }
 
 void AObject::setName(const string &value) {
+    PROFILE_FUNCTION()
     if(!value.empty()) {
         if(m_sName != value && m_pParent) {
-            auto it = m_pParent->m_mComponents.find(m_sName);
-            if(it !=  m_pParent->m_mComponents.end()) {
-                m_pParent->m_mComponents.erase(it);
-            }
-            m_pParent->addComponent(value, this);
+            m_pParent->removeChild(m_sName);
+            m_pParent->addChild(this, value);
         }
         m_sName = value;
     }
 }
 
-void AObject::addComponent(const string &name, AObject *value) {
-    if(value) {
-        string type = name;
-        if(type.empty()) {
-            type    = value->metaObject()->name();
+void AObject::addChild(AObject *value, const string &name) {
+    PROFILE_FUNCTION()
+    if(value && !name.empty()) {
+        auto it = m_mChildren.find(name);
+        if(it != m_mChildren.end()) {
+            delete (*it).second;
         }
-        string str  = type;
-        int i       = 0;
-        while(true) {
-            if(m_mComponents.find(str) == m_mComponents.end()) {
-                break;
-            } else {
-                i++;
-                str = type + "_" + to_string(i);
-            }
-        }
-        m_mComponents[str]  = value;
+        m_mChildren[name]    = value;
+    }
+}
 
-        value->m_pParent    = this;
-        value->m_sName      = str;
+void AObject::removeChild(const string &name) {
+    PROFILE_FUNCTION()
+    auto it = m_mChildren.find(name);
+    if(it != m_mChildren.end()) {
+        m_mChildren.erase(it);
     }
 }
 
 bool AObject::isEnable() const {
+    PROFILE_FUNCTION()
     return m_bEnable;
 }
 
 void AObject::emitSignal(const char *signal, const AVariant &args) {
+    PROFILE_FUNCTION()
     int32_t index   = metaObject()->indexOfSignal(&signal[1]);
     for(auto &it : m_lRecievers) {
         Link *link  = &(it);
@@ -253,6 +305,7 @@ void AObject::emitSignal(const char *signal, const AVariant &args) {
 }
 
 bool AObject::postEvent(AEvent *e) {
+    PROFILE_FUNCTION()
     unique_lock<mutex> locker(m_Mutex);
     m_EventQueue.push(e);
 
@@ -260,6 +313,7 @@ bool AObject::postEvent(AEvent *e) {
 }
 
 void AObject::processEvents() {
+    PROFILE_FUNCTION()
     while(!m_EventQueue.empty()) {
         unique_lock<mutex> locker(m_Mutex);
         AEvent *e   = m_EventQueue.front();
@@ -286,6 +340,7 @@ void AObject::processEvents() {
 }
 
 string AObject::reference() const {
+    PROFILE_FUNCTION()
     if(m_pParent) {
         return m_pParent->reference() + "/" + m_sName;
     }
@@ -293,14 +348,17 @@ string AObject::reference() const {
 }
 
 void AObject::setEnable(bool state) {
+    PROFILE_FUNCTION()
     m_bEnable   = state;
 }
 
 bool AObject::event(AEvent *e) {
+    PROFILE_FUNCTION()
     return false;
 }
 
 AVariant AObject::property(const char *name) const {
+    PROFILE_FUNCTION()
     const AMetaObject *meta = metaObject();
     int index   = meta->indexOfProperty(name);
     if(index > -1) {
@@ -315,6 +373,7 @@ AVariant AObject::property(const char *name) const {
 }
 
 void AObject::setProperty(const char *name, const AVariant &value) {
+    PROFILE_FUNCTION()
     const AMetaObject *meta = metaObject();
     int index   = meta->indexOfProperty(name);
     if(index > -1) {
@@ -325,18 +384,22 @@ void AObject::setProperty(const char *name, const AVariant &value) {
 }
 
 void AObject::onCreated() {
+    PROFILE_FUNCTION()
 
 }
 
 void AObject::onDestroyed() {
+    PROFILE_FUNCTION()
 
 }
 
 AObject *AObject::sender() const {
+    PROFILE_FUNCTION()
     return m_pCurrentSender;
 }
 
 AVariant AObject::toVariant() {
+    PROFILE_FUNCTION()
     AVariant::AVariantMap object;
     object[TYPE]    = typeName();
     object[NAME]    = m_sName;
@@ -367,7 +430,7 @@ AVariant AObject::toVariant() {
     // Save components
     {
         AVariant::AVariantMap components;
-        for(const auto &it : m_mComponents) {
+        for(const auto &it : m_mChildren) {
             if(it.second) {
                 AVariant left   = it.second->toVariant();
                 components[it.first]    = left;
@@ -411,11 +474,11 @@ AVariant AObject::toVariant() {
 }
 
 void AObject::fromVariant(const AVariant &variant) {
+    PROFILE_FUNCTION()
     AVariant::AVariantMap map   = variant.toMap();
 
     setName(map[NAME].toString());
     setEnable(map[ENABLE].toBool());
-
     // Load properties
     {
         for(const auto &it : map[PROPERTIES].toList()) {
@@ -427,7 +490,7 @@ void AObject::fromVariant(const AVariant &variant) {
     // Load components
     {
         for(const auto &it : map[COMPONENTS].toMap()) {
-            if(m_mComponents.find(it.first) == m_mComponents.end()) {
+            if(m_mChildren.find(it.first) == m_mChildren.end()) {
                 toObject(it.second, this);
             }
         }
@@ -449,9 +512,10 @@ void AObject::fromVariant(const AVariant &variant) {
 }
 
 AObject *AObject::toObject(const AVariant &variant, AObject *parent) {
+    PROFILE_FUNCTION()
     AVariant::AVariantMap map   = variant.toMap();
 
-    AObject *result = AObjectSystem::objectCreate(map[TYPE].toString(), parent);
+    AObject *result = AObjectSystem::objectCreate(map[TYPE].toString(), "", parent);
     if(result) {
         result->fromVariant(variant);
     }
@@ -459,6 +523,7 @@ AObject *AObject::toObject(const AVariant &variant, AObject *parent) {
 }
 
 bool AObject::isLinkExist(const Link &link) const {
+    PROFILE_FUNCTION()
     for(const auto &it : m_lRecievers) {
         if(it == link) {
             return true;
@@ -468,74 +533,10 @@ bool AObject::isLinkExist(const Link &link) const {
 }
 
 AObject &AObject::operator=(AObject &right) {
+    PROFILE_FUNCTION()
     return AObject(right);
 }
 
 AObject::AObject(const AObject &) {
-}
-
-bool AObject::operator==(const AObject &right) {
-    bool result = true;
-
-    result &= (m_bEnable    == right.m_bEnable);
-    result &= (typeName()   == right.typeName());
-
-    result &= (m_mDynamicProperties == right.m_mDynamicProperties);
-
-    if(!result) {
-        return result;
-    }
-
-    {
-        if(m_lRecievers.size() == right.m_lRecievers.size()) {
-            for(const auto &li : m_lRecievers) {
-                result  = false;
-                for(const auto &ri : right.m_lRecievers) {
-                    if(li == ri) {
-                        result  = true;
-                        break;
-                    }
-                }
-                if(!result) {
-                    return result;
-                }
-            }
-        } else {
-            return false;
-        }
-    }
-
-    {
-        if(m_mComponents.size()  == right.m_mComponents.size()) {
-            for(const auto &it : m_mComponents) {
-                const auto &c   = right.m_mComponents.find(it.first);
-                if(c != right.m_mComponents.end()) {
-                    if(*(it.second) != *(c->second)) {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            }
-        } else {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-inline bool AObject::operator!=(const AObject &right) {
-    return !(*this == right);
-}
-
-inline bool operator==(const AObject::Link &left, const AObject::Link &right) {
-    bool result = true;
-    result &= left.signal   == right.signal;
-    result &= left.method   == right.method;
-    return result;
-}
-
-inline bool operator!=(const AObject::Link &left, const AObject::Link &right) {
-    return !(left == right);
+    PROFILE_FUNCTION()
 }

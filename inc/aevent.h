@@ -3,7 +3,9 @@
 
 #include <stdint.h>
 
-class AEvent {
+#include <acommon.h>
+
+class NEXT_LIBRARY_EXPORT AEvent {
 public:
     enum Type {
         Invalid                 = 0,

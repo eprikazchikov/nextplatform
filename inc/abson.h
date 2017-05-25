@@ -8,7 +8,7 @@
 
 typedef vector<uint8_t>         AByteVector;
 
-class ABson {
+class NEXT_LIBRARY_EXPORT ABson {
 public:
     ABson                       ();
 

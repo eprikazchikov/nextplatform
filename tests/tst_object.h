@@ -37,6 +37,7 @@ private slots:
     void Sender_destructor();
     void Emit_signal();
     void Find_object();
+    void Clone_object();
 };
 
 #endif // TST_OBJECT_H

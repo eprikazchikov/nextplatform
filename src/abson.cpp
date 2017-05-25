@@ -2,8 +2,6 @@
 
 #include <streambuf>
 
-#include "atools.h"
-
 AVariant appendProperty(const AVariant &container, const AVariant &data, const string &name) {
     switch(container.type()) {
         case AMetaType::VariantList: {
@@ -34,6 +32,7 @@ AVariant appendProperty(const AVariant &container, const AVariant &data, const s
 }
 
 AVariant ABson::load(const AByteVector &data, AMetaType::Type type) {
+    PROFILE_FUNCTION()
     AVariant result(type);
 
     uint32_t offset = 0;
@@ -108,6 +107,7 @@ AVariant ABson::load(const AByteVector &data, AMetaType::Type type) {
 }
 
 AByteVector ABson::save(const AVariant &data) {
+    PROFILE_FUNCTION()
     AByteVector result;
 
     switch(data.type()) {
@@ -182,6 +182,7 @@ AByteVector ABson::save(const AVariant &data) {
 }
 
 uint8_t ABson::type(const AVariant &data) {
+    PROFILE_FUNCTION()
     uint8_t result;
     switch (data.type()) {
         case AMetaType::Invalid:        result  = NONE; break;

@@ -57,9 +57,11 @@ enum States {
 };
 
 AJson::AJson() {
+    PROFILE_FUNCTION()
 }
 
 AVariant AJson::load(const string &data) {
+    PROFILE_FUNCTION()
     AVariant result;
 
     VariantStack    s;
@@ -182,6 +184,7 @@ AVariant AJson::load(const string &data) {
 }
 
 string AJson::save(const AVariant &data, int32_t depth) {
+    PROFILE_FUNCTION()
     string result;
     switch(data.type()) {
         case AMetaType::Bool:
@@ -231,6 +234,7 @@ string AJson::save(const AVariant &data, int32_t depth) {
 }
 
 inline string AJson::readString(const string &data, uint32_t &it) {
+    PROFILE_FUNCTION()
     uint32_t s  = ++it;
     char c          = data[s];
     while(it < data.length() && c != '"') {
@@ -243,15 +247,18 @@ inline string AJson::readString(const string &data, uint32_t &it) {
 }
 
 inline void AJson::skipSpaces(const char *data, uint32_t &it) {
+    PROFILE_FUNCTION()
     while(isSpace(data[it])) {
         it++;
     }
 }
 
 inline bool AJson::isSpace(uint8_t c) {
+    PROFILE_FUNCTION()
     return c == ' ' || c == '\t' || c == '\r' || c == '\n';
 }
 
 inline bool AJson::isDigit(uint8_t c) {
+    PROFILE_FUNCTION()
     return c >= '0' && c <= '9';
 }

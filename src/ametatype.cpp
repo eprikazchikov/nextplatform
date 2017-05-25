@@ -104,17 +104,21 @@ AMetaType::NameMap AMetaType::s_Names = {
 
 AMetaType::AMetaType(const Table *table) :
         m_pTable(table) {
+    PROFILE_FUNCTION()
 }
 
 const char *AMetaType::name() const {
+    PROFILE_FUNCTION()
     return m_pTable->name;
 }
 
 int AMetaType::size() const {
+    PROFILE_FUNCTION()
     return m_pTable->get_size();
 }
 
 void *AMetaType::construct(void *where, const void *copy) const {
+    PROFILE_FUNCTION()
     if(copy) {
         m_pTable->clone(&copy, &where);
         return where;
@@ -125,6 +129,7 @@ void *AMetaType::construct(void *where, const void *copy) const {
 }
 
 void *AMetaType::create(const void *copy) const {
+    PROFILE_FUNCTION()
     void *where = nullptr;
     m_pTable->static_new(&where);
 
@@ -135,22 +140,27 @@ void *AMetaType::create(const void *copy) const {
 }
 
 void AMetaType::destroy(void *data) const {
+    PROFILE_FUNCTION()
     m_pTable->static_delete(&data);
 }
 
 void AMetaType::destruct(void *data) const {
+    PROFILE_FUNCTION()
     m_pTable->destruct(&data);
 }
 
 bool AMetaType::compare(const void *left, const void *right) const {
+    PROFILE_FUNCTION()
     return m_pTable->compare(&left, &right);
 }
 
 bool AMetaType::isValid() const {
+    PROFILE_FUNCTION()
     return (m_pTable != nullptr);
 }
 
 uint32_t AMetaType::registerType(Table &table) {
+    PROFILE_FUNCTION()
     uint32_t result  = ++AMetaType::s_NextId;
     AMetaType::s_Types[result]      = table;
     AMetaType::s_Names[table.name]  = result;
@@ -158,6 +168,7 @@ uint32_t AMetaType::registerType(Table &table) {
 }
 
 uint32_t AMetaType::type(const char *name) {
+    PROFILE_FUNCTION()
     auto it = AMetaType::s_Names.find(name);
     if(it != AMetaType::s_Names.end()) {
         return it->second;
@@ -167,6 +178,7 @@ uint32_t AMetaType::type(const char *name) {
 }
 
 const char *AMetaType::name(uint32_t type) {
+    PROFILE_FUNCTION()
     auto it = AMetaType::s_Types.find(type);
     if(it != AMetaType::s_Types.end()) {
         return AMetaType(&(it->second)).name();
@@ -175,6 +187,7 @@ const char *AMetaType::name(uint32_t type) {
 }
 
 int AMetaType::size(uint32_t type) {
+    PROFILE_FUNCTION()
     auto it = AMetaType::s_Types.find(type);
     if(it != AMetaType::s_Types.end()) {
         return AMetaType(&(it->second)).size();
@@ -183,6 +196,7 @@ int AMetaType::size(uint32_t type) {
 }
 
 void *AMetaType::construct(uint32_t type, void *where, const void *copy) {
+    PROFILE_FUNCTION()
     auto it = AMetaType::s_Types.find(type);
     if(it != AMetaType::s_Types.end()) {
         return AMetaType(&(it->second)).construct(where, copy);
@@ -191,6 +205,7 @@ void *AMetaType::construct(uint32_t type, void *where, const void *copy) {
 }
 
 void *AMetaType::create(uint32_t type, const void *copy) {
+    PROFILE_FUNCTION()
     auto it = AMetaType::s_Types.find(type);
     if(it != AMetaType::s_Types.end()) {
         return AMetaType(&(it->second)).create(copy);
@@ -199,6 +214,7 @@ void *AMetaType::create(uint32_t type, const void *copy) {
 }
 
 void AMetaType::destroy(uint32_t type, void *data) {
+    PROFILE_FUNCTION()
     auto it = AMetaType::s_Types.find(type);
     if(it != AMetaType::s_Types.end()) {
         AMetaType(&(it->second)).destroy(data);
@@ -206,6 +222,7 @@ void AMetaType::destroy(uint32_t type, void *data) {
 }
 
 void AMetaType::destruct(uint32_t type, void *data) {
+    PROFILE_FUNCTION()
     auto it = AMetaType::s_Types.find(type);
     if(it != AMetaType::s_Types.end()) {
         AMetaType(&(it->second)).destruct(data);
@@ -213,6 +230,7 @@ void AMetaType::destruct(uint32_t type, void *data) {
 }
 
 bool AMetaType::compare(const void *left, const void *right, uint32_t type) {
+    PROFILE_FUNCTION()
     auto it = AMetaType::s_Types.find(type);
     if(it != AMetaType::s_Types.end()) {
         return AMetaType(&(it->second)).compare(left, right);
@@ -221,6 +239,7 @@ bool AMetaType::compare(const void *left, const void *right, uint32_t type) {
 }
 
 bool AMetaType::convert(const void *from, uint32_t fromType, void *to, uint32_t toType) {
+    PROFILE_FUNCTION()
     auto t = s_Converters.find(toType);
     if(t != s_Converters.end()) {
         auto it = t->second.find(fromType);
@@ -232,6 +251,7 @@ bool AMetaType::convert(const void *from, uint32_t fromType, void *to, uint32_t 
 }
 
 bool AMetaType::hasConverter(uint32_t from, uint32_t to) {
+    PROFILE_FUNCTION()
     auto t = s_Converters.find(to);
     if(t != s_Converters.end()) {
         auto it = t->second.find(from);
@@ -243,6 +263,7 @@ bool AMetaType::hasConverter(uint32_t from, uint32_t to) {
 }
 
 bool AMetaType::toBoolean(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result = true;
     bool *r     = static_cast<bool *>(to);
     switch(fromType) {
@@ -255,6 +276,7 @@ bool AMetaType::toBoolean(void *to, const void *from, const uint32_t fromType) {
 }
 
 bool AMetaType::toInteger(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result = true;
     int *r      = static_cast<int *>(to);
     switch(fromType) {
@@ -267,6 +289,7 @@ bool AMetaType::toInteger(void *to, const void *from, const uint32_t fromType) {
 }
 
 bool AMetaType::toDouble(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result = true;
     double *r   = static_cast<double *>(to);
     switch(fromType) {
@@ -279,6 +302,7 @@ bool AMetaType::toDouble(void *to, const void *from, const uint32_t fromType) {
 }
 
 bool AMetaType::toString(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result = true;
     string *r   = static_cast<string *>(to);
     switch(fromType) {
@@ -291,6 +315,7 @@ bool AMetaType::toString(void *to, const void *from, const uint32_t fromType) {
 }
 
 bool AMetaType::toList(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result = true;
     AVariant::AVariantList *r = static_cast<AVariant::AVariantList *>(to);
     switch(fromType) {
@@ -345,6 +370,7 @@ bool AMetaType::toList(void *to, const void *from, const uint32_t fromType) {
 }
 
 bool AMetaType::toVector2D(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result     = true;
     AVector2D *r    = static_cast<AVector2D *>(to);
     switch(fromType) {
@@ -363,6 +389,7 @@ bool AMetaType::toVector2D(void *to, const void *from, const uint32_t fromType) 
 }
 
 bool AMetaType::toVector3D(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result     = true;
     AVector3D *r    = static_cast<AVector3D *>(to);
     switch(fromType) {
@@ -382,6 +409,7 @@ bool AMetaType::toVector3D(void *to, const void *from, const uint32_t fromType) 
 }
 
 bool AMetaType::toVector4D(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result     = true;
     AVector4D *r    = static_cast<AVector4D *>(to);
     switch(fromType) {
@@ -402,6 +430,7 @@ bool AMetaType::toVector4D(void *to, const void *from, const uint32_t fromType) 
 }
 
 bool AMetaType::toMatrix3D(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result     = true;
     AMatrix3D *r    = static_cast<AMatrix3D *>(to);
     switch(fromType) {
@@ -418,6 +447,7 @@ bool AMetaType::toMatrix3D(void *to, const void *from, const uint32_t fromType) 
 }
 
 bool AMetaType::toMatrix4D(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result     = true;
     AMatrix4D *r    = static_cast<AMatrix4D *>(to);
     switch(fromType) {
@@ -434,6 +464,7 @@ bool AMetaType::toMatrix4D(void *to, const void *from, const uint32_t fromType) 
 }
 
 bool AMetaType::toQuaternion(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result     = true;
     AQuaternion *r  = static_cast<AQuaternion *>(to);
     switch(fromType) {
@@ -451,6 +482,7 @@ bool AMetaType::toQuaternion(void *to, const void *from, const uint32_t fromType
 }
 
 bool AMetaType::toCurve(void *to, const void *from, const uint32_t fromType) {
+    PROFILE_FUNCTION()
     bool result = true;
     ACurve *r   = static_cast<ACurve *>(to);
     switch(fromType) {

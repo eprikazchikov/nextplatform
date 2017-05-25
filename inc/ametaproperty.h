@@ -6,7 +6,7 @@
 
 class AObject;
 
-class AMetaProperty {
+class NEXT_LIBRARY_EXPORT AMetaProperty {
 public:
     typedef AVariant            (*ReadMem)              (const AObject *);
     typedef void                (*WriteMem)             (AObject *, const AVariant&);
