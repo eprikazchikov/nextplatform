@@ -41,11 +41,21 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
     AObject *result = AObject::toObject(data);
     AObject *object = dynamic_cast<AObject*>(&obj1);
 
-    QCOMPARE((result != 0), true);
-    QCOMPARE((object != 0), true);
+    QCOMPARE((result != nullptr), true);
+    QCOMPARE((object != nullptr), true);
     QCOMPARE(compare(*object, *result), true);
 
     delete result;
+}
+
+void ObjectSystemTest::Override_object() {
+    ATestObjectEx::registerClassFactory();
+    AObject *object = AObjectSystem::objectCreate<ATestObject>();
+
+    QCOMPARE((object != 0), true);
+    QCOMPARE((dynamic_cast<ATestObjectEx *>(object) != nullptr), true);
+
+    delete object;
 }
 
 void ObjectSystemTest::Delta_Serialize_Desirialize_Object() {

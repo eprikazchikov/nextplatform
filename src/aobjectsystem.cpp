@@ -53,6 +53,7 @@ AObject *AObjectSystem::objectCreate(const string &uri, const string &name, AObj
 void AObjectSystem::factoryAdd(const string &uri, const AMetaObject *meta) {
     PROFILE_FUNCTION()
     AUri group(uri);
+
     AObjectSystem::s_Instance->m_Groups[group.name()]   = uri;
     AObjectSystem::s_Instance->m_Factories[uri]         = meta;
 }

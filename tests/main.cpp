@@ -46,7 +46,6 @@ int main(int argc, char *argv[]) {
 
     AObjectSystem system;
     ATestObject::registerClassFactory();
-
     {
         MathTest ts;
         status |= aExec(ts, argc, argv);

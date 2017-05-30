@@ -50,6 +50,11 @@ public:
     AVector2D       m_Vector2;
 };
 
+class ATestObjectEx : public ATestObject {
+    //A_OBJECT(ATestObjectEx, ATestObject)
+    A_OVERRIDE(ATestObjectEx, ATestObject, Test)
+};
+
 inline bool compare(const AObject::Link &left, const AObject::Link &right) {
     bool result = true;
     result &= left.signal   == right.signal;

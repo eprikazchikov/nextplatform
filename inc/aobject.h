@@ -40,6 +40,12 @@ public: \
         AObjectSystem::factoryAdd(string("thor://") + #Group + "/" + Class::metaClass()->name(), Class::metaClass()); \
     }
 
+#define A_OVERRIDE(Class, Super, Group) \
+public: \
+    static void                 registerClassFactory        () { \
+        AObjectSystem::factoryAdd(string("thor://") + #Group + "/" + Super::metaClass()->name(), Class::metaClass()); \
+    }
+
 using namespace std;
 
 class NEXT_LIBRARY_EXPORT AObject {

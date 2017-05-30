@@ -23,6 +23,7 @@ public:
     AMetaProperty           (const Table *table);
 
     const char             *name                        () const;
+    const char             *group                       () const;
     bool                    isValid                     () const;
     const AMetaType         type                        () const;
 

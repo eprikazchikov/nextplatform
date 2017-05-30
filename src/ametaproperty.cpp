@@ -10,6 +10,11 @@ const char *AMetaProperty::name() const {
     return m_pTable->name;
 }
 
+const char *AMetaProperty::group() const {
+    PROFILE_FUNCTION()
+    return m_pTable->group;
+}
+
 bool AMetaProperty::isValid() const {
     PROFILE_FUNCTION()
     return (m_pTable != nullptr);
