@@ -7,7 +7,7 @@ struct AABox {
 
     bool intersect(const AVector3D &p, float r) {
         AVector3D min, max;
-        get_box(min, max);
+        box(min, max);
 
         float d = 0;
         float s = 0;
@@ -21,7 +21,6 @@ struct AABox {
                 d  += s * s;
             }
         }
-
         return d <= r * r;
     }
 
@@ -38,32 +37,33 @@ struct AABox {
     }
 
     inline const AABox operator*(const AMatrix4D &m) {
-        AVector3D p = pos * AVector3D(m[0], m[5], m[10]);
-        p          += AVector3D(m[12], m[13], m[14]);
-        AVector3D s = size * AVector3D(m[0], m[5], m[10]);
+        const float *v  = (const float*)glm::value_ptr(m);
+        AVector3D p = pos * AVector3D(v[0], v[5], v[10]);
+        p          += AVector3D(v[12], v[13], v[14]);
+        AVector3D s = size * AVector3D(v[0], v[5], v[10]);
         return AABox(p, s);
     }
 
-    inline void set_box(AVector3D &min, AVector3D &max) {
+    inline void setBox(const AVector3D &min, const AVector3D &max) {
         size    = max - min;
-        pos     = min + size * 0.5;
+        pos     = min + size * 0.5f;
     }
 
-    inline void get_box(AVector3D &min, AVector3D &max) const {
-        min     = pos - size * 0.5;
+    inline void box(AVector3D &min, AVector3D &max) const {
+        min     = pos - size * 0.5f;
         max     = min + size;
     }
 
-    inline AVector3D get_vertex_p(AVector3D &normal) {
-        AVector3D res = pos - size * 0.5;
+    inline AVector3D vertexP(AVector3D &normal) {
+        AVector3D res = pos - size * 0.5f;
         if (normal.x > 0) res.x += size.x;
         if (normal.y > 0) res.y += size.y;
         if (normal.z > 0) res.z += size.z;
         return res;
     }
 
-    inline AVector3D get_vertex_n(AVector3D &normal) {
-        AVector3D res = pos - size * 0.5;
+    inline AVector3D vertexN(AVector3D &normal) {
+        AVector3D res = pos - size * 0.5f;
         if (normal.x < 0) res.x += size.x;
         if (normal.y < 0) res.y += size.y;
         if (normal.z < 0) res.z += size.z;

@@ -7,12 +7,12 @@ struct ARay {
 
     inline bool intersect(const AVector3D &p, float r, AVector3D *pt) {
         AVector3D l = p - pos;
-        float tca   = l.dot(dir);
+        float tca   = dot(l, dir);
         if(tca < 0) {
             return false;
         }
 
-        float d2    = l.dot(l) - tca * tca;
+        float d2    = dot(l, l) - tca * tca;
         if(d2 > r * r) {
             return false;
         }
@@ -33,18 +33,18 @@ struct ARay {
 
     inline bool intersect(const APlane &p, AVector3D *pt, bool back = false) {
         AVector3D n = p.normal;
-        float d     = dir.dot(n);
+        float d     = dot(dir, n);
         if(d >= 0.0f) {
             if(back) {
                 n   = -n;
-                d   = dir.dot(n);
+                d   = dot(dir, n);
             } else {
                 return false;
             }
         }
 
         //float t = p.normal.dot(p.normal * p.d - pos) / d;
-        float t = -n.dot(pos - p.point) / d;
+        float t = dot(-n, pos - p.point) / d;
         if(t <= 0.0) {
             return false;
         }
@@ -58,7 +58,7 @@ struct ARay {
 
     inline bool intersect(const AABox &b, AVector3D *pt) {
         AVector3D min, max;
-        b.get_box(min, max);
+        b.box(min, max);
 
         bool inside = true;
         char quadrant[3];
@@ -132,11 +132,11 @@ struct ARay {
         AVector3D ve0   = v3 - v1;
         AVector3D ve1   = v2 - v1;
         AVector3D ve2   = ip - v1;
-        float dot00     = ve0.dot(ve0);
-        float dot01     = ve0.dot(ve1);
-        float dot02     = ve0.dot(ve2);
-        float dot11     = ve1.dot(ve1);
-        float dot12     = ve1.dot(ve2);
+        float dot00     = dot(ve0, ve0);
+        float dot01     = dot(ve0, ve1);
+        float dot02     = dot(ve0, ve2);
+        float dot11     = dot(ve1, ve1);
+        float dot12     = dot(ve1, ve2);
         float invDenom  = 1.0f / (dot00 * dot11 - dot01 * dot01);
         AVector2D b     = AVector2D((dot11 * dot02 - dot01 * dot12) * invDenom, (dot00 * dot12 - dot01 * dot02) * invDenom);
 
@@ -154,8 +154,8 @@ struct ARay {
         ARay ret;
 
         ret.pos     = p;
-        ret.dir     = dir - n * ((float)2.0 * dir.dot(n));
-        ret.dir.normalize();
+        ret.dir     = dir - n * ((float)2.0 * dot(dir, n));
+        normalize(ret.dir);
 
         return ret;
     }
@@ -164,12 +164,12 @@ struct ARay {
         ARay ret;
 
         float eta   = c0 / c1;
-        float theta = n.dot(dir);
+        float theta = dot(n, dir);
         float k     = (float)1.0 - eta * eta * ((float)1.0 - theta * theta);
 
         ret.pos     = p;
         ret.dir     = dir * eta - n * (eta * theta + sqrt(k));
-        ret.dir.normalize();
+        normalize(ret.dir);
 
         return ret;
     }
@@ -177,17 +177,17 @@ struct ARay {
     inline ARay diffuse(const AVector3D &n, const AVector3D &p, float min, float max) {
         ARay ret;
 
-        float r1    = (float)2.0 * PI * RANGE(min, max);
+        float r1    = 2.0f * glm::pi<float>() * RANGE(min, max);
         float r2    = RANGE(min, max);
         float r2s   = sqrt(r2);
 
-        AVector3D u = (fabs(n.x) > .1 ? AVector3D(0, 1, 0) : AVector3D(1)) % n;
-        u.normalize();
-        AVector3D v = n % u;
+        AVector3D u = glm::cross((fabs(n.x) > .1 ? AVector3D(0, 1, 0) : AVector3D(1)), n);
+        normalize(u);
+        AVector3D v = glm::cross(n, u);
 
         ret.pos     = p;
         ret.dir     = u * cos(r1) * r2s + v * sin(r1) * r2s + n * sqrt(1 - r2);
-        ret.dir.normalize();
+        normalize(ret.dir);
 
         return ret;
     }

@@ -9,6 +9,7 @@
 #define ENABLE      "Enable"
 #define PROPERTIES  "Properties"
 #define COMPONENTS  "Components"
+#define PARENT      "Parent"
 
 inline bool operator==(const AObject::Link &left, const AObject::Link &right) {
     bool result = true;

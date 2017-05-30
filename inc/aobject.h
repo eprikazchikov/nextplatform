@@ -58,6 +58,8 @@ public:
 
     typedef map<string, AObject *>  ObjectMap;
 
+    typedef list<AObject *>         ObjectList;
+
     typedef list<Link>              LinkList;
     typedef map<string, AVariant>   PropertyMap;
 
@@ -88,6 +90,7 @@ public:
     virtual AObject            *clone                       ();
 
     AObject                    *parent                      () const;
+
     string                      name                        () const;
     string                      typeName                    () const;
 

@@ -27,6 +27,7 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
     ATestObject obj3;
 
     obj1.setName("MainObject");
+
     obj2.setName("TestComponent2");
     obj3.setName("TestComponent3");
     obj2.setParent(&obj1);
@@ -53,7 +54,6 @@ void ObjectSystemTest::Delta_Serialize_Desirialize_Object() {
     AObject *instance   = m_pSystem->objectCreate(ATestObject::metaClass()->name());
     AObject *obj1       = m_pSystem->objectCreate(ATestObject::metaClass()->name());
     instance->addComponent("TestComponent1", obj1);
-
     /// \todo: Links referencies destroy deltas if name changed
     AObject::addEventListner(instance, TSIGNAL, obj1, TSLOT);
     AObject::addEventListner(instance, TPROPERTY1, obj1, TPROPERTY1);

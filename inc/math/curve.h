@@ -1,22 +1,3 @@
-/*
-    This file is part of Thunder Next.
-
-    Thunder Next is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Thunder Next is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with Thunder Next.  If not, see <http://www.gnu.org/licenses/>.
-
-    © Copyright: 2008-2014 Evgeny Prikazchikov
-*/
-
 #ifndef CURVE_H_HEADER_INCLUDED
 #define CURVE_H_HEADER_INCLUDED
 
@@ -115,13 +96,13 @@ struct ACurve {
                     AVector3D p1    = mList[o].mY;
                     AVector3D p2    = mList[i].mY;
 
-                    AVector3D s1    = p1 + AVector3D(tan(-mList[o].mO.x * DEG2RAD),
-                                                     tan(-mList[o].mO.y * DEG2RAD),
-                                                     tan(-mList[o].mO.z * DEG2RAD));
+                    AVector3D s1    = p1 + AVector3D(tan(glm::radians(-mList[o].mO.x)),
+                                                     tan(glm::radians(-mList[o].mO.y)),
+                                                     tan(glm::radians(-mList[o].mO.z)));
 
-                    AVector3D s2    = p2 - AVector3D(tan( mList[i].mI.x * DEG2RAD),
-                                                     tan( mList[i].mI.y * DEG2RAD),
-                                                     tan( mList[i].mI.z * DEG2RAD));
+                    AVector3D s2    = p2 - AVector3D(tan( glm::radians(mList[i].mI.x)),
+                                                     tan( glm::radians(mList[i].mI.y)),
+                                                     tan( glm::radians(mList[i].mI.z)));
 
                     AVector3D a     = p2 * pow(u, 3);
                     AVector3D b     = s2 * (3 * pow(u, 2) * (1 - u));

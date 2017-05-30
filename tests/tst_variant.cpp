@@ -69,7 +69,7 @@ void VariantTest::Set_Get_Advanced_Check() {
         QCOMPARE(value.toCurve(),  curve);
     }
     {
-        AMatrix3D matrix;
+        AMatrix3D matrix    = AMatrix3D();
         AVariant value      = matrix;
         QCOMPARE(value.toMatrix3D(), matrix);
     }
