@@ -39,7 +39,6 @@ public:
     typedef map<string, AVariant>  AVariantMap;
     typedef list<AVariant>         AVariantList;
 
-
     struct Data {
         Data                    ();
 

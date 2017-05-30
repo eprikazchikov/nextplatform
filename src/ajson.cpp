@@ -176,7 +176,9 @@ AVariant AJson::load(const string &data) {
                     it  += 3;
                 }
             } break;
-            default: break;
+            default: {
+                return result;
+            }
         }
         it++;
     }
@@ -236,7 +238,7 @@ string AJson::save(const AVariant &data, int32_t depth) {
 inline string AJson::readString(const string &data, uint32_t &it) {
     PROFILE_FUNCTION()
     uint32_t s  = ++it;
-    char c          = data[s];
+    char c      = data[s];
     while(it < data.length() && c != '"') {
         c = data[++it];
         if(c == '\\') {

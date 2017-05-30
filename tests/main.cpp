@@ -1,7 +1,6 @@
 #include <QtTest>
 
 #include "tst_common.h"
-#include "tst_math.h"
 #include "tst_variant.h"
 #include "tst_object.h"
 #include "tst_objectsystem.h"
@@ -46,10 +45,6 @@ int main(int argc, char *argv[]) {
 
     AObjectSystem system;
     ATestObject::registerClassFactory();
-    {
-        MathTest ts;
-        status |= aExec(ts, argc, argv);
-    }
     {
         VariantTest ts;
         status |= aExec(ts, argc, argv);

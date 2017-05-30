@@ -1,8 +1,8 @@
 QT       -= core gui
 
 win32: {
-    Debug:TARGET    = anextd
-    Release:TARGET  = anext
+    Debug:TARGET    = ../bin/anextd
+    Release:TARGET  = ../bin/anext
 }
 
 android: {
@@ -46,11 +46,15 @@ HEADERS += \
 
 INCLUDEPATH += \
     inc \
-    ../easy_profiler-1.0.2/include
+    ../glm/inc
 
 DEFINES += NEXT_LIBRARY
 
-LIBS += \
-    -L"../../external/easy_profiler-1.0.2/bin" \
-    -leasy_profiler
+defined(BUILD_WITH_EASY_PROFILER) {
+    INCLUDEPATH += \
+        ../easy_profiler-1.0.2/include
 
+    LIBS += \
+        -L"../../external/easy_profiler-1.0.2/bin" \
+        -leasy_profiler
+}
