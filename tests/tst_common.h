@@ -8,8 +8,7 @@
 #include <QTest>
 
 class ATestObject : public AObject {
-    A_OBJECT(ATestObject, AObject)
-    A_REGISTER(ATestObject, Test)
+    A_REGISTER(ATestObject, AObject, Test)
 
     A_METHODS(
         A_SLOT(setSlot),
@@ -51,8 +50,19 @@ public:
 };
 
 class ATestObjectEx : public ATestObject {
-    //A_OBJECT(ATestObjectEx, ATestObject)
     A_OVERRIDE(ATestObjectEx, ATestObject, Test)
+
+    A_NOMETHODS()
+    A_NOPROPERTIES()
+
+};
+
+class ASecondObject : public ATestObject {
+    A_REGISTER(ASecondObject, ATestObject, Test)
+
+    A_NOMETHODS()
+    A_NOPROPERTIES()
+
 };
 
 inline bool compare(const AObject::Link &left, const AObject::Link &right) {
@@ -123,18 +133,17 @@ inline bool compare(const AObject &left, const AObject &right) {
     }
 
     {
-        if(left.getChildren().size()  == right.getChildren().size()) {
-            for(const auto &it : left.getChildren()) {
-                const auto &c   = right.getChildren().find(it.first);
-                if(c != right.getChildren().end()) {
-                    const AObject *l    = it.second;
-                    const AObject *r    = c->second;
-                    if(!compare(*l, *r)) {
-                        return false;
-                    }
-                } else {
+        if(left.getChildren().size() == right.getChildren().size()) {
+            auto il = left.getChildren().begin();
+            auto ir = right.getChildren().begin();
+            while(il != left.getChildren().end() && ir != right.getChildren().end()) {
+                AObject *l  = *il;
+                AObject *r  = *ir;
+                if(!compare(*l, *r)) {
                     return false;
                 }
+                il++;
+                ir++;
             }
         } else {
             return false;

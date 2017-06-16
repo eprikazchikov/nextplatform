@@ -322,37 +322,37 @@ bool AMetaType::toList(void *to, const void *from, const uint32_t fromType) {
         case Vector2D: {
             const AVector2D v = *(reinterpret_cast<const AVector2D *>(from));
             for(int i = 0; i < 2; i++) {
-                r->push_back(v.v[i]);
+                r->push_back(v[i]);
             }
         } break;
         case Vector3D: {
             const AVector3D v = *(reinterpret_cast<const AVector3D *>(from));
             for(int i = 0; i < 3; i++) {
-                r->push_back(v.v[i]);
+                r->push_back(v[i]);
             }
         } break;
         case Vector4D: {
             const AVector4D v = *(reinterpret_cast<const AVector4D *>(from));
             for(int i = 0; i < 4; i++) {
-                r->push_back(v.v[i]);
+                r->push_back(v[i]);
             }
         } break;
         case Quaternion: {
             const AQuaternion v = *(reinterpret_cast<const AQuaternion *>(from));
             for(int i = 0; i < 4; i++) {
-                r->push_back(v.q[i]);
+                r->push_back(v[i]);
             }
         } break;
         case Matrix3D: {
             const AMatrix3D v = *(reinterpret_cast<const AMatrix3D *>(from));
             for(int i = 0; i < 9; i++) {
-                r->push_back(v.mat[i]);
+                r->push_back(glm::value_ptr(v)[i]);
             }
         } break;
         case Matrix4D:{
             const AMatrix4D v = *(reinterpret_cast<const AMatrix4D *>(from));
             for(int i = 0; i < 16; i++) {
-                r->push_back(v.mat[i]);
+                r->push_back(glm::value_ptr(v)[i]);
             }
         } break;
         case Curve: {
@@ -380,7 +380,7 @@ bool AMetaType::toVector2D(void *to, const void *from, const uint32_t fromType) 
             const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 2; i++, it++) {
-                r->v[i] = (*it).toDouble();
+                (*r)[i] = (*it).toDouble();
             }
         } break;
         default:    { result    = false; } break;
@@ -399,7 +399,7 @@ bool AMetaType::toVector3D(void *to, const void *from, const uint32_t fromType) 
             const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 3; i++, it++) {
-                r->v[i] = (*it).toDouble();
+                (*r)[i] = (*it).toDouble();
             }
         } break;
         case Vector2D:  { *r = AVector3D(*(static_cast<const AVector2D *>(from)), 0.0); } break;
@@ -419,7 +419,7 @@ bool AMetaType::toVector4D(void *to, const void *from, const uint32_t fromType) 
             const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 4; i++, it++) {
-                r->v[i] = (*it).toDouble();
+                (*r)[i] = (*it).toDouble();
             }
         } break;
         case Vector2D:  { *r = AVector4D(*(static_cast<const AVector2D *>(from)), 0.0, 1.0); } break;
@@ -438,7 +438,7 @@ bool AMetaType::toMatrix3D(void *to, const void *from, const uint32_t fromType) 
             const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 9; i++, it++) {
-                r->mat[i]   = (*it).toDouble();
+                glm::value_ptr(*r)[i]   = (*it).toDouble();
             }
         } break;
         default: { result   = false; } break;
@@ -455,7 +455,7 @@ bool AMetaType::toMatrix4D(void *to, const void *from, const uint32_t fromType) 
             const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 16; i++, it++) {
-                r->mat[i]   = (*it).toDouble();
+                glm::value_ptr(*r)[i]   = (*it).toDouble();
             }
         } break;
         default: { result   = false; } break;
@@ -472,10 +472,10 @@ bool AMetaType::toQuaternion(void *to, const void *from, const uint32_t fromType
             const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 4; i++, it++) {
-                r->q[i] = (*it).toDouble();
+                (*r)[i] = (*it).toDouble();
             }
         } break;
-        case Vector3D:  { *r = AQuaternion(*(static_cast<const AVector3D *>(from)), 0.0); } break;
+        case Vector3D:  { *r = glm::quat_cast(glm::orientate3(*(static_cast<const AVector3D *>(from))) ); } break;
         default:    { result    = false; } break;
     }
     return result;

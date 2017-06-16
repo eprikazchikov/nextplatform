@@ -11,7 +11,9 @@ class ObjectSystemTest : public QObject {
 private slots:
     void Object_Instansing();
     void Serialize_Desirialize_Object();
-    void Override_object();
+    void RegisterUnregister_Object();
+    void Override_Object();
+
     void Delta_Serialize_Desirialize_Object();
     void Virtual_Inheritance();
 

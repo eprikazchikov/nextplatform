@@ -60,6 +60,8 @@ void AObjectSystem::factoryAdd(const string &uri, const AMetaObject *meta) {
 
 void AObjectSystem::factoryRemove(const string &uri) {
     PROFILE_FUNCTION()
+    AUri group(uri);
+    AObjectSystem::s_Instance->m_Groups.erase(group.name());
     AObjectSystem::s_Instance->m_Factories.erase(uri);
 }
 

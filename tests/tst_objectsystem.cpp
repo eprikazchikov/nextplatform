@@ -49,13 +49,34 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
     delete result;
 }
 
-void ObjectSystemTest::Override_object() {
+void ObjectSystemTest::RegisterUnregister_Object() {
+    QCOMPARE((int)AObjectSystem::instance()->factories().size(), 1);
+    ASecondObject::registerClassFactory();
+    QCOMPARE((int)AObjectSystem::instance()->factories().size(), 2);
+    ASecondObject::unregisterClassFactory();
+    QCOMPARE((int)AObjectSystem::instance()->factories().size(), 1);
+}
+
+void ObjectSystemTest::Override_Object() {
     ATestObjectEx::registerClassFactory();
     AObject *object = AObjectSystem::objectCreate<ATestObject>();
 
-    QCOMPARE((object != 0), true);
-    QCOMPARE((dynamic_cast<ATestObjectEx *>(object) != nullptr), true);
+    QCOMPARE((object != nullptr), true);
 
+    const AMetaObject *meta = object->metaObject();
+
+    QCOMPARE((dynamic_cast<ATestObjectEx *>(object) != nullptr), true);
+    QCOMPARE(meta->methodCount(), 2);
+    QCOMPARE(meta->propertyCount(), 2);
+
+    int index   = meta->indexOfProperty("slot");
+    QCOMPARE((index > -1), true);
+    delete object;
+
+    ATestObjectEx::unregisterClassFactory();
+    object = AObjectSystem::objectCreate<ATestObject>();
+    QCOMPARE((dynamic_cast<ATestObject *>(object) != nullptr), true);
+    QCOMPARE((dynamic_cast<ATestObjectEx *>(object) == nullptr), true);
     delete object;
 }
 

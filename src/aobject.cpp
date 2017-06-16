@@ -47,7 +47,7 @@ AObject::~AObject() {
     disconnect(this, 0, 0, 0);
 
     for(const auto &it : m_mChildren) {
-        AObject *c  = it.second;
+        AObject *c  = it;
         if(c) {
             c->m_pParent    = 0;
             delete c;
@@ -56,18 +56,18 @@ AObject::~AObject() {
     m_mChildren.clear();
 
     if(m_pParent) {
-        m_pParent->removeChild(m_sName);
+        m_pParent->removeChild(this);
     }
 }
 
-AObject *AObject::createObject() {
+AObject *AObject::construct() {
     PROFILE_FUNCTION()
     return new AObject();
 }
 
 const AMetaObject *AObject::metaClass() {
     PROFILE_FUNCTION()
-    static const AMetaObject staticMetaData("AObject", nullptr, &createObject, nullptr, nullptr);
+    static const AMetaObject staticMetaData("AObject", nullptr, &construct, nullptr, nullptr);
     return &staticMetaData;
 }
 
@@ -78,18 +78,20 @@ const AMetaObject *AObject::metaObject() const {
 
 AObject *AObject::clone() {
     PROFILE_FUNCTION()
-    AObject *result = metaObject()->createInstance();
+    const AMetaObject *meta = metaObject();
+    AObject *result = meta->createInstance();
     for(auto it : getDynamicProperties()) {
         result->setProperty(it.first.c_str(), it.second);
     }
-    for(int i = 0; i < metaObject()->propertyCount(); i++) {
+    uint32_t count  = meta->propertyCount();
+    for(int i = 0; i < count; i++) {
         AMetaProperty lp    = result->metaObject()->property(i);
-        AMetaProperty rp    = metaObject()->property(i);
+        AMetaProperty rp    = meta->property(i);
         lp.write(result, rp.read(this));
     }
     for(auto it : getChildren()) {
-        AObject *clone  = it.second->clone();
-        clone->setName(it.first);
+        AObject *clone  = it->clone();
+        clone->setName(it->name());
         clone->setParent(result);
     }
     for(auto it : getSenders()) {
@@ -197,7 +199,7 @@ void AObject::deleteLater() {
     postEvent(new AEvent(AEvent::Delete));
 }
 
-const AObject::ObjectMap &AObject::getChildren() const {
+const AObject::ObjectList &AObject::getChildren() const {
     PROFILE_FUNCTION()
     return m_mChildren;
 }
@@ -230,7 +232,7 @@ AObject *AObject::find(const string &path) {
     int index  = path.find('/', 1);
     if(index > -1) {
         for(const auto &it : m_mChildren) {
-            AObject *o  = it.second->find(path.substr(index + 1));
+            AObject *o  = it->find(path.substr(index + 1));
             if(o) {
                 return o;
             }
@@ -245,10 +247,10 @@ AObject *AObject::find(const string &path) {
 void AObject::setParent(AObject *parent) {
     PROFILE_FUNCTION()
     if(m_pParent) {
-        m_pParent->removeChild(m_sName);
+        m_pParent->removeChild(this);
     }
     if(parent) {
-        parent->addChild(this, m_sName);
+        parent->addChild(this);
     }
     m_pParent   = parent;
 }
@@ -256,30 +258,27 @@ void AObject::setParent(AObject *parent) {
 void AObject::setName(const string &value) {
     PROFILE_FUNCTION()
     if(!value.empty()) {
-        if(m_sName != value && m_pParent) {
-            m_pParent->removeChild(m_sName);
-            m_pParent->addChild(this, value);
-        }
         m_sName = value;
+        // \todo Notify receivers
     }
 }
 
-void AObject::addChild(AObject *value, const string &name) {
+void AObject::addChild(AObject *value) {
     PROFILE_FUNCTION()
-    if(value && !name.empty()) {
-        auto it = m_mChildren.find(name);
-        if(it != m_mChildren.end()) {
-            delete (*it).second;
+    if(value) {
+        m_mChildren.push_back(value);
+    }
+}
+
+void AObject::removeChild(AObject *value) {
+    PROFILE_FUNCTION()
+    auto it = m_mChildren.begin();
+    while(it != m_mChildren.end()) {
+        if(*it == value) {
+            m_mChildren.erase(it);
+            return;
         }
-        m_mChildren[name]    = value;
-    }
-}
-
-void AObject::removeChild(const string &name) {
-    PROFILE_FUNCTION()
-    auto it = m_mChildren.find(name);
-    if(it != m_mChildren.end()) {
-        m_mChildren.erase(it);
+        it++;
     }
 }
 
@@ -430,13 +429,12 @@ AVariant AObject::toVariant() {
     }
     // Save components
     {
-        AVariant::AVariantMap components;
+        AVariant::AVariantList components;
         for(const auto &it : m_mChildren) {
-            if(it.second) {
-                AVariant left   = it.second->toVariant();
-                components[it.first]    = left;
+            if(it) {
+                components.push_back(it->toVariant());
             } else {
-                components[it.first]    = static_cast<void *>(nullptr);
+                components.push_back(nullptr);
             }
         }
         object[COMPONENTS]  = components;
@@ -490,10 +488,8 @@ void AObject::fromVariant(const AVariant &variant) {
     }
     // Load components
     {
-        for(const auto &it : map[COMPONENTS].toMap()) {
-            if(m_mChildren.find(it.first) == m_mChildren.end()) {
-                toObject(it.second, this);
-            }
+        for(const auto &it : map[COMPONENTS].toList()) {
+            toObject(it, this);
         }
     }
     // Load links

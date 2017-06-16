@@ -34,16 +34,29 @@
 #include <ametaobject.h>
 #include <aevent.h>
 
-#define A_REGISTER(Class, Group) \
+#define A_REGISTER(Class, Super, Group) \
+    A_OBJECT(Class, Super) \
 public: \
     static void                 registerClassFactory        () { \
         AObjectSystem::factoryAdd(string("thor://") + #Group + "/" + Class::metaClass()->name(), Class::metaClass()); \
+    } \
+    static void                 unregisterClassFactory      () { \
+        AObjectSystem::factoryRemove(string("thor://") + #Group + "/" + Class::metaClass()->name()); \
     }
 
+
 #define A_OVERRIDE(Class, Super, Group) \
+    A_OBJECT(Class, Super) \
 public: \
     static void                 registerClassFactory        () { \
         AObjectSystem::factoryAdd(string("thor://") + #Group + "/" + Super::metaClass()->name(), Class::metaClass()); \
+    } \
+    static void                 unregisterClassFactory      () { \
+        AObjectSystem::factoryRemove(string("thor://") + #Group + "/" + Super::metaClass()->name()); \
+        AObjectSystem::factoryAdd(string("thor://") + #Group + "/" + Super::metaClass()->name(), Super::metaClass()); \
+    } \
+    virtual string              typeName                    () const { \
+        return Super::metaClass()->name(); \
     }
 
 using namespace std;
@@ -62,8 +75,6 @@ public:
         string                  reference;
     };
 
-    typedef map<string, AObject *>  ObjectMap;
-
     typedef list<AObject *>         ObjectList;
 
     typedef list<Link>              LinkList;
@@ -75,7 +86,7 @@ protected:
     /// Object name
     string                      m_sName;
 
-    ObjectMap                   m_mChildren;
+    ObjectList                  m_mChildren;
     LinkList                    m_lRecievers;
     LinkList                    m_lSenders;
 
@@ -88,7 +99,7 @@ public:
 
     virtual ~AObject            ();
 
-    static AObject             *createObject                ();
+    static AObject             *construct                   ();
 
     static const AMetaObject   *metaClass                   ();
     virtual const AMetaObject  *metaObject                  () const;
@@ -98,7 +109,6 @@ public:
     AObject                    *parent                      () const;
 
     string                      name                        () const;
-    string                      typeName                    () const;
 
     string                      reference                   () const;
 
@@ -107,7 +117,6 @@ public:
 
     void                        deleteLater                 ();
 
-    void                        setParent                   (AObject *parent);
     void                        setName                     (const string &value);
 
     bool                        isEnable                    () const;
@@ -122,7 +131,7 @@ public:
     template<typename T>
     T                           findChild                   (bool recursive = true) {
         for(auto it : m_mChildren) {
-            AObject *object = it.second;
+            AObject *object = it;
             T result    = dynamic_cast<T>(object);
             if(result) {
                 return result;
@@ -140,7 +149,7 @@ public:
     list<T>                     findChildren                (bool recursive = true) {
         list<T> result;
         for(auto it : m_mChildren) {
-            AObject *component = it.second;
+            AObject *component = it;
             T object    = dynamic_cast<T>(component);
             if(object) {
                 result.push_back(object);
@@ -156,11 +165,13 @@ public:
 
 // Virtual members
 public:
-    virtual const ObjectMap    &getChildren                 () const;
+    virtual const ObjectList   &getChildren                 () const;
     virtual const LinkList     &getReceivers                () const;
     virtual const LinkList     &getSenders                  () const;
     virtual const PropertyMap  &getDynamicProperties        () const;
 
+    virtual void                setParent                   (AObject *parent);
+    virtual string              typeName                    () const;
     virtual AVariant            property                    (const char *name) const;
     virtual void                setProperty                 (const char *name, const AVariant &value);
 
@@ -169,8 +180,8 @@ public:
     virtual bool                event                       (AEvent *e);
 
 protected:
-    void                        addChild                    (AObject *value, const string &name);
-    void                        removeChild                 (const string &name);
+    void                        addChild                    (AObject *value);
+    void                        removeChild                 (AObject *value);
 
     void                        emitSignal                  (const char *signal, const AVariant &args = AVariant());
     bool                        postEvent                   (AEvent *e);

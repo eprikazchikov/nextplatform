@@ -12,14 +12,14 @@
 
 #define A_OBJECT(Class, Super) \
 private: \
-    static AObject *createObject() { return new Class(); } \
+    static AObject *construct() { return new Class(); } \
 public: \
     static const AMetaObject *metaClass() { \
         OBJECT_CHECK(Class) \
         static const AMetaObject staticMetaData ( \
             #Class, \
             Super::metaClass(), \
-            &Class::createObject, \
+            &Class::construct, \
             expose_method<Class>::exec(), \
             expose_props_method<Class>::exec() \
         ); \
@@ -39,11 +39,29 @@ public: \
         return table; \
     }
 
+#define A_NOPROPERTIES() \
+public: \
+    static const AMetaProperty::Table *properties() { \
+        static const AMetaProperty::Table table[] { \
+            {nullptr, nullptr, nullptr, nullptr} \
+        }; \
+        return table; \
+    }
+
 #define A_METHODS(...) \
 public: \
     static const AMetaMethod::Table *methods() { \
         static const AMetaMethod::Table table[] { \
             __VA_ARGS__, \
+            {AMetaMethod::Method, nullptr, nullptr, 0, nullptr} \
+        }; \
+        return table; \
+    }
+
+#define A_NOMETHODS() \
+public: \
+    static const AMetaMethod::Table *methods() { \
+        static const AMetaMethod::Table table[] { \
             {AMetaMethod::Method, nullptr, nullptr, 0, nullptr} \
         }; \
         return table; \
@@ -111,6 +129,7 @@ public:
     AMetaProperty               property                    (int) const;
     int                         propertyCount               () const;
     int                         propertyOffset              () const;
+    bool                        canCastTo                   (const char *) const;
 
 private:
     Constructor                 m_Constructor;

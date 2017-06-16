@@ -123,7 +123,7 @@ int AMetaObject::indexOfProperty(const char *name) const {
     while(s) {
         for(int i = 0; i < s->m_PropCount; ++i) {
             if(strcmp(s->m_pProperties[i].name, name) == 0) {
-                return i + propertyOffset();
+                return i + s->propertyOffset();
             }
         }
         s   = s->m_pSuper;
@@ -163,4 +163,17 @@ int AMetaObject::propertyOffset() const {
         s       = s->m_pSuper;
     }
     return offset;
+}
+
+bool AMetaObject::canCastTo(const char *type) const {
+    PROFILE_FUNCTION()
+    const AMetaObject *s    = this;
+
+    while(s) {
+        if(strcmp(s->m_pName, type) == 0) {
+            return true;
+        }
+        s   = s->m_pSuper;
+    }
+    return false;
 }

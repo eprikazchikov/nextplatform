@@ -4,6 +4,7 @@
 #include <map>
 #include <typeinfo>
 #include <typeindex>
+#include <stdint.h>
 
 #include <acommon.h>
 
@@ -202,7 +203,7 @@ inline static AMetaType::Table *getTable(const char *typeName) {
 }
 
 template<typename T>
-static uint32_t         registerMetaType            (const char *typeName) {
+static uint32_t registerMetaType(const char *typeName) {
     return AMetaType::registerType(*getTable<T>(typeName));
 }
 

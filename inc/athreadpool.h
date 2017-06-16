@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <thread>
+#include <condition_variable>
 #include <set>
 
 #include "aobject.h"
