@@ -37,25 +37,25 @@
 #define A_REGISTER(Class, Super, Group) \
     A_OBJECT(Class, Super) \
 public: \
-    static void                 registerClassFactory        () { \
-        AObjectSystem::factoryAdd(string("thor://") + #Group + "/" + Class::metaClass()->name(), Class::metaClass()); \
+    static void                 registerClassFactory    () { \
+        AObjectSystem::factoryAdd<Class>(#Group, Class::metaClass()); \
     } \
-    static void                 unregisterClassFactory      () { \
-        AObjectSystem::factoryRemove(string("thor://") + #Group + "/" + Class::metaClass()->name()); \
+    static void                 unregisterClassFactory  () { \
+        AObjectSystem::factoryRemove<Class>(#Group); \
     }
 
 
 #define A_OVERRIDE(Class, Super, Group) \
     A_OBJECT(Class, Super) \
 public: \
-    static void                 registerClassFactory        () { \
-        AObjectSystem::factoryAdd(string("thor://") + #Group + "/" + Super::metaClass()->name(), Class::metaClass()); \
+    static void                 registerClassFactory    () { \
+        AObjectSystem::factoryAdd<Super>(#Group, Class::metaClass()); \
     } \
-    static void                 unregisterClassFactory      () { \
-        AObjectSystem::factoryRemove(string("thor://") + #Group + "/" + Super::metaClass()->name()); \
-        AObjectSystem::factoryAdd(string("thor://") + #Group + "/" + Super::metaClass()->name(), Super::metaClass()); \
+    static void                 unregisterClassFactory  () { \
+        AObjectSystem::factoryRemove<Super>(#Group); \
+        AObjectSystem::factoryAdd<Super>(#Group, Super::metaClass()); \
     } \
-    virtual string              typeName                    () const { \
+    virtual string              typeName                () const { \
         return Super::metaClass()->name(); \
     }
 
@@ -110,7 +110,7 @@ public:
 
     string                      name                        () const;
 
-    string                      reference                   () const;
+    uint32_t                    uuid                        () const;
 
     static void                 connect                     (AObject *sender, const char *signal, AObject *receiver, const char *method);
     static void                 disconnect                  (AObject *sender, const char *signal, AObject *receiver, const char *method);
@@ -121,10 +121,6 @@ public:
 
     bool                        isEnable                    () const;
 
-    AVariant                    toVariant                   ();
-    void                        fromVariant                 (const AVariant &variant);
-
-    static AObject             *toObject                    (const AVariant &variant, AObject *parent = 0);
 
     AObject                    *find                        (const string &path);
 
@@ -179,6 +175,10 @@ public:
 
     virtual bool                event                       (AEvent *e);
 
+    virtual void                loadUserData                (const AVariant &data);
+
+    virtual AVariant            saveUserData                () const;
+
 protected:
     void                        addChild                    (AObject *value);
     void                        removeChild                 (AObject *value);
@@ -195,11 +195,14 @@ protected:
 private:
     friend class ObjectTest;
     friend class AThreadPool;
+    friend class AObjectSystem;
 
     AObject                    *m_pCurrentSender;
 
     typedef queue<AEvent *>     EventQueue;
     EventQueue                  m_EventQueue;
+
+    uint32_t                    m_UUID;
 
     mutex                       m_Mutex;
 

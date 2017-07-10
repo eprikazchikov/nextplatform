@@ -3,14 +3,6 @@
 #include "aobjectsystem.h"
 #include "auri.h"
 
-#define TYPE        "Type"
-#define NAME        "Name"
-#define LINKS       "Links"
-#define ENABLE      "Enable"
-#define PROPERTIES  "Properties"
-#define COMPONENTS  "Components"
-#define PARENT      "Parent"
-
 inline bool operator==(const AObject::Link &left, const AObject::Link &right) {
     bool result = true;
     result &= (left.sender      == right.sender);
@@ -23,7 +15,8 @@ inline bool operator==(const AObject::Link &left, const AObject::Link &right) {
 AObject::AObject() :
         m_bEnable(true),
         m_pParent(nullptr),
-        m_pCurrentSender(nullptr) {
+        m_pCurrentSender(nullptr),
+        m_UUID(0) {
     PROFILE_FUNCTION()
 
     onCreated();
@@ -119,6 +112,11 @@ string AObject::name() const {
     return m_sName;
 }
 
+uint32_t AObject::uuid() const {
+    PROFILE_FUNCTION()
+    return m_UUID;
+}
+
 string AObject::typeName() const {
     PROFILE_FUNCTION()
     return metaObject()->name();
@@ -144,10 +142,7 @@ void AObject::connect(AObject *sender, const char *signal, AObject *receiver, co
             link.signal     = snd;
             link.receiver   = receiver;
             link.method     = rcv;
-/*
-            link.reference  = receiver->reference() + "?" + char(method.type() + 0x30) + method.signature();
-            sender->reference() + "#" + char(method.type() + 0x30) + method.signature();
-*/
+
             if(!sender->isLinkExist(link)) {
                 {
                     unique_lock<mutex> locker(sender->m_Mutex);
@@ -339,14 +334,6 @@ void AObject::processEvents() {
     }
 }
 
-string AObject::reference() const {
-    PROFILE_FUNCTION()
-    if(m_pParent) {
-        return m_pParent->reference() + "/" + m_sName;
-    }
-    return string("thor://") + AObjectSystem::instance()->name() + "/" + m_sName;
-}
-
 void AObject::setEnable(bool state) {
     PROFILE_FUNCTION()
     m_bEnable   = state;
@@ -355,6 +342,14 @@ void AObject::setEnable(bool state) {
 bool AObject::event(AEvent *e) {
     PROFILE_FUNCTION()
     return false;
+}
+
+void AObject::loadUserData(const AVariant &data) {
+
+}
+
+AVariant AObject::saveUserData() const {
+    return AVariant();
 }
 
 AVariant AObject::property(const char *name) const {
@@ -396,127 +391,6 @@ void AObject::onDestroyed() {
 AObject *AObject::sender() const {
     PROFILE_FUNCTION()
     return m_pCurrentSender;
-}
-
-AVariant AObject::toVariant() {
-    PROFILE_FUNCTION()
-    AVariant::AVariantMap object;
-    object[TYPE]    = typeName();
-    object[NAME]    = m_sName;
-    object[ENABLE]  = m_bEnable;
-
-    const AMetaObject *meta = metaObject();
-    // Save properties
-    {
-        AVariant::AVariantList s;
-        for(uint32_t i = 0; i < meta->propertyCount(); i++) {
-            AMetaProperty p = meta->property(i);
-            if(p.isValid()) {
-                AVariant::AVariantMap property;
-                property[NAME]  = p.name();
-                property[DATA]  = p.read(this);
-                s.push_back(property);
-            }
-        }
-        for(const auto it : m_mDynamicProperties) {
-            AVariant::AVariantMap property;
-            property[NAME]  = it.first;
-            property[DATA]  = it.second;
-
-            s.push_back(property);
-        }
-        object[PROPERTIES]  = s;
-    }
-    // Save components
-    {
-        AVariant::AVariantList components;
-        for(const auto &it : m_mChildren) {
-            if(it) {
-                components.push_back(it->toVariant());
-            } else {
-                components.push_back(nullptr);
-            }
-        }
-        object[COMPONENTS]  = components;
-    }
-    // Save links
-    {
-        AVariant::AVariantList s;
-        for(const auto &it : m_lRecievers) {
-            AVariant::AVariantList link;
-
-            AMetaMethod method  = metaObject()->method(it.signal);
-            link.push_back(AVariant(char(method.type() + 0x30) + method.signature()));
-
-            AObject *reciever   = it.receiver;
-            method      = reciever->metaObject()->method(it.method);
-            link.push_back(reciever->reference() + "?" + char(method.type() + 0x30) + method.signature());
-
-            s.push_back(link);
-        }
-        for(const auto &it : m_lSenders) {
-            AVariant::AVariantList link;
-
-            AMetaMethod method  = metaObject()->method(it.method);
-            link.push_back(AVariant(char(method.type() + 0x30) + method.signature()));
-
-            AObject *sender = it.sender;
-            method      = sender->metaObject()->method(it.signal);
-            link.push_back(sender->reference() + "#" + char(method.type() + 0x30) + method.signature());
-
-            s.push_back(link);
-        }
-        object[LINKS]   = s;
-    }
-
-    return object;
-}
-
-void AObject::fromVariant(const AVariant &variant) {
-    PROFILE_FUNCTION()
-    AVariant::AVariantMap map   = variant.toMap();
-
-    setName(map[NAME].toString());
-    setEnable(map[ENABLE].toBool());
-    // Load properties
-    {
-        for(const auto &it : map[PROPERTIES].toList()) {
-            AVariant::AVariantMap m = it.toMap();
-
-            setProperty(m[NAME].toString().c_str(), m[DATA]);
-        }
-    }
-    // Load components
-    {
-        for(const auto &it : map[COMPONENTS].toList()) {
-            toObject(it, this);
-        }
-    }
-    // Load links
-    for(const auto &link : map[LINKS].toList()) {
-        AVariant::AVariantList list = link.toList();
-
-        AUri uri(list.back().toString());
-        AObject *o  = find(uri.path());
-        if(o) {
-            if(uri.fragment().empty()) {
-                connect(this, list.front().toString().c_str(), o, uri.query().c_str());
-            } else {
-                connect(o, uri.fragment().c_str(), this, list.front().toString().c_str());
-            }
-        }
-    }
-}
-
-AObject *AObject::toObject(const AVariant &variant, AObject *parent) {
-    PROFILE_FUNCTION()
-    AVariant::AVariantMap map   = variant.toMap();
-
-    AObject *result = AObjectSystem::objectCreate(map[TYPE].toString(), "", parent);
-    if(result) {
-        result->fromVariant(variant);
-    }
-    return result;
 }
 
 bool AObject::isLinkExist(const Link &link) const {

@@ -8,46 +8,83 @@
 
 #include <QtTest>
 
+const string gTestPath  = "Test/Asset/Path";
+ATestObject *resource;
+
+void ObjectSystemTest::initTestCase() {
+    resource   = AObjectSystem::objectCreate<ATestObject>();
+    resource->setName("TestResource");
+    //AObjectSystem::instance()->m_ResourceCache[gTestPath]   = resource;
+}
+
+void ObjectSystemTest::cleanupTestCase() {
+    //auto it = AObjectSystem::instance()->m_ResourceCache.find(gTestPath);
+    //if(it != AObjectSystem::instance()->m_ResourceCache.end()) {
+    //    AObjectSystem::instance()->m_ResourceCache.erase(it);
+    //}
+
+    delete resource;
+}
+
 void ObjectSystemTest::Object_Instansing() {
     ATestObject obj1;
 
-    AObject *result = AObjectSystem::objectCreate<ATestObject>();
+    AObject *result1    = AObjectSystem::objectCreate<ATestObject>();
     AObject *object = dynamic_cast<AObject*>(&obj1);
 
-    QCOMPARE((result != 0), true);
+    QCOMPARE((result1 != 0), true);
     QCOMPARE((object != 0), true);
-    QCOMPARE(compare(*object, *result), true);
+    QCOMPARE(compare(*object, *result1), true);
 
-    delete result;
+    AObject *result2    = AObjectSystem::objectCreate<ATestObject>();
+
+    QCOMPARE((result1->uuid() != result2->uuid()), true);
+
+    delete result1;
+    delete result2;
 }
 
 void ObjectSystemTest::Serialize_Desirialize_Object() {
-    ATestObject obj1;
-    ATestObject obj2;
-    ATestObject obj3;
+    ATestObject *obj1   = AObjectSystem::objectCreate<ATestObject>();
+    ATestObject *obj2   = AObjectSystem::objectCreate<ATestObject>();
+    ATestObject *obj3   = AObjectSystem::objectCreate<ATestObject>();
 
-    obj1.setName("MainObject");
+    obj1->setName("MainObject");
 
-    obj2.setName("TestComponent2");
-    obj3.setName("TestComponent3");
-    obj2.setParent(&obj1);
-    obj3.setParent(&obj1);
-    obj1.setProperty("DynamicProperty", true);
+    obj2->setName("TestComponent2");
+    obj3->setName("TestComponent3");
+    obj2->setParent(obj1);
+    obj3->setParent(obj2);
 
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
-    AObject::connect(&obj2, _SIGNAL(signal(bool)), &obj3, _SLOT(setSlot(bool)));
+    //obj1->setResource(resource);
+    //obj1->setProperty("DynamicProperty", AVariant::fromValue(resource));
 
-    AVariant data   = obj1.toVariant();
-    AObject *result = AObject::toObject(data);
-    AObject *object = dynamic_cast<AObject*>(&obj1);
+    AObject::connect(obj1, _SIGNAL(signal(bool)), obj2, _SLOT(setSlot(bool)));
+    AObject::connect(obj1, _SIGNAL(signal(bool)), obj3, _SIGNAL(signal(bool)));
+    AObject::connect(obj2, _SIGNAL(signal(bool)), obj3, _SLOT(setSlot(bool)));
+
+    string data     = AJson::save(AObjectSystem::toVariant(obj1), 0);
+    AObject *result = AObjectSystem::toObject(AJson::load(data));
+    AObject *object = dynamic_cast<AObject*>(obj1);
 
     QCOMPARE((result != nullptr), true);
     QCOMPARE((object != nullptr), true);
     QCOMPARE(compare(*object, *result), true);
 
     delete result;
+
+    delete obj3;
+    delete obj2;
+    delete obj1;
 }
+
+class ASecondObject : public ATestObject {
+    A_REGISTER(ASecondObject, ATestObject, Test)
+
+    A_NOMETHODS()
+    A_NOPROPERTIES()
+
+};
 
 void ObjectSystemTest::RegisterUnregister_Object() {
     QCOMPARE((int)AObjectSystem::instance()->factories().size(), 1);
@@ -57,77 +94,34 @@ void ObjectSystemTest::RegisterUnregister_Object() {
     QCOMPARE((int)AObjectSystem::instance()->factories().size(), 1);
 }
 
+class ATestObjectEx : public ATestObject {
+    A_OVERRIDE(ATestObjectEx, ATestObject, Test)
+
+    A_NOMETHODS()
+    A_NOPROPERTIES()
+
+};
+
 void ObjectSystemTest::Override_Object() {
     ATestObjectEx::registerClassFactory();
+
     AObject *object = AObjectSystem::objectCreate<ATestObject>();
 
     QCOMPARE((object != nullptr), true);
-
     const AMetaObject *meta = object->metaObject();
 
     QCOMPARE((dynamic_cast<ATestObjectEx *>(object) != nullptr), true);
     QCOMPARE(meta->methodCount(), 2);
-    QCOMPARE(meta->propertyCount(), 2);
+    QCOMPARE(meta->propertyCount(), 3);
 
     int index   = meta->indexOfProperty("slot");
     QCOMPARE((index > -1), true);
     delete object;
 
     ATestObjectEx::unregisterClassFactory();
+
     object = AObjectSystem::objectCreate<ATestObject>();
     QCOMPARE((dynamic_cast<ATestObject *>(object) != nullptr), true);
     QCOMPARE((dynamic_cast<ATestObjectEx *>(object) == nullptr), true);
     delete object;
-}
-
-void ObjectSystemTest::Delta_Serialize_Desirialize_Object() {
-/*
-    AObject *instance   = m_pSystem->objectCreate(ATestObject::metaClass()->name());
-    AObject *obj1       = m_pSystem->objectCreate(ATestObject::metaClass()->name());
-    instance->addComponent("TestComponent1", obj1);
-    /// \todo: Links referencies destroy deltas if name changed
-    AObject::addEventListner(instance, TSIGNAL, obj1, TSLOT);
-    AObject::addEventListner(instance, TPROPERTY1, obj1, TPROPERTY1);
-
-    instance->setName("CopiedObject");
-    instance->setProperty(TPROPERTY1, true);
-    instance->setProperty("Dynamic", 5);
-
-    AVariant data   = instance->toVariant();
-    AObject *result = AObject::toObject(data, m_pSystem);
-
-    QCOMPARE((result != 0), true);
-    QCOMPARE(result->property(TPROPERTY1).toBool(), true);
-    QCOMPARE((*instance == *result), true);
-
-    delete result;
-
-    delete instance;
-*/
-}
-
-void ObjectSystemTest::Virtual_Inheritance() {
-/*
-    AObject *prototype  = m_pSystem->objectCreate(ATestObject::metaClass()->name());
-    prototype->setName("PrototypeObject");
-
-    AObject *obj1       = m_pSystem->objectCreate(ATestObject::metaClass()->name());
-    prototype->addComponent("TestComponent1", obj1);
-    prototype->setType("InheritedClass");
-
-    m_pSystem->factoryAdd(prototype->typeName(), prototype);
-
-    AObject *instance   = m_pSystem->objectCreate(prototype->typeName());
-    instance->setName("CopiedObject");
-
-    AVariant data   = instance->toVariant();
-    AObject *result = AObject::toObject(data, m_pSystem);
-
-    QCOMPARE((result != 0), true);
-    QCOMPARE(result->property(TPROPERTY1).toBool(), false);
-    QCOMPARE((*instance == *result), true);
-
-    delete instance;
-    delete result;
-*/
 }

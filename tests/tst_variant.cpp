@@ -106,7 +106,7 @@ void VariantTest::Convert_Float_to_Bool_Int_String() {
         QVariant result = 6.4f;
         QCOMPARE(value.toBool(),    result.toBool());
         QCOMPARE(value.toInt(),     result.toInt());
-        QCOMPARE(value.toString().c_str(),  "6.4");
+        QCOMPARE(value.toString().c_str(),  "6.40");
     }
     {
         AVariant value  = 7.5f;

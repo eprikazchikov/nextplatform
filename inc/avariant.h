@@ -29,15 +29,13 @@
 #include <amath.h>
 #include <ametatype.h>
 
-#define STRUCTURE "__S__"
-#define DATA "__D__"
-
 using namespace std;
 
 class NEXT_LIBRARY_EXPORT AVariant {
 public:
-    typedef map<string, AVariant>  AVariantMap;
-    typedef list<AVariant>         AVariantList;
+    typedef map<string, AVariant>   AVariantMap;
+    typedef list<AVariant>          AVariantList;
+    typedef vector<int8_t>          AByteArray;
 
     struct Data {
         Data                    ();
@@ -56,6 +54,7 @@ public:
     AVariant                    (const string &value);
     AVariant                    (const AVariantMap &value);
     AVariant                    (const AVariantList &value);
+    AVariant                    (const AByteArray &value);
 
     AVariant                    (const AVector2D &value);
     AVariant                    (const AVector3D &value);
@@ -75,7 +74,12 @@ public:
     bool                        operator!=                  (const AVariant &right) const;
 
     uint32_t                    type                        () const;
+
+    uint32_t                    userType                    () const;
+
     void                       *data                        () const;
+
+    bool                        isValid                     () const;
 
     bool                        canConvert                  (uint32_t type) const;
 
@@ -119,6 +123,7 @@ public:
 
     const AVariantMap           toMap                       () const;
     const AVariantList          toList                      () const;
+    const AByteArray            toByteArray                 () const;
 
     const AVector2D             toVector2D                  () const;
     const AVector3D             toVector3D                  () const;

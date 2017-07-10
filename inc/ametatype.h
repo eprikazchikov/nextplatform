@@ -21,6 +21,7 @@ public:
         String,
         VariantMap,
         VariantList,
+        ByteArray,
 
         Vector2D                = 10,
         Vector3D,
@@ -44,6 +45,8 @@ public:
         type_index const    (*index)                    ();
         const char         *name;
     };
+
+    typedef bool            (*converterCallback)        (void *to, const void *from, const uint32_t fromType);
 
 public:
     AMetaType               (const Table *table);
@@ -80,6 +83,7 @@ public:
 
     static bool             compare                     (const void *left, const void *right, uint32_t type);
     static bool             convert                     (const void *from, uint32_t fromType, void *to, uint32_t toType);
+    static bool             registerConverter           (uint32_t from, uint32_t to, converterCallback function);
     static bool             hasConverter                (uint32_t from, uint32_t to);
 
     static bool             toBoolean                   (void *to, const void *from, const uint32_t fromType);
@@ -98,8 +102,6 @@ public:
 protected:
     typedef map<uint32_t, Table>    TypeMap;
     typedef map<string, uint32_t>   NameMap;
-
-    typedef bool            (*converterCallback)        (void *to, const void *from, const uint32_t fromType);
 
     typedef map<uint32_t, map<uint32_t, converterCallback>> ConverterMap;
 

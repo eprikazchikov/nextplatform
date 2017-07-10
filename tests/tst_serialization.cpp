@@ -1,9 +1,12 @@
 #include "tst_serialization.h"
 
+#include "aobjectsystem.h"
 #include "abson.h"
 #include "ajson.h"
 
 #include <QtTest>
+
+#include "tst_common.h"
 
 void SerializationTest::initTestCase() {
     var1["bool"]    = true;
@@ -44,5 +47,8 @@ void SerializationTest::Json_Serialize_Desirialize() {
 }
 
 void SerializationTest::Bson_Serialize_Desirialize() {
+    AVariant::AByteArray bin    = {'\x00','\x01','\x02','\x03','\x04','\xFF'};
+    var1["bin"] = bin;
+
     QCOMPARE(AVariant(var1), ABson::load(ABson::save(var1)));
 }

@@ -9,13 +9,13 @@ class ObjectSystemTest : public QObject {
     Q_OBJECT
 
 private slots:
+    void initTestCase();
+    void cleanupTestCase();
+
     void Object_Instansing();
     void Serialize_Desirialize_Object();
     void RegisterUnregister_Object();
     void Override_Object();
-
-    void Delta_Serialize_Desirialize_Object();
-    void Virtual_Inheritance();
 
 private:
 };

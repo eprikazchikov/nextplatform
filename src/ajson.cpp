@@ -1,6 +1,7 @@
 #include "ajson.h"
 
 #include "avariant.h"
+#include "aobjectsystem.h"
 
 #define J_TRUE  "true"
 #define J_FALSE "false"
@@ -11,35 +12,24 @@
 typedef stack<AVariant> VariantStack;
 typedef stack<string>   NameStack;
 
-void appendProperty(VariantStack &s, NameStack &n, const AVariant &data, const string &name) {
-    AVariant v  = s.top();
-    s.pop();
+void appendProperty(VariantStack &s, const AVariant &data, const string &name) {
+    AVariant v;
+    if(!s.empty()) {
+        v   = s.top();
+        s.pop();
+    }
     switch(v.type()) {
         case AMetaType::VariantList: {
-            AVariant::AVariantList list = v.toList();
+            AVariant::AVariantList list = v.value<AVariant::AVariantList>();
             list.push_back(data);
             s.push(list);
             return;
         }
         case AMetaType::VariantMap: {
-            AVariant::AVariantMap map   = v.toMap();
-            if(name == STRUCTURE) {
-                auto d = map.find(DATA);
-                if(d != map.end()) {
-                    AVariant::AVariantList list = d->second.toList();
-
-                    AMetaType::Type type    = (AMetaType::Type)data.toInt();
-                    void *object    = AMetaType::create(type);
-                    AMetaType::convert(&list, AMetaType::VariantList, object, type);
-
-                    s.push(AVariant(type, object));
-                    return;
-                }
-            } else {
-                map[name]    = data;
-                s.push(map);
-                return;
-            }
+            AVariant::AVariantMap map   = v.value<AVariant::AVariantMap>();
+            map[name]    = data;
+            s.push(map);
+            return;
         } break;
         default: break;
     }
@@ -83,7 +73,7 @@ AVariant AJson::load(const string &data) {
                 result  = s.top();
                 s.pop();
                 if(s.size()) {
-                    appendProperty(s, n, result, n.top());
+                    appendProperty(s, result, n.top());
                 }
                 n.pop();
                 state   = propertyName;
@@ -99,8 +89,16 @@ AVariant AJson::load(const string &data) {
             case ']': {
                 result  = s.top();
                 s.pop();
-                if(s.size()) {
-                    appendProperty(s, n, result, n.top());
+
+                AVariant::AVariantList list = result.value<AVariant::AVariantList>();
+                uint32_t type   = list.front().toInt();
+                list.pop_front();
+                if(type != AMetaType::VariantList) {
+                    void *object    = AMetaType::create(type);
+                    AMetaType::convert(&list, AMetaType::VariantList, object, type);
+                    appendProperty(s, AVariant(type, object), n.top());
+                } else {
+                    appendProperty(s, list, n.top());
                 }
                 n.pop();
                 state   = propertyName;
@@ -121,7 +119,7 @@ AVariant AJson::load(const string &data) {
                 if(state == propertyName) {
                     name    = str;
                 } else {
-                    appendProperty(s, n, str, name);
+                    appendProperty(s, str, name);
                 }
             } break;
             case '0':
@@ -148,14 +146,14 @@ AVariant AJson::load(const string &data) {
                 }
                 if(state == propertyValue) {
                     AVariant v(data.substr(st, it - st));
-                    appendProperty(s, n, (number) ? AVariant(v.toDouble()) : AVariant(v.toInt()), name);
+                    appendProperty(s, (number) ? AVariant(v.toDouble()) : AVariant(v.toInt()), name);
                 }
                 it--;
             } break;
             case 't': {
                 if(data.substr(it, 4) == J_TRUE) {
                     if(state == propertyValue) {
-                        appendProperty(s, n, true, name);
+                        appendProperty(s, true, name);
                     }
                     it  += 3;
                 }
@@ -163,7 +161,7 @@ AVariant AJson::load(const string &data) {
             case 'f': {
                 if(data.substr(it, 5) == J_FALSE) {
                     if(state == propertyValue) {
-                        appendProperty(s, n, false, name);
+                        appendProperty(s, false, name);
                     }
                     it  += 4;
                 }
@@ -171,7 +169,7 @@ AVariant AJson::load(const string &data) {
             case 'n': {
                 if(data.substr(it, 4) == J_NULL) {
                     if(state == propertyValue) {
-                        appendProperty(s, n, static_cast<void *>(nullptr), name);
+                        appendProperty(s, static_cast<void *>(nullptr), name);
                     }
                     it  += 3;
                 }
@@ -197,24 +195,7 @@ string AJson::save(const AVariant &data, int32_t depth) {
         case AMetaType::String: {
             result += '"' + data.toString() + '"';
         } break;
-        case AMetaType::VariantList: {
-            result += "[";
-            result += FORMAT;
-            uint32_t i = 1;
-            AVariant::AVariantList list = data.toList();
-            for(auto &it: list) {
-                result.append(depth + 1, '\t');
-                result += save(it, (depth > -1) ? depth + 1 : depth);
-                result += ((i < list.size()) ? "," : "");
-                result += FORMAT;
-                i++;
-            }
-            if(depth > -1) {
-                result.append(depth, '\t');
-            }
-            result += "]";
-        } break;
-        default: {
+        case AMetaType::VariantMap: {
             result += "{";
             result += FORMAT;
             uint32_t i = 1;
@@ -230,6 +211,23 @@ string AJson::save(const AVariant &data, int32_t depth) {
                 result.append(depth, '\t');
             }
             result += "}";
+        } break;
+        default: {
+            result += "[";
+            result += FORMAT;
+            uint32_t i = 1;
+            AVariant::AVariantList list = data.toList();
+            for(auto &it: list) {
+                result.append(depth + 1, '\t');
+                result += save(it, (depth > -1) ? depth + 1 : depth);
+                result += ((i < list.size()) ? "," : "");
+                result += FORMAT;
+                i++;
+            }
+            if(depth > -1) {
+                result.append(depth, '\t');
+            }
+            result += "]";
         } break;
     }
     return result;

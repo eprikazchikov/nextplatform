@@ -27,6 +27,7 @@ AMetaType::TypeMap AMetaType::s_Types = {
     {AMetaType::String,     DECLARE_BUILT_TYPE(string)},
     {AMetaType::VariantMap, DECLARE_BUILT_TYPE(AVariant::AVariantMap)},
     {AMetaType::VariantList,DECLARE_BUILT_TYPE(AVariant::AVariantList)},
+    {AMetaType::ByteArray,  DECLARE_BUILT_TYPE(AVariant::AByteArray)},
     {AMetaType::Vector2D,   DECLARE_BUILT_TYPE(AVector2D)},
     {AMetaType::Vector3D,   DECLARE_BUILT_TYPE(AVector3D)},
     {AMetaType::Vector4D,   DECLARE_BUILT_TYPE(AVector4D)},
@@ -93,6 +94,7 @@ AMetaType::NameMap AMetaType::s_Names = {
     {"string",          AMetaType::String},
     {"map",             AMetaType::VariantMap},
     {"list",            AMetaType::VariantList},
+    {"AByteArray",      AMetaType::ByteArray},
     {"AVector2D",       AMetaType::Vector2D},
     {"AVector3D",       AMetaType::Vector3D},
     {"AVector4D",       AMetaType::Vector4D},
@@ -250,6 +252,23 @@ bool AMetaType::convert(const void *from, uint32_t fromType, void *to, uint32_t 
     return false;
 }
 
+bool AMetaType::registerConverter(uint32_t from, uint32_t to, converterCallback function) {
+    PROFILE_FUNCTION()
+    if(hasConverter(from, to)) {
+        return false;
+    }
+
+    auto t = s_Converters.find(to);
+    if(t != s_Converters.end()) {
+        t->second[from] = function;
+    } else {
+        map<uint32_t, converterCallback> m;
+        m[from] = function;
+        s_Converters[to]    = m;
+    }
+    return true;
+}
+
 bool AMetaType::hasConverter(uint32_t from, uint32_t to) {
     PROFILE_FUNCTION()
     auto t = s_Converters.find(to);
@@ -307,7 +326,7 @@ bool AMetaType::toString(void *to, const void *from, const uint32_t fromType) {
     string *r   = static_cast<string *>(to);
     switch(fromType) {
         case Bool:  { *r        = (*(static_cast<const bool *>(from))) ? "true" : "false"; } break;
-        case Double:{ string s  = to_string(*(static_cast<const double *>(from))); s.erase(s.find_last_not_of('0') + 1, string::npos ); *r = s; } break;
+        case Double:{ string s  = to_string(*(static_cast<const double *>(from))); s.erase(s.find_last_not_of('0') + 2, string::npos ); *r = s; } break;
         case Int:   { *r        = to_string(*(static_cast<const int *>(from))); } break;
         default:    { result    = false; } break;
     }

@@ -26,6 +26,7 @@ class ObjectTest : public QObject {
     Q_OBJECT
 
 private slots:
+    void Meta_type();
     void Meta_property();
     void Meta_methods();
     void Disconnect_base();

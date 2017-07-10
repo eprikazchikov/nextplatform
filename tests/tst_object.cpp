@@ -25,6 +25,34 @@
 
 #include <QtTest>
 
+bool toList(void *to, const void *from, const uint32_t fromType) {
+    if(fromType == AMetaType::type<ATestObject *>()) {
+        const AObject *o  = *(const AObject **)from;
+
+        AVariant::AVariantList *r    = static_cast<AVariant::AVariantList *>(to);
+        *r  = AObjectSystem::toVariant(o).value<AVariant::AVariantList>();
+
+        return true;
+    }
+    return false;
+}
+
+void ObjectTest::Meta_type() {
+    int type    = AMetaType::type<ATestObject *>();
+    bool result = AMetaType::registerConverter(type, AMetaType::VariantList, &toList);
+
+    QCOMPARE(result, true);
+
+    ATestObject *obj    = new ATestObject;
+    AVariant variant    = AVariant::fromValue(obj);
+
+    QCOMPARE(variant.isValid(), true);
+    QCOMPARE((int)variant.userType(), type);
+
+    AVariant::AVariantList list = variant.toList();
+    QCOMPARE((int)list.size(), 2);
+}
+
 void ObjectTest::Meta_property() {
     ATestObject obj;
     const AMetaObject *meta = obj.metaObject();
@@ -32,7 +60,7 @@ void ObjectTest::Meta_property() {
 
     QCOMPARE(meta->name(), "ATestObject");
 
-    QCOMPARE(meta->propertyCount(), 2);
+    QCOMPARE(meta->propertyCount(), 3);
     QCOMPARE(meta->property(0).isValid(), true);
     QCOMPARE(meta->property(1).isValid(), true);
 
@@ -230,13 +258,11 @@ void ObjectTest::Find_object() {
     obj2.setParent(&obj1);
     obj3.setParent(&obj1);
     {
-        AUri uri(obj2.reference());
-        AObject *result = obj1.find(uri.path());
+        AObject *result = obj1.find("/MainObject/TestComponent2");
         QCOMPARE(result, &obj2);
     }
     {
-        AUri uri(obj3.reference());
-        AObject *result = obj1.find(uri.path());
+        AObject *result = obj1.find("/MainObject/TestComponent3");
         QCOMPARE(&obj3, result);
     }
     {

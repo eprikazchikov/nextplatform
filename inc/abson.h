@@ -6,14 +6,12 @@
 
 #include "avariant.h"
 
-typedef vector<uint8_t>         AByteVector;
-
 class NEXT_LIBRARY_EXPORT ABson {
 public:
     ABson                       ();
 
-    static AVariant             load                        (const AByteVector &data, AMetaType::Type type = AMetaType::VariantMap);
-    static AByteVector          save                        (const AVariant &data);
+    static AVariant             load                        (const AVariant::AByteArray &data, AMetaType::Type type = AMetaType::VariantMap);
+    static AVariant::AByteArray save                        (const AVariant &data);
 
 protected:
     enum BsonDataTypes {
@@ -21,7 +19,7 @@ protected:
         STRING,
         OBJECT,
         ARRAY,
-        BYNARY,
+        BINARY,
         UNDEFINED,
         OBJECTID,
         BOOL,
