@@ -16,8 +16,9 @@ class ATestObject : public AObject {
     )
 
     A_PROPERTIES(
-        A_PROPERTY(bool, slot, getSlot, setSlot, General),
-        A_PROPERTY(AVector2D, vec, getVector, setVector, General)
+        A_PROPERTY(bool, slot, getSlot, setSlot),
+        A_PROPERTY(AVector2D, vec, getVector, setVector),
+        A_PROPERTY(ATestObject *, resource, getResource, setResource)
     )
 
 public:
@@ -25,6 +26,7 @@ public:
             AObject() {
         m_bSlot     = false;
         m_Vector2   = AVector2D(1.0f, 0.0f);
+        m_pResource = nullptr;
     }
 
     bool            getSlot         () const {
@@ -43,26 +45,19 @@ public:
         m_Vector2   = value;
     }
 
+    ATestObject    *getResource     () const {
+        return m_pResource;
+    }
+
+    void            setResource     (ATestObject *resource) {
+        m_pResource = resource;
+    }
+
     void            signal          (const bool value);
 
     bool            m_bSlot;
     AVector2D       m_Vector2;
-};
-
-class ATestObjectEx : public ATestObject {
-    A_OVERRIDE(ATestObjectEx, ATestObject, Test)
-
-    A_NOMETHODS()
-    A_NOPROPERTIES()
-
-};
-
-class ASecondObject : public ATestObject {
-    A_REGISTER(ASecondObject, ATestObject, Test)
-
-    A_NOMETHODS()
-    A_NOPROPERTIES()
-
+    ATestObject    *m_pResource;
 };
 
 inline bool compare(const AObject::Link &left, const AObject::Link &right) {
@@ -78,7 +73,6 @@ inline bool compare(const AObject &left, const AObject &right) {
 
     result &= (left.isEnable()  == right.isEnable());
     result &= (left.typeName()  == right.typeName());
-    result &= (left.getDynamicProperties() == right.getDynamicProperties());
 
     if(!result) {
         return result;
@@ -88,7 +82,9 @@ inline bool compare(const AObject &left, const AObject &right) {
         for(int i = 0; i < left.metaObject()->propertyCount(); i++) {
             AMetaProperty lp    = left.metaObject()->property(i);
             AMetaProperty rp    = right.metaObject()->property(i);
-            if(lp.name() != rp.name() || lp.read(&left) != rp.read(&right)) {
+            AVariant lv = lp.read(&left);
+            AVariant rv = rp.read(&right);
+            if(lp.name() != rp.name() || lv != rv) {
                 return false;
             }
         }

@@ -106,7 +106,7 @@ void VariantTest::Convert_Float_to_Bool_Int_String() {
         QVariant result = 6.4f;
         QCOMPARE(value.toBool(),    result.toBool());
         QCOMPARE(value.toInt(),     result.toInt());
-        QCOMPARE(value.toString().c_str(),  "6.4");
+        QCOMPARE(value.toString().c_str(),  "6.400000");
     }
     {
         AVariant value  = 7.5f;
@@ -164,13 +164,13 @@ void VariantTest::Compare_Variants_Basic() {
         QCOMPARE((value1 == value2),    false);
     }
 }
-/// \todo: Add structures
+
 void VariantTest::Compare_Variants_Advanced() {
     {
-        AVariant::AVariantList value1;
+        AVariantList value1;
         value1.push_back("Test");
         value1.push_back(true);
-        AVariant::AVariantList value2;
+        AVariantList value2;
         value2.push_back("Test");
         value2.push_back(false);
 
@@ -178,10 +178,10 @@ void VariantTest::Compare_Variants_Advanced() {
         QCOMPARE((AVariant(value1) == AVariant(value2)),    false);
     }
     {
-        AVariant::AVariantMap value1;
+        AVariantMap value1;
         value1["NAME"]  = "Test";
         value1["VALUE"] = true;
-        AVariant::AVariantMap value2;
+        AVariantMap value2;
         value2["NAME"]  = "Test";
         value2["VALUE"] = false;
 
@@ -189,3 +189,4 @@ void VariantTest::Compare_Variants_Advanced() {
         QCOMPARE((AVariant(value1) == AVariant(value2)),    false);
     }
 }
+

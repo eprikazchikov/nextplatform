@@ -67,10 +67,9 @@ public: \
         return table; \
     }
 
-#define A_PROPERTY(t, p, r, w, g) \
+#define A_PROPERTY(t, p, r, w) \
 { \
     #p, \
-    #g, \
     Reader<decltype(&r), &r>::type(#t), \
    &Reader<decltype(&r), &r>::read, \
    &Writer<decltype(&w), &w>::write \

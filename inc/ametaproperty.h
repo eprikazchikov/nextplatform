@@ -13,7 +13,6 @@ public:
 
     struct Table {
         const char             *name;
-        const char             *group;
         const AMetaType::Table *type;
         ReadMem                 reader;
         WriteMem                writer;
@@ -23,7 +22,6 @@ public:
     AMetaProperty           (const Table *table);
 
     const char             *name                        () const;
-    const char             *group                       () const;
     bool                    isValid                     () const;
     const AMetaType         type                        () const;
 
@@ -58,7 +56,7 @@ struct Reader<T(Class::*)(), ReadFunc> {
     }
 
     inline static AVariant read(const AObject *obj) {
-        return (static_cast<Class *>(obj)->*ReadFunc)();
+        return AVariant::fromValue<T>((static_cast<Class *>(obj)->*ReadFunc)());
     }
 };
 template<typename T, typename Class, T(Class::*ReadFunc)()const>
@@ -68,7 +66,7 @@ struct Reader<T(Class::*)()const, ReadFunc> {
     }
 
     inline static AVariant read(const AObject *obj) {
-        return (static_cast<const Class *>(obj)->*ReadFunc)();
+        return AVariant::fromValue<T>((static_cast<const Class *>(obj)->*ReadFunc)());
     }
 };
 

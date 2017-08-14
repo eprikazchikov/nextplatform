@@ -21,6 +21,7 @@ public:
         String,
         VariantMap,
         VariantList,
+        ByteArray,
 
         Vector2D                = 10,
         Vector3D,
@@ -45,6 +46,8 @@ public:
         const char         *name;
     };
 
+    typedef bool            (*converterCallback)        (void *to, const void *from, const uint32_t fromType);
+
 public:
     AMetaType               (const Table *table);
 
@@ -61,14 +64,11 @@ public:
 
     static uint32_t         type                        (const char *name);
 
+    static uint32_t         type                        (const type_info &type);
+
     template<typename T>
     static uint32_t         type                        () {
-        for(auto it : s_Types) {
-            if(it.second.index() == type_index(typeid(T)) ) {
-                return it.first;
-            }
-        }
-        return Invalid;
+        return type(typeid(T));
     }
 
     static const char      *name                        (uint32_t type);
@@ -80,6 +80,7 @@ public:
 
     static bool             compare                     (const void *left, const void *right, uint32_t type);
     static bool             convert                     (const void *from, uint32_t fromType, void *to, uint32_t toType);
+    static bool             registerConverter           (uint32_t from, uint32_t to, converterCallback function);
     static bool             hasConverter                (uint32_t from, uint32_t to);
 
     static bool             toBoolean                   (void *to, const void *from, const uint32_t fromType);
@@ -95,22 +96,10 @@ public:
     static bool             toQuaternion                (void *to, const void *from, const uint32_t fromType);
     static bool             toCurve                     (void *to, const void *from, const uint32_t fromType);
 
-protected:
-    typedef map<uint32_t, Table>    TypeMap;
-    typedef map<string, uint32_t>   NameMap;
-
-    typedef bool            (*converterCallback)        (void *to, const void *from, const uint32_t fromType);
-
-    typedef map<uint32_t, map<uint32_t, converterCallback>> ConverterMap;
-
+private:
     const Table            *m_pTable;
 
-    static TypeMap          s_Types;
-    static NameMap          s_Names;
-
     static uint32_t         s_NextId;
-
-    static ConverterMap     s_Converters;
 };
 
 template<typename T>

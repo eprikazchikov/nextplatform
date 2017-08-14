@@ -37,100 +37,84 @@
 #define A_REGISTER(Class, Super, Group) \
     A_OBJECT(Class, Super) \
 public: \
-    static void                 registerClassFactory        () { \
-        AObjectSystem::factoryAdd(string("thor://") + #Group + "/" + Class::metaClass()->name(), Class::metaClass()); \
+    static void                     registerClassFactory    () { \
+        AObjectSystem::factoryAdd<Class>(#Group, Class::metaClass()); \
     } \
-    static void                 unregisterClassFactory      () { \
-        AObjectSystem::factoryRemove(string("thor://") + #Group + "/" + Class::metaClass()->name()); \
+    static void                     unregisterClassFactory  () { \
+        AObjectSystem::factoryRemove<Class>(#Group); \
     }
 
 
 #define A_OVERRIDE(Class, Super, Group) \
     A_OBJECT(Class, Super) \
 public: \
-    static void                 registerClassFactory        () { \
-        AObjectSystem::factoryAdd(string("thor://") + #Group + "/" + Super::metaClass()->name(), Class::metaClass()); \
+    static void                     registerClassFactory    () { \
+        AObjectSystem::factoryAdd<Super>(#Group, Class::metaClass()); \
     } \
-    static void                 unregisterClassFactory      () { \
-        AObjectSystem::factoryRemove(string("thor://") + #Group + "/" + Super::metaClass()->name()); \
-        AObjectSystem::factoryAdd(string("thor://") + #Group + "/" + Super::metaClass()->name(), Super::metaClass()); \
+    static void                     unregisterClassFactory  () { \
+        AObjectSystem::factoryRemove<Super>(#Group); \
+        AObjectSystem::factoryAdd<Super>(#Group, Super::metaClass()); \
     } \
-    virtual string              typeName                    () const { \
+    virtual string                  typeName                () const { \
         return Super::metaClass()->name(); \
     }
 
-using namespace std;
+class AObjectPrivate;
 
 class NEXT_LIBRARY_EXPORT AObject {
 public:
     struct Link {
-        AObject                *sender;
+        AObject                    *sender;
 
-        int32_t                 signal;
+        int32_t                     signal;
 
-        AObject                *receiver;
+        AObject                    *receiver;
 
-        int32_t                 method;
+        int32_t                     method;
 
-        string                  reference;
+        string                      reference;
     };
 
     typedef list<AObject *>         ObjectList;
 
     typedef list<Link>              LinkList;
-    typedef map<string, AVariant>   PropertyMap;
 
-protected:
-    /// Enable object flag
-    bool                        m_bEnable;
-    /// Object name
-    string                      m_sName;
-
-    ObjectList                  m_mChildren;
-    LinkList                    m_lRecievers;
-    LinkList                    m_lSenders;
-
-    PropertyMap                 m_mDynamicProperties;
-    /// Parent object
-    AObject                    *m_pParent;
+private:
+    AObjectPrivate                 *p_ptr;
 
 public:
-    AObject                     ();
+    AObject                         ();
 
-    virtual ~AObject            ();
+    virtual ~AObject                ();
 
-    static AObject             *construct                   ();
+    static AObject                 *construct                   ();
 
-    static const AMetaObject   *metaClass                   ();
-    virtual const AMetaObject  *metaObject                  () const;
+    static const AMetaObject       *metaClass                   ();
+    virtual const AMetaObject      *metaObject                  () const;
 
-    virtual AObject            *clone                       ();
+    virtual AObject                *clone                       ();
 
-    AObject                    *parent                      () const;
+    AObject                        *parent                      () const;
 
-    string                      name                        () const;
+    string                          name                        () const;
 
-    string                      reference                   () const;
+    uint32_t                        uuid                        () const;
 
-    static void                 connect                     (AObject *sender, const char *signal, AObject *receiver, const char *method);
-    static void                 disconnect                  (AObject *sender, const char *signal, AObject *receiver, const char *method);
+    static void                     connect                     (AObject *sender, const char *signal, AObject *receiver, const char *method);
+    static void                     disconnect                  (AObject *sender, const char *signal, AObject *receiver, const char *method);
 
-    void                        deleteLater                 ();
+    void                            deleteLater                 ();
 
-    void                        setName                     (const string &value);
+    void                            setName                     (const string &value);
 
-    bool                        isEnable                    () const;
+    bool                            isEnable                    () const;
 
-    AVariant                    toVariant                   ();
-    void                        fromVariant                 (const AVariant &variant);
 
-    static AObject             *toObject                    (const AVariant &variant, AObject *parent = 0);
-
-    AObject                    *find                        (const string &path);
+    AObject                        *find                        (const string &path);
 
     template<typename T>
-    T                           findChild                   (bool recursive = true) {
-        for(auto it : m_mChildren) {
+    T                               findChild                   (bool recursive = true) {
+        for(auto it : getChildren()) {
             AObject *object = it;
             T result    = dynamic_cast<T>(object);
             if(result) {
@@ -146,9 +130,9 @@ public:
     }
 
     template<typename T>
-    list<T>                     findChildren                (bool recursive = true) {
+    list<T>                         findChildren                (bool recursive = true) {
         list<T> result;
-        for(auto it : m_mChildren) {
+        for(auto it : getChildren()) {
             AObject *component = it;
             T object    = dynamic_cast<T>(component);
             if(object) {
@@ -165,46 +149,45 @@ public:
 
 // Virtual members
 public:
-    virtual const ObjectList   &getChildren                 () const;
-    virtual const LinkList     &getReceivers                () const;
-    virtual const LinkList     &getSenders                  () const;
-    virtual const PropertyMap  &getDynamicProperties        () const;
+    virtual const ObjectList       &getChildren                 () const;
+    virtual const LinkList         &getReceivers                () const;
+    virtual const LinkList         &getSenders                  () const;
 
-    virtual void                setParent                   (AObject *parent);
-    virtual string              typeName                    () const;
-    virtual AVariant            property                    (const char *name) const;
-    virtual void                setProperty                 (const char *name, const AVariant &value);
+    virtual void                    setParent                   (AObject *parent);
+    virtual string                  typeName                    () const;
+    virtual AVariant                property                    (const char *name) const;
+    virtual void                    setProperty                 (const char *name, const AVariant &value);
 
-    virtual void                setEnable                   (bool state);
+    virtual void                    setEnable                   (bool state);
 
-    virtual bool                event                       (AEvent *e);
+    virtual bool                    event                       (AEvent *);
+
+    virtual void                    loadUserData                (const AVariantMap &);
+
+    virtual AVariantMap             saveUserData                () const;
 
 protected:
-    void                        addChild                    (AObject *value);
-    void                        removeChild                 (AObject *value);
+    void                            addChild                    (AObject *value);
+    void                            removeChild                 (AObject *value);
 
-    void                        emitSignal                  (const char *signal, const AVariant &args = AVariant());
-    bool                        postEvent                   (AEvent *e);
-    void                        processEvents               ();
+    void                            emitSignal                  (const char *signal, const AVariant &args = AVariant());
+    bool                            postEvent                   (AEvent *e);
+    void                            processEvents               ();
 
-    virtual void                onCreated                   ();
-    virtual void                onDestroyed                 ();
+    virtual void                    onCreated                   ();
+    virtual void                    onDestroyed                 ();
 
-    AObject                    *sender                      () const;
+    AObject                        *sender                      () const;
 
 private:
     friend class ObjectTest;
     friend class AThreadPool;
-
-    AObject                    *m_pCurrentSender;
-
-    typedef queue<AEvent *>     EventQueue;
-    EventQueue                  m_EventQueue;
-
-    mutex                       m_Mutex;
+    friend class AObjectSystem;
 
 private:
     bool                        isLinkExist                 (const Link &link) const;
+
+    void                        setUUID                     (uint32_t id);
 
     bool                        operator==                  (const AObject &) const { return false; }
     bool                        operator!=                  (const AObject &) const { return false; }

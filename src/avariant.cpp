@@ -51,6 +51,11 @@ AVariant::AVariant(const AVariantList &value) {
     *this   = fromValue<AVariantList>(value);
 }
 
+AVariant::AVariant(const AByteArray &value) {
+    PROFILE_FUNCTION()
+    *this   = fromValue<AByteArray>(value);
+}
+
 AVariant::AVariant(const AVector2D &value) {
     PROFILE_FUNCTION()
     *this   = fromValue<AVector2D>(value);
@@ -94,14 +99,25 @@ AVariant::AVariant(uint32_t type, void *copy) {
 
 AVariant::~AVariant() {
     PROFILE_FUNCTION()
+    AMetaType::destroy(mData.type, mData.so);
+    mData.type  = 0;
+}
+
+AVariant::AVariant(const AVariant &value) {
+    PROFILE_FUNCTION()
+    mData.type  = value.mData.type;
+    mData.so    = AMetaType::create(value.mData.type, value.mData.so);
 }
 
 AVariant &AVariant::operator=(const AVariant &value) {
-    mData   = value.mData;
+    PROFILE_FUNCTION()
+    mData.type  = value.mData.type;
+    mData.so    = AMetaType::create(value.mData.type, value.mData.so);
     return *this;
 }
 
 bool AVariant::operator==(const AVariant &right) const {
+    PROFILE_FUNCTION()
     if(mData.type  == right.mData.type) {
         return AMetaType::compare(mData.so, right.mData.so, mData.type);
     }
@@ -109,10 +125,16 @@ bool AVariant::operator==(const AVariant &right) const {
 }
 
 bool AVariant::operator!=(const AVariant &right) const {
+    PROFILE_FUNCTION()
     return !(*this == right);
 }
 
 uint32_t AVariant::type() const {
+    PROFILE_FUNCTION()
+    return (mData.type < AMetaType::UserType) ? mData.type : AMetaType::UserType;
+}
+
+uint32_t AVariant::userType() const {
     PROFILE_FUNCTION()
     return mData.type;
 }
@@ -120,6 +142,11 @@ uint32_t AVariant::type() const {
 void *AVariant::data() const {
     PROFILE_FUNCTION()
     return mData.so;
+}
+
+bool AVariant::isValid() const {
+    PROFILE_FUNCTION()
+    return (mData.type != AMetaType::Invalid && mData.so);
 }
 
 bool AVariant::canConvert(uint32_t type) const {
@@ -148,20 +175,21 @@ const string AVariant::toString() const {
     return value<string>();
 }
 
-const AVariant::AVariantMap AVariant::toMap() const {
+const AVariantMap AVariant::toMap() const {
     PROFILE_FUNCTION()
-    AVariantMap result  = value<AVariantMap>();
+    return value<AVariantMap>();
+}
 
-    if(mData.type > AMetaType::VariantList) {
-        result[STRUCTURE]   = static_cast<int>(mData.type);
-        result[DATA]        = toList();
-    }
+const AVariantList AVariant::toList() const {
+    PROFILE_FUNCTION()
+    AVariantList result = value<AVariantList>();
+    result.push_front(static_cast<int>(mData.type));
     return result;
 }
 
-const AVariant::AVariantList AVariant::toList() const {
+const AByteArray AVariant::toByteArray() const {
     PROFILE_FUNCTION()
-    return value<AVariantList>();
+    return value<AByteArray>();
 }
 
 const AVector2D AVariant::toVector2D() const {

@@ -1,15 +1,7 @@
-#include "aobject.h"
+#include "aobject_p.h"
 
 #include "aobjectsystem.h"
 #include "auri.h"
-
-#define TYPE        "Type"
-#define NAME        "Name"
-#define LINKS       "Links"
-#define ENABLE      "Enable"
-#define PROPERTIES  "Properties"
-#define COMPONENTS  "Components"
-#define PARENT      "Parent"
 
 inline bool operator==(const AObject::Link &left, const AObject::Link &right) {
     bool result = true;
@@ -21,9 +13,7 @@ inline bool operator==(const AObject::Link &left, const AObject::Link &right) {
 }
 
 AObject::AObject() :
-        m_bEnable(true),
-        m_pParent(nullptr),
-        m_pCurrentSender(nullptr) {
+        p_ptr(new AObjectPrivate) {
     PROFILE_FUNCTION()
 
     onCreated();
@@ -34,29 +24,29 @@ AObject::~AObject() {
     onDestroyed();
 
     {
-        unique_lock<mutex> locker(m_Mutex);
-        while(!m_EventQueue.empty()) {
-            delete m_EventQueue.front();
-            m_EventQueue.pop();
+        unique_lock<mutex> locker(p_ptr->m_Mutex);
+        while(!p_ptr->m_EventQueue.empty()) {
+            delete p_ptr->m_EventQueue.front();
+            p_ptr->m_EventQueue.pop();
         }
     }
 
-    while(!m_lSenders.empty()) {
-        disconnect(m_lSenders.front().sender, 0, this, 0);
+    while(!p_ptr->m_lSenders.empty()) {
+        disconnect(p_ptr->m_lSenders.front().sender, 0, this, 0);
     }
     disconnect(this, 0, 0, 0);
 
-    for(const auto &it : m_mChildren) {
+    for(const auto &it : p_ptr->m_mChildren) {
         AObject *c  = it;
         if(c) {
-            c->m_pParent    = 0;
+            c->p_ptr->m_pParent    = 0;
             delete c;
         }
     }
-    m_mChildren.clear();
+    p_ptr->m_mChildren.clear();
 
-    if(m_pParent) {
-        m_pParent->removeChild(this);
+    if(p_ptr->m_pParent) {
+        p_ptr->m_pParent->removeChild(this);
     }
 }
 
@@ -80,10 +70,8 @@ AObject *AObject::clone() {
     PROFILE_FUNCTION()
     const AMetaObject *meta = metaObject();
     AObject *result = meta->createInstance();
-    for(auto it : getDynamicProperties()) {
-        result->setProperty(it.first.c_str(), it.second);
-    }
-    uint32_t count  = meta->propertyCount();
+    result->p_ptr->m_UUID  = AObjectSystem::instance()->nextID();
+    int count  = meta->propertyCount();
     for(int i = 0; i < count; i++) {
         AMetaProperty lp    = result->metaObject()->property(i);
         AMetaProperty rp    = meta->property(i);
@@ -111,12 +99,17 @@ AObject *AObject::clone() {
 
 AObject *AObject::parent() const {
     PROFILE_FUNCTION()
-    return m_pParent;
+    return p_ptr->m_pParent;
 }
 
 string AObject::name() const {
     PROFILE_FUNCTION()
-    return m_sName;
+    return p_ptr->m_sName;
+}
+
+uint32_t AObject::uuid() const {
+    PROFILE_FUNCTION()
+    return p_ptr->m_UUID;
 }
 
 string AObject::typeName() const {
@@ -144,18 +137,15 @@ void AObject::connect(AObject *sender, const char *signal, AObject *receiver, co
             link.signal     = snd;
             link.receiver   = receiver;
             link.method     = rcv;
-/*
-            link.reference  = receiver->reference() + "?" + char(method.type() + 0x30) + method.signature();
-            sender->reference() + "#" + char(method.type() + 0x30) + method.signature();
-*/
+
             if(!sender->isLinkExist(link)) {
                 {
-                    unique_lock<mutex> locker(sender->m_Mutex);
-                    sender->m_lRecievers.push_back(link);
+                    unique_lock<mutex> locker(sender->p_ptr->m_Mutex);
+                    sender->p_ptr->m_lRecievers.push_back(link);
                 }
                 {
-                    unique_lock<mutex> locker(receiver->m_Mutex);
-                    receiver->m_lSenders.push_back(link);
+                    unique_lock<mutex> locker(receiver->p_ptr->m_Mutex);
+                    receiver->p_ptr->m_lSenders.push_back(link);
                 }
             }
         }
@@ -164,8 +154,8 @@ void AObject::connect(AObject *sender, const char *signal, AObject *receiver, co
 
 void AObject::disconnect(AObject *sender, const char *signal, AObject *receiver, const char *method) {
     PROFILE_FUNCTION()
-    if(sender && !sender->m_lRecievers.empty()) {
-        for(auto snd = sender->m_lRecievers.begin(); snd != sender->m_lRecievers.end(); snd) {
+    if(sender && !sender->p_ptr->m_lRecievers.empty()) {
+        for(auto snd = sender->p_ptr->m_lRecievers.begin(); snd != sender->p_ptr->m_lRecievers.end(); snd) {
             Link *data = &(*snd);
 
             if(data->sender == sender) {
@@ -173,16 +163,16 @@ void AObject::disconnect(AObject *sender, const char *signal, AObject *receiver,
                     if(receiver == nullptr || data->receiver == receiver) {
                         if(method == nullptr || (receiver && data->method == receiver->metaObject()->indexOfMethod(&method[1]))) {
 
-                            for(auto rcv = data->receiver->m_lSenders.begin(); rcv != data->receiver->m_lSenders.end(); rcv) {
+                            for(auto rcv = data->receiver->p_ptr->m_lSenders.begin(); rcv != data->receiver->p_ptr->m_lSenders.end(); rcv) {
                                 if(*rcv == *data) {
-                                    unique_lock<mutex> locker(data->receiver->m_Mutex);
-                                    rcv = data->receiver->m_lSenders.erase(rcv);
+                                    unique_lock<mutex> locker(data->receiver->p_ptr->m_Mutex);
+                                    rcv = data->receiver->p_ptr->m_lSenders.erase(rcv);
                                 } else {
                                     rcv++;
                                 }
                             }
-                            unique_lock<mutex> locker(sender->m_Mutex);
-                            snd = sender->m_lRecievers.erase(snd);
+                            unique_lock<mutex> locker(sender->p_ptr->m_Mutex);
+                            snd = sender->p_ptr->m_lRecievers.erase(snd);
 
                             continue;
                         }
@@ -201,28 +191,23 @@ void AObject::deleteLater() {
 
 const AObject::ObjectList &AObject::getChildren() const {
     PROFILE_FUNCTION()
-    return m_mChildren;
+    return p_ptr->m_mChildren;
 }
 
 const AObject::LinkList &AObject::getReceivers() const {
     PROFILE_FUNCTION()
-    return m_lRecievers;
+    return p_ptr->m_lRecievers;
 }
 
 const AObject::LinkList &AObject::getSenders() const {
     PROFILE_FUNCTION()
-    return m_lSenders;
-}
-
-const AObject::PropertyMap &AObject::getDynamicProperties() const {
-    PROFILE_FUNCTION()
-    return m_mDynamicProperties;
+    return p_ptr->m_lSenders;
 }
 
 AObject *AObject::find(const string &path) {
     PROFILE_FUNCTION()
-    if(m_pParent && path[0] == '/') {
-        return m_pParent->find(path);
+    if(p_ptr->m_pParent && path[0] == '/') {
+        return p_ptr->m_pParent->find(path);
     }
 
     unsigned int start  = 0;
@@ -231,13 +216,13 @@ AObject *AObject::find(const string &path) {
     }
     int index  = path.find('/', 1);
     if(index > -1) {
-        for(const auto &it : m_mChildren) {
+        for(const auto &it : p_ptr->m_mChildren) {
             AObject *o  = it->find(path.substr(index + 1));
             if(o) {
                 return o;
             }
         }
-    } else if(path.substr(start, index) == m_sName) {
+    } else if(path.substr(start, index) == p_ptr->m_sName) {
         return this;
     }
 
@@ -246,19 +231,19 @@ AObject *AObject::find(const string &path) {
 
 void AObject::setParent(AObject *parent) {
     PROFILE_FUNCTION()
-    if(m_pParent) {
-        m_pParent->removeChild(this);
+    if(p_ptr->m_pParent) {
+        p_ptr->m_pParent->removeChild(this);
     }
     if(parent) {
         parent->addChild(this);
     }
-    m_pParent   = parent;
+    p_ptr->m_pParent    = parent;
 }
 
 void AObject::setName(const string &value) {
     PROFILE_FUNCTION()
     if(!value.empty()) {
-        m_sName = value;
+        p_ptr->m_sName = value;
         // \todo Notify receivers
     }
 }
@@ -266,16 +251,16 @@ void AObject::setName(const string &value) {
 void AObject::addChild(AObject *value) {
     PROFILE_FUNCTION()
     if(value) {
-        m_mChildren.push_back(value);
+        p_ptr->m_mChildren.push_back(value);
     }
 }
 
 void AObject::removeChild(AObject *value) {
     PROFILE_FUNCTION()
-    auto it = m_mChildren.begin();
-    while(it != m_mChildren.end()) {
+    auto it = p_ptr->m_mChildren.begin();
+    while(it != p_ptr->m_mChildren.end()) {
         if(*it == value) {
-            m_mChildren.erase(it);
+            p_ptr->m_mChildren.erase(it);
             return;
         }
         it++;
@@ -284,13 +269,13 @@ void AObject::removeChild(AObject *value) {
 
 bool AObject::isEnable() const {
     PROFILE_FUNCTION()
-    return m_bEnable;
+    return p_ptr->m_bEnable;
 }
 
 void AObject::emitSignal(const char *signal, const AVariant &args) {
     PROFILE_FUNCTION()
     int32_t index   = metaObject()->indexOfSignal(&signal[1]);
-    for(auto &it : m_lRecievers) {
+    for(auto &it : p_ptr->m_lRecievers) {
         Link *link  = &(it);
         if(link->signal == index) {
             const AMetaMethod &method   = link->receiver->metaObject()->method(link->method);
@@ -306,24 +291,24 @@ void AObject::emitSignal(const char *signal, const AVariant &args) {
 
 bool AObject::postEvent(AEvent *e) {
     PROFILE_FUNCTION()
-    unique_lock<mutex> locker(m_Mutex);
-    m_EventQueue.push(e);
+    unique_lock<mutex> locker(p_ptr->m_Mutex);
+    p_ptr->m_EventQueue.push(e);
 
     return true;
 }
 
 void AObject::processEvents() {
     PROFILE_FUNCTION()
-    while(!m_EventQueue.empty()) {
-        unique_lock<mutex> locker(m_Mutex);
-        AEvent *e   = m_EventQueue.front();
+    while(!p_ptr->m_EventQueue.empty()) {
+        unique_lock<mutex> locker(p_ptr->m_Mutex);
+        AEvent *e   = p_ptr->m_EventQueue.front();
         switch (e->type()) {
             case AEvent::MethodCall: {
                 AMethodCallEvent *call  = reinterpret_cast<AMethodCallEvent *>(e);
-                m_pCurrentSender    = call->sender();
+                p_ptr->m_pCurrentSender = call->sender();
                 AVariant result;
                 metaObject()->method(call->method()).invoke(this, result, 1, call->args());
-                m_pCurrentSender    = nullptr;
+                p_ptr->m_pCurrentSender = nullptr;
             } break;
             case AEvent::Delete: {
                 locker.unlock();
@@ -335,26 +320,26 @@ void AObject::processEvents() {
             } break;
         }
         delete e;
-        m_EventQueue.pop();
+        p_ptr->m_EventQueue.pop();
     }
-}
-
-string AObject::reference() const {
-    PROFILE_FUNCTION()
-    if(m_pParent) {
-        return m_pParent->reference() + "/" + m_sName;
-    }
-    return string("thor://") + AObjectSystem::instance()->name() + "/" + m_sName;
 }
 
 void AObject::setEnable(bool state) {
     PROFILE_FUNCTION()
-    m_bEnable   = state;
+    p_ptr->m_bEnable   = state;
 }
 
-bool AObject::event(AEvent *e) {
+bool AObject::event(AEvent *) {
     PROFILE_FUNCTION()
     return false;
+}
+
+void AObject::loadUserData(const AVariantMap &) {
+
+}
+
+AVariantMap AObject::saveUserData() const {
+    return AVariantMap();
 }
 
 AVariant AObject::property(const char *name) const {
@@ -363,11 +348,6 @@ AVariant AObject::property(const char *name) const {
     int index   = meta->indexOfProperty(name);
     if(index > -1) {
         return meta->property(index).read(this);
-    } else {
-        auto it = m_mDynamicProperties.find(name);
-        if(it != m_mDynamicProperties.end()) {
-            return it->second;
-        }
     }
     return AVariant();
 }
@@ -378,8 +358,6 @@ void AObject::setProperty(const char *name, const AVariant &value) {
     int index   = meta->indexOfProperty(name);
     if(index > -1) {
         meta->property(index).write(this, value);
-    } else {
-        m_mDynamicProperties[name]  = value;
     }
 }
 
@@ -395,133 +373,12 @@ void AObject::onDestroyed() {
 
 AObject *AObject::sender() const {
     PROFILE_FUNCTION()
-    return m_pCurrentSender;
-}
-
-AVariant AObject::toVariant() {
-    PROFILE_FUNCTION()
-    AVariant::AVariantMap object;
-    object[TYPE]    = typeName();
-    object[NAME]    = m_sName;
-    object[ENABLE]  = m_bEnable;
-
-    const AMetaObject *meta = metaObject();
-    // Save properties
-    {
-        AVariant::AVariantList s;
-        for(uint32_t i = 0; i < meta->propertyCount(); i++) {
-            AMetaProperty p = meta->property(i);
-            if(p.isValid()) {
-                AVariant::AVariantMap property;
-                property[NAME]  = p.name();
-                property[DATA]  = p.read(this);
-                s.push_back(property);
-            }
-        }
-        for(const auto it : m_mDynamicProperties) {
-            AVariant::AVariantMap property;
-            property[NAME]  = it.first;
-            property[DATA]  = it.second;
-
-            s.push_back(property);
-        }
-        object[PROPERTIES]  = s;
-    }
-    // Save components
-    {
-        AVariant::AVariantList components;
-        for(const auto &it : m_mChildren) {
-            if(it) {
-                components.push_back(it->toVariant());
-            } else {
-                components.push_back(nullptr);
-            }
-        }
-        object[COMPONENTS]  = components;
-    }
-    // Save links
-    {
-        AVariant::AVariantList s;
-        for(const auto &it : m_lRecievers) {
-            AVariant::AVariantList link;
-
-            AMetaMethod method  = metaObject()->method(it.signal);
-            link.push_back(AVariant(char(method.type() + 0x30) + method.signature()));
-
-            AObject *reciever   = it.receiver;
-            method      = reciever->metaObject()->method(it.method);
-            link.push_back(reciever->reference() + "?" + char(method.type() + 0x30) + method.signature());
-
-            s.push_back(link);
-        }
-        for(const auto &it : m_lSenders) {
-            AVariant::AVariantList link;
-
-            AMetaMethod method  = metaObject()->method(it.method);
-            link.push_back(AVariant(char(method.type() + 0x30) + method.signature()));
-
-            AObject *sender = it.sender;
-            method      = sender->metaObject()->method(it.signal);
-            link.push_back(sender->reference() + "#" + char(method.type() + 0x30) + method.signature());
-
-            s.push_back(link);
-        }
-        object[LINKS]   = s;
-    }
-
-    return object;
-}
-
-void AObject::fromVariant(const AVariant &variant) {
-    PROFILE_FUNCTION()
-    AVariant::AVariantMap map   = variant.toMap();
-
-    setName(map[NAME].toString());
-    setEnable(map[ENABLE].toBool());
-    // Load properties
-    {
-        for(const auto &it : map[PROPERTIES].toList()) {
-            AVariant::AVariantMap m = it.toMap();
-
-            setProperty(m[NAME].toString().c_str(), m[DATA]);
-        }
-    }
-    // Load components
-    {
-        for(const auto &it : map[COMPONENTS].toList()) {
-            toObject(it, this);
-        }
-    }
-    // Load links
-    for(const auto &link : map[LINKS].toList()) {
-        AVariant::AVariantList list = link.toList();
-
-        AUri uri(list.back().toString());
-        AObject *o  = find(uri.path());
-        if(o) {
-            if(uri.fragment().empty()) {
-                connect(this, list.front().toString().c_str(), o, uri.query().c_str());
-            } else {
-                connect(o, uri.fragment().c_str(), this, list.front().toString().c_str());
-            }
-        }
-    }
-}
-
-AObject *AObject::toObject(const AVariant &variant, AObject *parent) {
-    PROFILE_FUNCTION()
-    AVariant::AVariantMap map   = variant.toMap();
-
-    AObject *result = AObjectSystem::objectCreate(map[TYPE].toString(), "", parent);
-    if(result) {
-        result->fromVariant(variant);
-    }
-    return result;
+    return p_ptr->m_pCurrentSender;
 }
 
 bool AObject::isLinkExist(const Link &link) const {
     PROFILE_FUNCTION()
-    for(const auto &it : m_lRecievers) {
+    for(const auto &it : p_ptr->m_lRecievers) {
         if(it == link) {
             return true;
         }
@@ -529,9 +386,14 @@ bool AObject::isLinkExist(const Link &link) const {
     return false;
 }
 
+void AObject::setUUID(uint32_t id) {
+    PROFILE_FUNCTION()
+    p_ptr->m_UUID   = id;
+}
+
 AObject &AObject::operator=(AObject &right) {
     PROFILE_FUNCTION()
-    return AObject(right);
+    return *new AObject(right);
 }
 
 AObject::AObject(const AObject &) {

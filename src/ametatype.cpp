@@ -19,14 +19,19 @@
         #TYPE \
     }
 
+typedef map<uint32_t, AMetaType::Table> TypeMap;
+typedef map<string, uint32_t>           NameMap;
+typedef map<uint32_t, map<uint32_t, AMetaType::converterCallback>> ConverterMap;
+
 uint32_t AMetaType::s_NextId = AMetaType::UserType;
-AMetaType::TypeMap AMetaType::s_Types = {
+static TypeMap s_Types = {
     {AMetaType::Bool,       DECLARE_BUILT_TYPE(bool)},
     {AMetaType::Int,        DECLARE_BUILT_TYPE(int)},
     {AMetaType::Double,     DECLARE_BUILT_TYPE(double)},
     {AMetaType::String,     DECLARE_BUILT_TYPE(string)},
-    {AMetaType::VariantMap, DECLARE_BUILT_TYPE(AVariant::AVariantMap)},
-    {AMetaType::VariantList,DECLARE_BUILT_TYPE(AVariant::AVariantList)},
+    {AMetaType::VariantMap, DECLARE_BUILT_TYPE(AVariantMap)},
+    {AMetaType::VariantList,DECLARE_BUILT_TYPE(AVariantList)},
+    {AMetaType::ByteArray,  DECLARE_BUILT_TYPE(AByteArray)},
     {AMetaType::Vector2D,   DECLARE_BUILT_TYPE(AVector2D)},
     {AMetaType::Vector3D,   DECLARE_BUILT_TYPE(AVector3D)},
     {AMetaType::Vector4D,   DECLARE_BUILT_TYPE(AVector4D)},
@@ -36,7 +41,7 @@ AMetaType::TypeMap AMetaType::s_Types = {
     {AMetaType::Curve,      DECLARE_BUILT_TYPE(ACurve)}
 };
 
-AMetaType::ConverterMap AMetaType::s_Converters= {
+static ConverterMap s_Converters= {
     {AMetaType::Bool,      {{AMetaType::Int,        &AMetaType::toBoolean},
                             {AMetaType::Double,     &AMetaType::toBoolean},
                             {AMetaType::String,     &AMetaType::toBoolean}}},
@@ -86,13 +91,14 @@ AMetaType::ConverterMap AMetaType::s_Converters= {
     {AMetaType::Curve,      {{AMetaType::VariantList,&AMetaType::toCurve}}}
 };
 
-AMetaType::NameMap AMetaType::s_Names = {
+static NameMap s_Names = {
     {"bool",            AMetaType::Bool},
     {"int",             AMetaType::Int},
     {"double",          AMetaType::Double},
     {"string",          AMetaType::String},
     {"map",             AMetaType::VariantMap},
     {"list",            AMetaType::VariantList},
+    {"AByteArray",      AMetaType::ByteArray},
     {"AVector2D",       AMetaType::Vector2D},
     {"AVector3D",       AMetaType::Vector3D},
     {"AVector4D",       AMetaType::Vector4D},
@@ -161,26 +167,34 @@ bool AMetaType::isValid() const {
 
 uint32_t AMetaType::registerType(Table &table) {
     PROFILE_FUNCTION()
-    uint32_t result  = ++AMetaType::s_NextId;
-    AMetaType::s_Types[result]      = table;
-    AMetaType::s_Names[table.name]  = result;
+    uint32_t result = ++AMetaType::s_NextId;
+    s_Types[result] = table;
+    s_Names[table.name] = result;
     return result;
 }
 
 uint32_t AMetaType::type(const char *name) {
     PROFILE_FUNCTION()
-    auto it = AMetaType::s_Names.find(name);
-    if(it != AMetaType::s_Names.end()) {
+    auto it = s_Names.find(name);
+    if(it != s_Names.end()) {
         return it->second;
     }
-
+    return Invalid;
+}
+uint32_t AMetaType::type(const type_info &type) {
+    PROFILE_FUNCTION()
+    for(auto it : s_Types) {
+        if(it.second.index() == type_index(type) ) {
+            return it.first;
+        }
+    }
     return Invalid;
 }
 
 const char *AMetaType::name(uint32_t type) {
     PROFILE_FUNCTION()
-    auto it = AMetaType::s_Types.find(type);
-    if(it != AMetaType::s_Types.end()) {
+    auto it = s_Types.find(type);
+    if(it != s_Types.end()) {
         return AMetaType(&(it->second)).name();
     }
     return nullptr;
@@ -188,8 +202,8 @@ const char *AMetaType::name(uint32_t type) {
 
 int AMetaType::size(uint32_t type) {
     PROFILE_FUNCTION()
-    auto it = AMetaType::s_Types.find(type);
-    if(it != AMetaType::s_Types.end()) {
+    auto it = s_Types.find(type);
+    if(it != s_Types.end()) {
         return AMetaType(&(it->second)).size();
     }
     return 0;
@@ -197,8 +211,8 @@ int AMetaType::size(uint32_t type) {
 
 void *AMetaType::construct(uint32_t type, void *where, const void *copy) {
     PROFILE_FUNCTION()
-    auto it = AMetaType::s_Types.find(type);
-    if(it != AMetaType::s_Types.end()) {
+    auto it = s_Types.find(type);
+    if(it != s_Types.end()) {
         return AMetaType(&(it->second)).construct(where, copy);
     }
     return nullptr;
@@ -206,8 +220,8 @@ void *AMetaType::construct(uint32_t type, void *where, const void *copy) {
 
 void *AMetaType::create(uint32_t type, const void *copy) {
     PROFILE_FUNCTION()
-    auto it = AMetaType::s_Types.find(type);
-    if(it != AMetaType::s_Types.end()) {
+    auto it = s_Types.find(type);
+    if(it != s_Types.end()) {
         return AMetaType(&(it->second)).create(copy);
     }
     return nullptr;
@@ -215,24 +229,24 @@ void *AMetaType::create(uint32_t type, const void *copy) {
 
 void AMetaType::destroy(uint32_t type, void *data) {
     PROFILE_FUNCTION()
-    auto it = AMetaType::s_Types.find(type);
-    if(it != AMetaType::s_Types.end()) {
+    auto it = s_Types.find(type);
+    if(it != s_Types.end()) {
         AMetaType(&(it->second)).destroy(data);
     }
 }
 
 void AMetaType::destruct(uint32_t type, void *data) {
     PROFILE_FUNCTION()
-    auto it = AMetaType::s_Types.find(type);
-    if(it != AMetaType::s_Types.end()) {
+    auto it = s_Types.find(type);
+    if(it != s_Types.end()) {
         AMetaType(&(it->second)).destruct(data);
     }
 }
 
 bool AMetaType::compare(const void *left, const void *right, uint32_t type) {
     PROFILE_FUNCTION()
-    auto it = AMetaType::s_Types.find(type);
-    if(it != AMetaType::s_Types.end()) {
+    auto it = s_Types.find(type);
+    if(it != s_Types.end()) {
         return AMetaType(&(it->second)).compare(left, right);
     }
     return false;
@@ -248,6 +262,23 @@ bool AMetaType::convert(const void *from, uint32_t fromType, void *to, uint32_t 
         }
     }
     return false;
+}
+
+bool AMetaType::registerConverter(uint32_t from, uint32_t to, converterCallback function) {
+    PROFILE_FUNCTION()
+    if(hasConverter(from, to)) {
+        return false;
+    }
+
+    auto t = s_Converters.find(to);
+    if(t != s_Converters.end()) {
+        t->second[from] = function;
+    } else {
+        map<uint32_t, converterCallback> m;
+        m[from] = function;
+        s_Converters[to]    = m;
+    }
+    return true;
 }
 
 bool AMetaType::hasConverter(uint32_t from, uint32_t to) {
@@ -269,7 +300,10 @@ bool AMetaType::toBoolean(void *to, const void *from, const uint32_t fromType) {
     switch(fromType) {
         case Int:   { *r        = *(static_cast<const int *>(from)) != 0; } break;
         case Double:{ *r        = *(static_cast<const double *>(from)) != 0; } break;
-        case String:{ string s  = *(static_cast<const string *>(from)); *r = (s != "false" || s != "0" || !s.empty()); }  break;
+        case String:{
+            string s  = *(static_cast<const string *>(from));
+            *r = (s != "false" || s != "0" || !s.empty());
+        }  break;
         default:    { result    = false; } break;
     }
     return result;
@@ -281,8 +315,11 @@ bool AMetaType::toInteger(void *to, const void *from, const uint32_t fromType) {
     int *r      = static_cast<int *>(to);
     switch(fromType) {
         case Bool:  { *r        = (*(static_cast<const bool *>(from))) ? 1 : 0; } break;
-        case Double:{ float f   = *(static_cast<const double *>(from)); *r = int(f); f -= *r; *r += (f >= 0.5f) ? 1 : 0; } break;
-        case String:{ *r        = stoi(*(static_cast<const string *>(from))); } break;
+        case Double:{ double f  = *(static_cast<const double *>(from)); *r = int(f); f -= *r; *r += (f >= 0.5f) ? 1 : 0; } break;
+        case String:{
+            string s  = *(static_cast<const string *>(from));
+            *r        = stoi(s);
+        } break;
         default:    { result    = false; } break;
     }
     return result;
@@ -307,7 +344,7 @@ bool AMetaType::toString(void *to, const void *from, const uint32_t fromType) {
     string *r   = static_cast<string *>(to);
     switch(fromType) {
         case Bool:  { *r        = (*(static_cast<const bool *>(from))) ? "true" : "false"; } break;
-        case Double:{ string s  = to_string(*(static_cast<const double *>(from))); s.erase(s.find_last_not_of('0') + 1, string::npos ); *r = s; } break;
+        case Double:{ string s  = to_string(*(static_cast<const double *>(from))); *r = s; } break;
         case Int:   { *r        = to_string(*(static_cast<const int *>(from))); } break;
         default:    { result    = false; } break;
     }
@@ -317,7 +354,7 @@ bool AMetaType::toString(void *to, const void *from, const uint32_t fromType) {
 bool AMetaType::toList(void *to, const void *from, const uint32_t fromType) {
     PROFILE_FUNCTION()
     bool result = true;
-    AVariant::AVariantList *r = static_cast<AVariant::AVariantList *>(to);
+    AVariantList *r = static_cast<AVariantList *>(to);
     switch(fromType) {
         case Vector2D: {
             const AVector2D v = *(reinterpret_cast<const AVector2D *>(from));
@@ -377,7 +414,7 @@ bool AMetaType::toVector2D(void *to, const void *from, const uint32_t fromType) 
         case Int:   { *r  = AVector2D(*(static_cast<const int *>(from))); } break;
         case Double:{ *r  = AVector2D(*(static_cast<const double *>(from))); } break;
         case VariantList: {
-            const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
+            const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 2; i++, it++) {
                 (*r)[i] = (*it).toDouble();
@@ -396,7 +433,7 @@ bool AMetaType::toVector3D(void *to, const void *from, const uint32_t fromType) 
         case Int:   { *r  = AVector3D(*(static_cast<const int *>(from))); } break;
         case Double:{ *r  = AVector3D(*(static_cast<const double *>(from))); } break;
         case VariantList: {
-            const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
+            const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 3; i++, it++) {
                 (*r)[i] = (*it).toDouble();
@@ -416,7 +453,7 @@ bool AMetaType::toVector4D(void *to, const void *from, const uint32_t fromType) 
         case Int:   { *r  = AVector4D(*(static_cast<const int *>(from))); } break;
         case Double:{ *r  = AVector4D(*(static_cast<const double *>(from))); } break;
         case VariantList: {
-            const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
+            const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 4; i++, it++) {
                 (*r)[i] = (*it).toDouble();
@@ -435,7 +472,7 @@ bool AMetaType::toMatrix3D(void *to, const void *from, const uint32_t fromType) 
     AMatrix3D *r    = static_cast<AMatrix3D *>(to);
     switch(fromType) {
         case VariantList: {
-            const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
+            const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 9; i++, it++) {
                 glm::value_ptr(*r)[i]   = (*it).toDouble();
@@ -452,7 +489,7 @@ bool AMetaType::toMatrix4D(void *to, const void *from, const uint32_t fromType) 
     AMatrix4D *r    = static_cast<AMatrix4D *>(to);
     switch(fromType) {
         case VariantList: {
-            const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
+            const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 16; i++, it++) {
                 glm::value_ptr(*r)[i]   = (*it).toDouble();
@@ -469,7 +506,7 @@ bool AMetaType::toQuaternion(void *to, const void *from, const uint32_t fromType
     AQuaternion *r  = static_cast<AQuaternion *>(to);
     switch(fromType) {
         case VariantList: {
-            const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
+            const AVariantList *list  = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 4; i++, it++) {
                 (*r)[i] = (*it).toDouble();
@@ -487,7 +524,7 @@ bool AMetaType::toCurve(void *to, const void *from, const uint32_t fromType) {
     ACurve *r   = static_cast<ACurve *>(to);
     switch(fromType) {
         case VariantList: {
-            const AVariant::AVariantList *list  = reinterpret_cast<const AVariant::AVariantList *>(from);
+            const AVariantList *list  = reinterpret_cast<const AVariantList *>(from);
             for(auto it = list->begin(); it != list->end(); it++) {
                 float x     = (*it).toDouble();
                 it++;

@@ -23,7 +23,7 @@ struct AOBox {
     void setBox(AVector3D &min, AVector3D &max) {
         size    = max - min;
         pos     = min + size * 0.5f;
-        radius  = glm::max(size.x, glm::max(size.y, size.z));
+        radius  = glm::length(size);
     }
 
     void box(AVector3D &min, AVector3D &max) {
