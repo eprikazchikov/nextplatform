@@ -14,7 +14,7 @@ private slots:
     void Bson_Serialize_Desirialize();
 
 private:
-    AVariant::AVariantMap var1;
+    AVariantMap var1;
 };
 
 #endif // TST_SERIALIZATION_H

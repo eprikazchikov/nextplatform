@@ -78,7 +78,7 @@ void AThreadPool::setMaxThreads(uint32_t value) {
     PROFILE_FUNCTION()
     uint32_t current    = m_Workers.size();
     if(current < value) {
-        for(int i = 0; i < value - current; i++) {
+        for(uint32_t i = 0; i < value - current; i++) {
             APoolWorker *worker = new APoolWorker(this);
             AObject *object     = takeTask();
             if(object) {
@@ -87,7 +87,7 @@ void AThreadPool::setMaxThreads(uint32_t value) {
             m_Workers.insert(worker);
         }
     } else if(current > value) {
-        for(int i = 0; i < current - value; i++) {
+        for(uint32_t i = 0; i < current - value; i++) {
             auto it = m_Workers.end();
             --it;
             APoolWorker *worker = (*it);

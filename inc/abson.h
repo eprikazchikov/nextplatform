@@ -10,8 +10,8 @@ class NEXT_LIBRARY_EXPORT ABson {
 public:
     ABson                       ();
 
-    static AVariant             load                        (const AVariant::AByteArray &data, AMetaType::Type type = AMetaType::VariantMap);
-    static AVariant::AByteArray save                        (const AVariant &data);
+    static AVariant             load                        (const AByteArray &data, uint32_t &offset, AMetaType::Type type = AMetaType::VariantList, bool first = true);
+    static AByteArray           save                        (const AVariant &data);
 
 protected:
     enum BsonDataTypes {

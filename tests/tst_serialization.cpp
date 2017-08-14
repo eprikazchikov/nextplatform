@@ -14,14 +14,14 @@ void SerializationTest::initTestCase() {
     var1["int"]     = 2;
     var1["double"]  = 3.0;
 
-    AVariant::AVariantMap m;
+    AVariantMap m;
     m["bool"]       = true;
     m["str"]        = "true";
     m["int"]        = 1;
 
     var1["map"]     = m;
 
-    AVariant::AVariantList a;
+    AVariantList a;
     a.push_back("string");
     a.push_back(1.0);
     a.push_back(123);
@@ -47,8 +47,9 @@ void SerializationTest::Json_Serialize_Desirialize() {
 }
 
 void SerializationTest::Bson_Serialize_Desirialize() {
-    AVariant::AByteArray bin    = {'\x00','\x01','\x02','\x03','\x04','\xFF'};
-    var1["bin"] = bin;
+    AByteArray bin  = {'\x00','\x01','\x02','\x03','\x04','\xFF'};
+    var1["bin"]     = bin;
 
-    QCOMPARE(AVariant(var1), ABson::load(ABson::save(var1)));
+    uint32_t offset = 0;
+    QCOMPARE(AVariant(var1), ABson::load(ABson::save(var1), offset, AMetaType::VariantMap));
 }

@@ -20,13 +20,13 @@ void appendProperty(VariantStack &s, const AVariant &data, const string &name) {
     }
     switch(v.type()) {
         case AMetaType::VariantList: {
-            AVariant::AVariantList list = v.value<AVariant::AVariantList>();
+            AVariantList list = v.value<AVariantList>();
             list.push_back(data);
             s.push(list);
             return;
         }
         case AMetaType::VariantMap: {
-            AVariant::AVariantMap map   = v.value<AVariant::AVariantMap>();
+            AVariantMap map   = v.value<AVariantMap>();
             map[name]    = data;
             s.push(map);
             return;
@@ -63,7 +63,7 @@ AVariant AJson::load(const string &data) {
         skipSpaces(data.c_str(), it);
         switch(data[it]) {
             case '{': {
-                AVariant::AVariantMap map;
+                AVariantMap map;
                 s.push(map);
                 n.push(name);
                 name    = "";
@@ -80,17 +80,15 @@ AVariant AJson::load(const string &data) {
             } break;
             case '[': {
                 if(state == propertyValue) {
-                    AVariant::AVariantList list;
+                    AVariantList list;
                     s.push(list);
                     n.push(name);
                     name    = "";
                 }
             } break;
             case ']': {
-                result  = s.top();
+                AVariantList list   = s.top().value<AVariantList>();
                 s.pop();
-
-                AVariant::AVariantList list = result.value<AVariant::AVariantList>();
                 uint32_t type   = list.front().toInt();
                 list.pop_front();
                 if(type != AMetaType::VariantList) {
@@ -100,6 +98,7 @@ AVariant AJson::load(const string &data) {
                 } else {
                     appendProperty(s, list, n.top());
                 }
+                result  = list;
                 n.pop();
                 state   = propertyName;
             } break;
@@ -199,7 +198,7 @@ string AJson::save(const AVariant &data, int32_t depth) {
             result += "{";
             result += FORMAT;
             uint32_t i = 1;
-            AVariant::AVariantMap map   = data.toMap();
+            AVariantMap map = data.toMap();
             for(auto &it: map) {
                 result.append(depth + 1, '\t');
                 result += "\"" + it.first + "\":" + ((depth > -1) ? " " : "") + save(it.second, (depth > -1) ? depth + 1 : depth);
@@ -216,7 +215,7 @@ string AJson::save(const AVariant &data, int32_t depth) {
             result += "[";
             result += FORMAT;
             uint32_t i = 1;
-            AVariant::AVariantList list = data.toList();
+            AVariantList list = data.toList();
             for(auto &it: list) {
                 result.append(depth + 1, '\t');
                 result += save(it, (depth > -1) ? depth + 1 : depth);

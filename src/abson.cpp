@@ -5,12 +5,12 @@
 AVariant appendProperty(const AVariant &container, const AVariant &data, const string &name) {
     switch(container.type()) {
         case AMetaType::VariantList: {
-            AVariant::AVariantList list = container.value<AVariant::AVariantList>();
+            AVariantList list   = container.value<AVariantList>();
             list.push_back(data);
             return list;
         } break;
         case AMetaType::VariantMap: {
-            AVariant::AVariantMap map   = container.value<AVariant::AVariantMap>();
+            AVariantMap map = container.value<AVariantMap>();
             map[name]    = data;
             return map;
         } break;
@@ -20,29 +20,28 @@ AVariant appendProperty(const AVariant &container, const AVariant &data, const s
     return container;
 }
 
-AVariant ABson::load(const AVariant::AByteArray &data, AMetaType::Type type) {
+AVariant ABson::load(const AByteArray &data, uint32_t &offset, AMetaType::Type type, bool first) {
     PROFILE_FUNCTION()
     AVariant result(type);
     if(data.empty()) {
         return result;
     }
 
-    uint32_t offset = 0;
+    uint32_t global = offset;
 
     uint32_t size;
     memcpy(&size, &data[offset], sizeof(uint32_t));
+    if(offset + size > data.size()) {
+        return AVariant();
+    }
     offset  += sizeof(uint32_t);
 
-    if(size != data.size()) {
-        return result;
-    }
-
-    while(offset < size) {
+    while(offset < global + size) {
         uint8_t t   = data[offset];
         offset++;
 
         string name;
-        for(; offset < size; offset++) {
+        for(; offset < global + size; offset++) {
             if(data[offset] == 0) {
                 offset++;
                 break;
@@ -87,17 +86,15 @@ AVariant ABson::load(const AVariant::AByteArray &data, AMetaType::Type type) {
             case ARRAY: {
                 int32_t length;
                 memcpy(&length, &data[offset], sizeof(uint32_t));
-
-                AVariant::AByteArray sub(data.begin() + offset, data.begin() + offset + length);
-                AVariant container  = load(sub, (t == ARRAY) ? AMetaType::VariantList : AMetaType::VariantMap);
+                AVariant container  = load(data, offset, (t == ARRAY) ? AMetaType::VariantList : AMetaType::VariantMap, false);
                 if(t == ARRAY) {
-                    AVariant::AVariantList list = container.value<AVariant::AVariantList>();
-                    uint32_t type   = list.front().toInt();
+                    AVariantList list   = container.value<AVariantList>();
+                    uint32_t containerType  = list.front().toInt();
                     list.pop_front();
-                    if(type != AMetaType::VariantList) {
-                        void *object    = AMetaType::create(type);
-                        AMetaType::convert(&list, AMetaType::VariantList, object, type);
-                        result  = appendProperty(result, AVariant(type, object), name);
+                    if(containerType != AMetaType::VariantList) {
+                        void *object    = AMetaType::create(containerType);
+                        AMetaType::convert(&list, AMetaType::VariantList, object, containerType);
+                        result  = appendProperty(result, AVariant(containerType, object), name);
                     } else {
                         result  = appendProperty(result, list, name);
                     }
@@ -105,7 +102,6 @@ AVariant ABson::load(const AVariant::AByteArray &data, AMetaType::Type type) {
                     result  = appendProperty(result, container, name);
                 }
 
-                offset += length;
             } break;
             case BINARY: {
                 int32_t length;
@@ -114,7 +110,7 @@ AVariant ABson::load(const AVariant::AByteArray &data, AMetaType::Type type) {
                 uint8_t sub;
                 memcpy(&sub, &data[offset],     sizeof(uint8_t));
                 offset++;
-                AVariant::AByteArray value(data.begin() + offset, data.begin() + offset + length);
+                AByteArray value(data.begin() + offset, data.begin() + offset + length);
 
                 result  = appendProperty(result, value, name);
                 offset += length;
@@ -123,12 +119,21 @@ AVariant ABson::load(const AVariant::AByteArray &data, AMetaType::Type type) {
         }
 
     }
+
+    if(first && result.type() == AMetaType::VariantList) {
+        AVariantList list   = result.value<AVariantList>();
+        if(!list.empty()) {
+            list.pop_front();
+        }
+        result  = list;
+    }
+
     return result;
 }
 
-AVariant::AByteArray ABson::save(const AVariant &data) {
+AByteArray ABson::save(const AVariant &data) {
     PROFILE_FUNCTION()
-    AVariant::AByteArray result;
+    AByteArray result;
 
     switch(data.type()) {
         case AMetaType::Bool: {
@@ -151,22 +156,24 @@ AVariant::AByteArray ABson::save(const AVariant &data) {
             memcpy(&result[sizeof(uint32_t)], value.c_str(), size);
         } break;
         case AMetaType::ByteArray: {
-            AVariant::AByteArray value  = data.toByteArray();
+            AByteArray value= data.toByteArray();
             uint32_t size   = value.size();
             result.resize(sizeof(uint32_t) + 1 + size);
 
             memcpy(&result[0], &size, sizeof(uint32_t));
             result[sizeof(uint32_t)] = '\x00';
-            memcpy(&result[sizeof(uint32_t) + 1], &value[0], size);
+            if(size) {
+                memcpy(&result[sizeof(uint32_t) + 1], &value[0], size);
+            }
         } break;
         case AMetaType::VariantMap: {
             uint32_t size   = sizeof(uint32_t);
             result.resize(size);
             uint32_t offset = size;
             uint32_t index  = 0;
-            AVariant::AVariantMap map   = data.toMap();
+            AVariantMap map = data.toMap();
             for(auto &it: map) {
-                AVariant::AByteArray element    = save(it.second);
+                AByteArray element  = save(it.second);
                 uint8_t t   = type(it.second);
                 size       += element.size() + 1 + (it.first.size() + 1);
                 result.resize(size);
@@ -187,9 +194,9 @@ AVariant::AByteArray ABson::save(const AVariant &data) {
             result.resize(size);
             uint32_t offset = size;
             uint32_t index  = 0;
-            AVariant::AVariantList list = data.toList();
+            AVariantList list   = data.toList();
             for(auto &it: list) {
-                AVariant::AByteArray element    = save(it);
+                AByteArray element  = save(it);
                 string i    = to_string(index);
                 uint8_t t   = type(it);
                 size       += element.size() + 1 + (i.size() + 1);

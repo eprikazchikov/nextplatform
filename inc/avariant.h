@@ -31,13 +31,15 @@
 
 using namespace std;
 
+class AVariant;
+
+typedef map<string, AVariant>   AVariantMap;
+typedef list<AVariant>          AVariantList;
+typedef vector<int8_t>          AByteArray;
+
 class NEXT_LIBRARY_EXPORT AVariant {
 public:
-    typedef map<string, AVariant>   AVariantMap;
-    typedef list<AVariant>          AVariantList;
-    typedef vector<int8_t>          AByteArray;
-
-    struct Data {
+     struct NEXT_LIBRARY_EXPORT Data {
         Data                    ();
 
         uint32_t                type;
@@ -67,6 +69,8 @@ public:
     AVariant                    (uint32_t type, void *copy);
 
     ~AVariant                   ();
+
+    AVariant                    (const AVariant &value);
 
     AVariant                   &operator=                   (const AVariant &value);
 

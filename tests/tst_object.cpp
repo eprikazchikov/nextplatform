@@ -27,10 +27,10 @@
 
 bool toList(void *to, const void *from, const uint32_t fromType) {
     if(fromType == AMetaType::type<ATestObject *>()) {
-        const AObject *o  = *(const AObject **)from;
+        const AObject *o = *(const AObject **)from;
 
-        AVariant::AVariantList *r    = static_cast<AVariant::AVariantList *>(to);
-        *r  = AObjectSystem::toVariant(o).value<AVariant::AVariantList>();
+        AVariantList *r = static_cast<AVariantList *>(to);
+        *r  = AObjectSystem::toVariant(o).value<AVariantList>();
 
         return true;
     }
@@ -49,7 +49,7 @@ void ObjectTest::Meta_type() {
     QCOMPARE(variant.isValid(), true);
     QCOMPARE((int)variant.userType(), type);
 
-    AVariant::AVariantList list = variant.toList();
+    AVariantList list   = variant.toList();
     QCOMPARE((int)list.size(), 2);
 }
 
@@ -291,5 +291,6 @@ void ObjectTest::Clone_object() {
     AObject *clone  = obj1.clone();
     QCOMPARE((clone != nullptr), true);
     QCOMPARE(compare(*clone, obj1), true);
+    QCOMPARE((clone->uuid() != 0), true);
     delete clone;
 }

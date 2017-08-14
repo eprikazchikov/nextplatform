@@ -9,15 +9,13 @@
 #include "aobject.h"
 
 class AMetaObject;
-
-using namespace std;
+class AObjectSystemPrivate;
 
 class NEXT_LIBRARY_EXPORT AObjectSystem : public AObject {
 public:
     typedef unordered_map<string, AObject *>            ObjectMap;
     typedef unordered_map<string, const AMetaObject *>  FactoryMap;
     typedef unordered_map<string, string>               GroupMap;
-    typedef set<string>                                 TypeSet;
 
 public:
     AObjectSystem                       (const string &name = "system");
@@ -39,46 +37,37 @@ public:
         string name = T::metaClass()->name();
         string uri  = string("thor://") + group + "/" + name;
         AObjectSystem *inst = AObjectSystem::instance();
-        inst->m_Groups[name]    = uri;
-        inst->m_Factories[uri]  = meta;
+        inst->factoryAdd(name, uri, meta);
 
         name += " *";
         if(AMetaType::type(name.c_str()) == 0) {
             registerMetaType<T *>(name.c_str());
-            inst->m_TypeSet.insert(name);
         }
     }
 
     template<typename T>
     static void                         factoryRemove           (const string &group) {
         const char *name    = T::metaClass()->name();
-        string uri  = string("thor://") + group + "/" + name;
-        AObjectSystem *inst = AObjectSystem::instance();
-        inst->m_Groups.erase(name);
-        inst->m_Factories.erase(uri);
+        AObjectSystem::instance()->factoryRemove(name, string("thor://") + group + "/" + name);
     }
 
     GroupMap                            factories               () const;
 
-    bool                                isObject                (const string &typeName);
-
     static AVariant                     toVariant               (const AObject *object);
     static AObject                     *toObject                (const AVariant &variant);
+
+    uint32_t                            nextID                  ();
 
 private:
     friend class ObjectSystemTest;
 
+    void                                factoryAdd              (const string &name, const string &uri, const AMetaObject *meta);
+
+    void                                factoryRemove           (const string &name, const string &uri);
+
     void                                factoryClear            ();
 
-    /// Container for registered callbacks.
-    FactoryMap                          m_Factories;
-    GroupMap                            m_Groups;
-
-    TypeSet                             m_TypeSet;
-
-    bool                                m_Exit;
-
-    uint32_t                            m_NextID;
+    AObjectSystemPrivate               *p_ptr;
 
     static AObjectSystem               *s_Instance;
 };

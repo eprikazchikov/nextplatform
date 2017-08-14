@@ -1,4 +1,4 @@
-#include "aobjectsystem.h"
+#include "aobjectsystem_p.h"
 
 #include "aobject.h"
 #include "auri.h"
@@ -8,14 +8,14 @@
 AObjectSystem *AObjectSystem::s_Instance    = nullptr;
 
 AObjectSystem::AObjectSystem(const string &name) :
-        m_Exit(false) {
+        p_ptr(new AObjectSystemPrivate()) {
     PROFILE_FUNCTION()
     if(AObjectSystem::s_Instance != nullptr) {
         throw "There should be only one ObjectSystem object";
     }
     AObjectSystem::s_Instance   = this;
-    m_sName     = name;
-    m_NextID    = 1000;
+    setName(name);
+    p_ptr->m_NextID = 1000;
 }
 
 AObjectSystem::~AObjectSystem() {
@@ -26,7 +26,7 @@ AObjectSystem::~AObjectSystem() {
 
 int32_t AObjectSystem::exec() {
     PROFILE_FUNCTION()
-    while(!m_Exit) {
+    while(!p_ptr->m_Exit) {
 
     }
     return 0;
@@ -42,36 +42,39 @@ AObject *AObjectSystem::objectCreate(const string &uri, const string &name, AObj
     AObject *object = nullptr;
 
     AObjectSystem *inst = instance();
-    FactoryMap::iterator it = inst->m_Factories.find(uri);
-    if(it == inst->m_Factories.end()) {
-        it  = inst->m_Factories.find(inst->m_Groups[uri]);
+    FactoryMap::iterator it = inst->p_ptr->m_Factories.find(uri);
+    if(it == inst->p_ptr->m_Factories.end()) {
+        it  = inst->p_ptr->m_Factories.find(inst->p_ptr->m_Groups[uri]);
     }
-    if(it != inst->m_Factories.end()) {
+    if(it != inst->p_ptr->m_Factories.end()) {
         object = (*it).second->createInstance();
         object->setName(name);
         object->setParent(parent);
-        object->m_UUID  = inst->m_NextID++;
+        object->setUUID(inst->nextID());
     }
     return object;
 }
 
+void AObjectSystem::factoryAdd(const string &name, const string &uri, const AMetaObject *meta) {
+    PROFILE_FUNCTION()
+    p_ptr->m_Groups[name]    = uri;
+    p_ptr->m_Factories[uri]  = meta;
+}
+
+void AObjectSystem::factoryRemove(const string &name, const string &uri) {
+    PROFILE_FUNCTION()
+    p_ptr->m_Groups.erase(name);
+    p_ptr->m_Factories.erase(uri);
+}
+
 void AObjectSystem::factoryClear() {
     PROFILE_FUNCTION()
-    m_Factories.clear();
+    p_ptr->m_Factories.clear();
 }
 
 AObjectSystem::GroupMap AObjectSystem::factories() const {
     PROFILE_FUNCTION()
-    return m_Groups;
-}
-
-bool AObjectSystem::isObject(const string &typeName) {
-    PROFILE_FUNCTION()
-    auto it = m_TypeSet.find(typeName);
-    if(it != m_TypeSet.end()) {
-        return true;
-    }
-    return false;
+    return p_ptr->m_Groups;
 }
 
 typedef list<const AObject *> ObjectArray;
@@ -86,7 +89,7 @@ void enumObjects(const AObject *object, ObjectArray &list) {
 
 AVariant AObjectSystem::toVariant(const AObject *object) {
     PROFILE_FUNCTION()
-    AVariant::AVariantList result;
+    AVariantList result;
 
     ObjectArray array;
     enumObjects(object, array);
@@ -95,7 +98,7 @@ AVariant AObjectSystem::toVariant(const AObject *object) {
         // Save Object
         int uuid    = int(it->uuid());
 
-        AVariant::AVariantList o;
+        AVariantList o;
         o.push_back(uuid);
         AObject *parent = it->parent();
         o.push_back(int((parent) ? parent->uuid() : 0));
@@ -104,9 +107,9 @@ AVariant AObjectSystem::toVariant(const AObject *object) {
         o.push_back(it->isEnable());
 
         // Save base properties
-        AVariant::AVariantMap properties;
+        AVariantMap properties;
         const AMetaObject *meta = it->metaObject();
-        for(uint32_t i = 0; i < meta->propertyCount(); i++) {
+        for(int i = 0; i < meta->propertyCount(); i++) {
             AMetaProperty p = meta->property(i);
             if(p.isValid()) {
                 AVariant v  = p.read(it);
@@ -115,16 +118,11 @@ AVariant AObjectSystem::toVariant(const AObject *object) {
                 }
             }
         }
-        for(const auto it : it->getDynamicProperties()) {
-            if(it.second.userType() < AMetaType::UserType) {
-                properties[it.first]     = it.second;
-            }
-        }
 
         // Save links
-        AVariant::AVariantList links;
+        AVariantList links;
         for(const auto &l : it->getSenders()) {
-            AVariant::AVariantList link;
+            AVariantList link;
 
             AObject *sender   = l.sender;
 
@@ -139,7 +137,7 @@ AVariant AObjectSystem::toVariant(const AObject *object) {
             links.push_back(link);
         }
         o.push_back(properties);
-        o.push_back(object->saveUserData());
+        o.push_back(it->saveUserData());
         o.push_back(links);
 
         result.push_back(o);
@@ -153,76 +151,85 @@ AObject *AObjectSystem::toObject(const AVariant &variant) {
     AObject *result = nullptr;
 
     // Create all declared objects
-    AVariant::AVariantList objects  = variant.value<AVariant::AVariantList>();
-    objects.pop_front();
-
+    AVariantList objects    = variant.value<AVariantList>();
     ObjectMap array;
     for(auto it : objects) {
-        AVariant::AVariantList o    = it.value<AVariant::AVariantList>();
-
-        auto i      = o.begin();
-        string uuid = (*i).toString();
-        i++;
-        AObject *parent = nullptr;
-        auto a  = array.find((*i).toString());
-        if(a != array.end()) {
-            parent  = (*a).second;
-        }
-        i++;
-        string type = (*i).toString();
-        i++;
-        string name = (*i).toString();
-        i++;
-        bool enable = (*i).toBool();
-        i++;
-
-        AObject *object = objectCreate(type, name, parent);
-        if(object) {
-            if(!object->parent()) {
-                result  = object;
-            }
-            object->setEnable(enable);
-            array[uuid] = object;
-            // Load base properties
-            for(const auto &it : (*i).toMap()) {
-                AVariant v  = it.second;
-                if(v.type() < AMetaType::UserType) {
-                    object->setProperty(it.first.c_str(), v);
-                }
+        AVariantList o  = it.value<AVariantList>();
+        if(o.size() >= 5) {
+            auto i      = o.begin();
+            string uuid = (*i).toString();
+            i++;
+            AObject *parent = nullptr;
+            auto a  = array.find((*i).toString());
+            if(a != array.end()) {
+                parent  = (*a).second;
             }
             i++;
+            string type = (*i).toString();
+            i++;
+            string name = (*i).toString();
+            i++;
+            bool enable = (*i).toBool();
+            i++;
+
+            AObject *object = objectCreate(type, name, parent);
+            if(object) {
+                if(!object->parent()) {
+                    result  = object;
+                }
+                object->setEnable(enable);
+                array[uuid] = object;
+                // Load base properties
+                for(const auto &it : (*i).toMap()) {
+                    AVariant v  = it.second;
+                    if(v.type() < AMetaType::UserType) {
+                        object->setProperty(it.first.c_str(), v);
+                    }
+                }
+                i++;
+                // Load user data
+                object->loadUserData((*i).toMap());
+                i++;
+            }
         }
     }
     // Restore connections
     for(auto it : objects) {
-        AVariant::AVariantList o    = it.value<AVariant::AVariantList>();
-        AVariant::AVariantList list = o.back().value<AVariant::AVariantList>();
+        AVariantList o  = it.value<AVariantList>();
+        AVariantList list   = o.back().value<AVariantList>();
         for(const auto &link : list) {
-            AVariant::AVariantList l = link.value<AVariant::AVariantList>();
+            AVariantList l  = link.value<AVariantList>();
             AObject *sender     = nullptr;
             AObject *receiver   = nullptr;
+            if(l.size() == 4) {
+                auto i  = l.begin();
+                auto s = array.find((*i).toString());
+                if(s != array.end()) {
+                    sender  = (*s).second;
+                }
+                i++;
 
-            auto i  = l.begin();
-            auto s = array.find((*i).toString());
-            if(s != array.end()) {
-                sender  = (*s).second;
+                string signal = (*i).toString();
+                i++;
+
+                s = array.find((*i).toString());
+                if(s != array.end()) {
+                    receiver  = (*s).second;
+                }
+                i++;
+
+                string method = (*i).toString();
+                i++;
+
+                connect(sender, signal.c_str(), receiver, method.c_str());
             }
-            i++;
-
-            string signal = (*i).toString();
-            i++;
-
-            s = array.find((*i).toString());
-            if(s != array.end()) {
-                receiver  = (*s).second;
-            }
-            i++;
-
-            string method = (*i).toString();
-            i++;
-
-            connect(sender, signal.c_str(), receiver, method.c_str());
         }
     }
+
     return result;
+}
+
+uint32_t AObjectSystem::nextID() {
+    PROFILE_FUNCTION()
+    return p_ptr->m_NextID++;
 }

@@ -42,7 +42,9 @@ HEADERS += \
     inc/ametamethod.h \
     inc/aevent.h \
     inc/athreadpool.h \
-    inc/acommon.h
+    inc/acommon.h \
+    src/aobject_p.h \
+    src/aobjectsystem_p.h
 
 INCLUDEPATH += \
     inc \

@@ -16,9 +16,9 @@ class ATestObject : public AObject {
     )
 
     A_PROPERTIES(
-        A_PROPERTY(bool, slot, getSlot, setSlot, General),
-        A_PROPERTY(AVector2D, vec, getVector, setVector, General),
-        A_PROPERTY(ATestObject *, resource, getResource, setResource, General)
+        A_PROPERTY(bool, slot, getSlot, setSlot),
+        A_PROPERTY(AVector2D, vec, getVector, setVector),
+        A_PROPERTY(ATestObject *, resource, getResource, setResource)
     )
 
 public:
@@ -73,7 +73,6 @@ inline bool compare(const AObject &left, const AObject &right) {
 
     result &= (left.isEnable()  == right.isEnable());
     result &= (left.typeName()  == right.typeName());
-    result &= (left.getDynamicProperties() == right.getDynamicProperties());
 
     if(!result) {
         return result;

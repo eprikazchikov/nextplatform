@@ -5,6 +5,7 @@
 #include "aobjectsystem.h"
 
 #include "ajson.h"
+#include "abson.h"
 
 #include <QtTest>
 
@@ -64,7 +65,11 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
     AObject::connect(obj2, _SIGNAL(signal(bool)), obj3, _SLOT(setSlot(bool)));
 
     string data     = AJson::save(AObjectSystem::toVariant(obj1), 0);
-    AObject *result = AObjectSystem::toObject(AJson::load(data));
+    AByteArray bytes  = ABson::save(AObjectSystem::toVariant(obj1));
+    //qDebug() << data.c_str();
+    //AObject *result = AObjectSystem::toObject(AJson::load(data));
+    uint32_t offset = 0;
+    AObject *result = AObjectSystem::toObject(ABson::load(bytes, offset));
     AObject *object = dynamic_cast<AObject*>(obj1);
 
     QCOMPARE((result != nullptr), true);
