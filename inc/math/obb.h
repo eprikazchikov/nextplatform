@@ -1,64 +1,47 @@
+/*
+    This file is part of Thunder Next.
+
+    Thunder Next is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Thunder Next is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with Thunder Next.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright: 2008-2017 Evgeny Prikazchikov
+*/
+
 #ifndef OBB_H_HEADER_INCLUDED
 #define OBB_H_HEADER_INCLUDED
 
-#include <glm/glm.hpp>
+#include "acommon.h"
 
-struct AOBox {
-    AOBox() : pos(0.0f), size(1.0f), radius(0.5f)                                                       { }
-    AOBox(const AVector3D &p, const AVector3D &s) : pos(p), size(s), radius(glm::max(s.x, glm::max(s.y, s.z)))    { }
-    AOBox(const AVector3D &p, const AVector3D &s, const AMatrix3D &r) : pos(p), size(s), rot(r)         { }
+#include "vector3.h"
+#include "matrix3.h"
 
-    const AOBox operator*(float f) {
-        AVector3D c     = pos * f;
-        AVector3D s     = size * f;
-        return AOBox(c, s, rot);
-    }
+class AMatrix4D;
 
-    const AOBox operator*(const AVector3D &v) {
-        AVector3D p(pos * v);
-        AVector3D s(size * v);
-        return AOBox(p, s, rot);
-    }
+class NEXT_LIBRARY_EXPORT AOBox {
+public:
+    AOBox                       ();
+    AOBox                       (const AVector3D &p, const AVector3D &s);
+    AOBox                       (const AVector3D &p, const AVector3D &s, const AMatrix3D &r);
 
-    void setBox(AVector3D &min, AVector3D &max) {
-        size    = max - min;
-        pos     = min + size * 0.5f;
-        radius  = glm::length(size);
-    }
+    inline const AOBox          operator*                   (areal f);
+    inline const AOBox          operator*                   (const AVector3D &v);
 
-    void box(AVector3D &min, AVector3D &max) {
-        min     = pos - size * 0.5f;
-        max     = min + size;
-    }
+    void                        box                         (AVector3D &min, AVector3D &max) const;
+    void                        setBox                      (const AVector3D &min, const AVector3D &max);
 
-    void box(AVector3D *b, const AMatrix4D &m) {
-        const float *v  = (const float*)glm::value_ptr(m);
-
-        AVector3D min, max;
-        box(min, max);
-
-        AVector3D t(v[12], v[13], v[14]);
-
-        AMatrix3D r;
-        float *vr = (float*)glm::value_ptr(r);
-        vr[0] = v[0]; vr[3] = v[4]; vr[6] = v[8];
-        vr[1] = v[1]; vr[4] = v[5]; vr[7] = v[9];
-        vr[2] = v[2]; vr[5] = v[6]; vr[8] = v[10];
-
-        b[0]  = r * AVector3D(min.x, min.y, min.z) + t;
-        b[1]  = r * AVector3D(min.x, min.y, max.z) + t;
-        b[2]  = r * AVector3D(max.x, min.y, max.z) + t;
-        b[3]  = r * AVector3D(max.x, min.y, min.z) + t;
-        b[4]  = r * AVector3D(min.x, max.y, min.z) + t;
-        b[5]  = r * AVector3D(min.x, max.y, max.z) + t;
-        b[6]  = r * AVector3D(max.x, max.y, max.z) + t;
-        b[7]  = r * AVector3D(max.x, max.y, min.z) + t;
-    }
-
-    float radius;
-    AVector3D pos;
-    AVector3D size;
-    AMatrix3D rot;
+    AVector3D                   pos;
+    AVector3D                   size;
+    AMatrix3D                   rot;
 };
 
 #endif // OBB_H_HEADER_INCLUDED

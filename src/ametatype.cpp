@@ -37,8 +37,7 @@ static TypeMap s_Types = {
     {AMetaType::Vector4D,   DECLARE_BUILT_TYPE(AVector4D)},
     {AMetaType::Quaternion, DECLARE_BUILT_TYPE(AQuaternion)},
     {AMetaType::Matrix3D,   DECLARE_BUILT_TYPE(AMatrix3D)},
-    {AMetaType::Matrix4D,   DECLARE_BUILT_TYPE(AMatrix4D)},
-    {AMetaType::Curve,      DECLARE_BUILT_TYPE(ACurve)}
+    {AMetaType::Matrix4D,   DECLARE_BUILT_TYPE(AMatrix4D)}
 };
 
 static ConverterMap s_Converters= {
@@ -63,8 +62,7 @@ static ConverterMap s_Converters= {
                              {AMetaType::Vector4D,  &AMetaType::toList},
                              {AMetaType::Quaternion,&AMetaType::toList},
                              {AMetaType::Matrix3D,  &AMetaType::toList},
-                             {AMetaType::Matrix4D,  &AMetaType::toList},
-                             {AMetaType::Curve,     &AMetaType::toList}}},
+                             {AMetaType::Matrix4D,  &AMetaType::toList}}},
 
     {AMetaType::Vector2D,   {{AMetaType::Int,       &AMetaType::toVector2D},
                              {AMetaType::Double,    &AMetaType::toVector2D},
@@ -81,14 +79,12 @@ static ConverterMap s_Converters= {
                              {AMetaType::Vector2D,  &AMetaType::toVector4D},
                              {AMetaType::Vector3D,  &AMetaType::toVector4D}}},
 
-    {AMetaType::Matrix3D,   {{AMetaType::VariantList,&AMetaType::toMatrix3D}}},
-
-    {AMetaType::Matrix4D,   {{AMetaType::VariantList,&AMetaType::toMatrix4D}}},
-
     {AMetaType::Quaternion, {{AMetaType::VariantList,&AMetaType::toQuaternion},
                              {AMetaType::Vector3D,  &AMetaType::toQuaternion}}},
 
-    {AMetaType::Curve,      {{AMetaType::VariantList,&AMetaType::toCurve}}}
+    {AMetaType::Matrix3D,   {{AMetaType::VariantList,&AMetaType::toMatrix3D}}},
+
+    {AMetaType::Matrix4D,   {{AMetaType::VariantList,&AMetaType::toMatrix4D}}}
 };
 
 static NameMap s_Names = {
@@ -104,8 +100,7 @@ static NameMap s_Names = {
     {"AVector4D",       AMetaType::Vector4D},
     {"AQuaternion",     AMetaType::Quaternion},
     {"AMatrix3D",       AMetaType::Matrix3D},
-    {"AMatrix4D",       AMetaType::Matrix4D},
-    {"ACurve",          AMetaType::Curve}
+    {"AMatrix4D",       AMetaType::Matrix4D}
 };
 
 AMetaType::AMetaType(const Table *table) :
@@ -332,7 +327,7 @@ bool AMetaType::toDouble(void *to, const void *from, const uint32_t fromType) {
     switch(fromType) {
         case Bool:  { *r        = double(*(static_cast<const bool *>(from))); } break;
         case Int:   { *r        = double(*(static_cast<const int *>(from))); } break;
-        case String:{ *r        = stof(*(static_cast<const string *>(from))); } break;
+        case String:{ *r        = stod(*(static_cast<const string *>(from))); } break;
         default:    { result    = false; } break;
     }
     return result;
@@ -383,22 +378,13 @@ bool AMetaType::toList(void *to, const void *from, const uint32_t fromType) {
         case Matrix3D: {
             const AMatrix3D v = *(reinterpret_cast<const AMatrix3D *>(from));
             for(int i = 0; i < 9; i++) {
-                r->push_back(glm::value_ptr(v)[i]);
+                r->push_back(v[i]);
             }
         } break;
         case Matrix4D:{
             const AMatrix4D v = *(reinterpret_cast<const AMatrix4D *>(from));
             for(int i = 0; i < 16; i++) {
-                r->push_back(glm::value_ptr(v)[i]);
-            }
-        } break;
-        case Curve: {
-            const ACurve v = *(reinterpret_cast<const ACurve *>(from));
-            for(const ACurvePoint &it : v.mList) {
-                r->push_back(it.mX);
-                r->push_back(it.mY);
-                r->push_back(it.mI);
-                r->push_back(it.mO);
+                r->push_back(v[i]);
             }
         } break;
         default:    { result    = false; } break;
@@ -475,7 +461,7 @@ bool AMetaType::toMatrix3D(void *to, const void *from, const uint32_t fromType) 
             const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 9; i++, it++) {
-                glm::value_ptr(*r)[i]   = (*it).toDouble();
+                (*r)[i]   = (*it).toDouble();
             }
         } break;
         default: { result   = false; } break;
@@ -492,7 +478,7 @@ bool AMetaType::toMatrix4D(void *to, const void *from, const uint32_t fromType) 
             const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 16; i++, it++) {
-                glm::value_ptr(*r)[i]   = (*it).toDouble();
+                (*r)[i] = (*it).toDouble();
             }
         } break;
         default: { result   = false; } break;
@@ -512,33 +498,8 @@ bool AMetaType::toQuaternion(void *to, const void *from, const uint32_t fromType
                 (*r)[i] = (*it).toDouble();
             }
         } break;
-        case Vector3D:  { *r = glm::quat_cast(glm::orientate3(*(static_cast<const AVector3D *>(from))) ); } break;
+        case Vector3D:  { AMatrix3D m; m.rotate(*(static_cast<const AVector3D *>(from))); *r = AQuaternion(m); } break;
         default:    { result    = false; } break;
     }
     return result;
 }
-
-bool AMetaType::toCurve(void *to, const void *from, const uint32_t fromType) {
-    PROFILE_FUNCTION()
-    bool result = true;
-    ACurve *r   = static_cast<ACurve *>(to);
-    switch(fromType) {
-        case VariantList: {
-            const AVariantList *list  = reinterpret_cast<const AVariantList *>(from);
-            for(auto it = list->begin(); it != list->end(); it++) {
-                float x     = (*it).toDouble();
-                it++;
-                AVector3D y = (it != list->end()) ? (*it).toVector3D() : AVector3D();
-                it++;
-                AVector3D i = (it != list->end()) ? (*it).toVector3D() : AVector3D();
-                it++;
-                AVector3D o = (it != list->end()) ? (*it).toVector3D() : AVector3D();
-
-                r->append(x, y, i, o);
-            }
-        } break;
-        default:    { result    = false; } break;
-    }
-    return result;
-}
-

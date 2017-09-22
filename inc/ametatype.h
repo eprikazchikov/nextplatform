@@ -29,7 +29,7 @@ public:
         Quaternion,
         Matrix3D,
         Matrix4D,
-        Curve,
+
         UserType                = 20
     };
 
@@ -94,7 +94,6 @@ public:
     static bool             toMatrix3D                  (void *to, const void *from, const uint32_t fromType);
     static bool             toMatrix4D                  (void *to, const void *from, const uint32_t fromType);
     static bool             toQuaternion                (void *to, const void *from, const uint32_t fromType);
-    static bool             toCurve                     (void *to, const void *from, const uint32_t fromType);
 
 private:
     const Table            *m_pTable;

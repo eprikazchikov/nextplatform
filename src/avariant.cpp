@@ -86,11 +86,6 @@ AVariant::AVariant(const AMatrix4D &value) {
     *this   = fromValue<AMatrix4D>(value);
 }
 
-AVariant::AVariant(const ACurve &value) {
-    PROFILE_FUNCTION()
-    *this   = fromValue<ACurve>(value);
-}
-
 AVariant::AVariant(uint32_t type, void *copy) {
     PROFILE_FUNCTION()
     mData.type  = type;
@@ -220,9 +215,4 @@ const AMatrix3D AVariant::toMatrix3D() const {
 const AMatrix4D AVariant::toMatrix4D() const {
     PROFILE_FUNCTION()
     return value<AMatrix4D>();
-}
-
-const ACurve AVariant::toCurve() const {
-    PROFILE_FUNCTION()
-    return value<ACurve>();
 }

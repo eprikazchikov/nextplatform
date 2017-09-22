@@ -22,12 +22,13 @@
 
 #include <map>
 #include <list>
+#include <vector>
 #include <string>
 
-#include <acommon.h>
+#include "acommon.h"
 
-#include <amath.h>
-#include <ametatype.h>
+#include "amath.h"
+#include "ametatype.h"
 
 using namespace std;
 
@@ -64,7 +65,6 @@ public:
     AVariant                    (const AQuaternion &value);
     AVariant                    (const AMatrix3D &value);
     AVariant                    (const AMatrix4D &value);
-    AVariant                    (const ACurve &value);
 
     AVariant                    (uint32_t type, void *copy);
 
@@ -135,7 +135,6 @@ public:
     const AQuaternion           toQuaternion                () const;
     const AMatrix3D             toMatrix3D                  () const;
     const AMatrix4D             toMatrix4D                  () const;
-    const ACurve                toCurve                     () const;
 
 protected:
     Data                        mData;

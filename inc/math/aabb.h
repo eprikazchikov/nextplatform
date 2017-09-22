@@ -1,77 +1,47 @@
+/*
+    This file is part of Thunder Next.
+
+    Thunder Next is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Thunder Next is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with Thunder Next.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright: 2008-2017 Evgeny Prikazchikov
+*/
+
 #ifndef AABB_H_HEADER_INCLUDED
 #define AABB_H_HEADER_INCLUDED
 
-struct AABox {
-    AABox() : pos(0.0f), size(1.0f)                                 { }
-    AABox(const AVector3D &p, const AVector3D &s) : pos(p), size(s) { }
+#include "acommon.h"
 
-    bool intersect(const AVector3D &p, float r) {
-        AVector3D min, max;
-        box(min, max);
+#include "vector3.h"
 
-        float d = 0;
-        float s = 0;
+class AMatrix4D;
 
-        for(int i = 0; i < 3; i++) {
-            if (p[i] < min[i]) {
-                s   = p[i] - min[i];
-                d  += s * s;
-            } else if (p[i] > max[i]) {
-                s   = p[i] - max[i];
-                d  += s * s;
-            }
-        }
-        return d <= r * r;
-    }
+class NEXT_LIBRARY_EXPORT AABox {
+public:
+    AABox                       ();
+    AABox                       (const AVector3D &p, const AVector3D &s);
 
-    inline const AABox operator*(float f) {
-        AVector3D c     = pos * f;
-        AVector3D s     = size * f;
-        return AABox(c, s);
-    }
+    inline const AABox          operator*                   (areal f) const;
+    inline const AABox          operator*                   (const AVector3D &v) const;
+    inline const AABox          operator*                   (const AMatrix4D &m) const;
 
-    inline const AABox operator*(const AVector3D &v) {
-        AVector3D p(pos * v);
-        AVector3D s(size * v);
-        return AABox(p, s);
-    }
+    bool                        intersect                   (const AVector3D &p, areal r) const;
 
-    inline const AABox operator*(const AMatrix4D &m) {
-        const float *v  = (const float*)glm::value_ptr(m);
-        AVector3D p = pos * AVector3D(v[0], v[5], v[10]);
-        p          += AVector3D(v[12], v[13], v[14]);
-        AVector3D s = size * AVector3D(v[0], v[5], v[10]);
-        return AABox(p, s);
-    }
+    void                        box                         (AVector3D &min, AVector3D &max) const;
+    void                        setBox                      (const AVector3D &min, const AVector3D &max);
 
-    inline void setBox(const AVector3D &min, const AVector3D &max) {
-        size    = max - min;
-        pos     = min + size * 0.5f;
-    }
-
-    inline void box(AVector3D &min, AVector3D &max) const {
-        min     = pos - size * 0.5f;
-        max     = min + size;
-    }
-
-    inline AVector3D vertexP(AVector3D &normal) {
-        AVector3D res = pos - size * 0.5f;
-        if (normal.x > 0) res.x += size.x;
-        if (normal.y > 0) res.y += size.y;
-        if (normal.z > 0) res.z += size.z;
-        return res;
-    }
-
-    inline AVector3D vertexN(AVector3D &normal) {
-        AVector3D res = pos - size * 0.5f;
-        if (normal.x < 0) res.x += size.x;
-        if (normal.y < 0) res.y += size.y;
-        if (normal.z < 0) res.z += size.z;
-        return res;
-    }
-
-    AVector3D pos;
-    AVector3D size;
+    AVector3D                   pos;
+    AVector3D                   size;
 };
 
 #endif /* AABB_H_HEADER_INCLUDED */

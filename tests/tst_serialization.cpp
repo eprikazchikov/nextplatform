@@ -34,12 +34,6 @@ void SerializationTest::initTestCase() {
     var1["quat"]    = AQuaternion();
     var1["mat3"]    = AMatrix3D();
     var1["mat4"]    = AMatrix4D();
-
-    ACurve curve;
-    curve.append(0.0f, AVector3D(1.0f), AVector3D(2.0f), AVector3D(3.0f));
-    curve.append(4.0f, AVector3D(5.0f), AVector3D(6.0f), AVector3D(7.0f));
-
-    var1["curve"]   = curve;
 }
 
 void SerializationTest::Json_Serialize_Desirialize() {

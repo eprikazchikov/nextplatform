@@ -1,4 +1,4 @@
-#include "aobjectsystem_p.h"
+#include "aobjectsystem.h"
 
 #include "aobject.h"
 #include "auri.h"
@@ -6,6 +6,21 @@
 #include "ajson.h"
 
 AObjectSystem *AObjectSystem::s_Instance    = nullptr;
+
+class AObjectSystemPrivate {
+public:
+    AObjectSystemPrivate() :
+        m_Exit(false) {
+    }
+
+    /// Container for registered callbacks.
+    AObjectSystem::FactoryMap   m_Factories;
+    AObjectSystem::GroupMap     m_Groups;
+
+    bool                        m_Exit;
+
+    uint32_t                    m_NextID;
+};
 
 AObjectSystem::AObjectSystem(const string &name) :
         p_ptr(new AObjectSystemPrivate()) {

@@ -23,4 +23,6 @@
     #define PROFILE_STOP
 #endif
 
+typedef double areal;
+
 #endif // ACOMMON_H

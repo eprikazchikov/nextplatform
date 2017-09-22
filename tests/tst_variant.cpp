@@ -57,16 +57,9 @@ void VariantTest::Set_Get_Advanced_Check() {
         QCOMPARE(value.toVector4D(), vector);
     }
     {
-        AQuaternion quaternion(1.0f, 2.0f, 3.0f, 4.0f);
+        AQuaternion quaternion(AVector3D(1.0f, 2.0f, 3.0f), 4.0f);
         AVariant value      = quaternion;
         QCOMPARE(value.toQuaternion(), quaternion);
-    }
-    {
-        ACurve curve;
-        curve.append(0.0f, AVector3D(1.0f), AVector3D(2.0f), AVector3D(3.0f));
-        curve.append(4.0f, AVector3D(5.0f), AVector3D(6.0f), AVector3D(7.0f));
-        AVariant value      = curve;
-        QCOMPARE(value.toCurve(),  curve);
     }
     {
         AMatrix3D matrix    = AMatrix3D();
