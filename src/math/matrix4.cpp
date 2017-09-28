@@ -232,25 +232,26 @@ void AMatrix4D::direction(const AVector3D &dir, AVector3D &up) {
 }
 
 void AMatrix4D::perspective(areal fov, areal aspect, areal znear, areal zfar) {
-    areal sine, cotangent, deltaZ;
-    areal radians   = fov / 2 * DEG2RAD;
+    float sine, cotangent, deltaZ;
+    float radians   = fov / 2 * DEG2RAD;
 
     deltaZ          = znear - zfar;
     sine            = sin(radians);
-    if ((deltaZ == 0) || (sine == 0) || (aspect == 0)) {
-        return;
-    }
     cotangent       = cos(radians) / sine;
+
+    //identity();
 
     mat[0]          = cotangent / aspect;
     mat[5]          = cotangent;
-    mat[10]         = - zfar / deltaZ - 1; // Negative
+    mat[10]         = -(zfar + znear) / (zfar - znear);
     mat[11]         = -1;
-    mat[14]         = - znear * zfar / deltaZ;  // Negative
+    mat[14]         = -(2.0 * zfar * znear) / (zfar - znear);
     mat[15]         = 0;
 }
 
 void AMatrix4D::ortho(areal left, areal right, areal bottom, areal top, areal znear, areal zfar) {
+    //identity();
+
     mat[0]          =  2.0f / (right - left);
     mat[5]          =  2.0f / (top - bottom);
     mat[10]         = -2.0f / (zfar - znear);

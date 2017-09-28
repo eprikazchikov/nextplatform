@@ -42,6 +42,7 @@ public:
     AVector3D                   pos;
     AVector3D                   size;
     AMatrix3D                   rot;
+    areal                       radius;
 };
 
 #endif // OBB_H_HEADER_INCLUDED

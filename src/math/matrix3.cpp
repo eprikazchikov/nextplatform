@@ -148,7 +148,7 @@ void AMatrix3D::rotate(const AVector3D &axis, areal angle) {
 
     mat[1] = (1.0f - c) * xy + zs;
     mat[4] = (1.0f - c) * v.y * v.y + c;
-    mat[7] = mat[6] = (1.0f - c) * yz - xs;
+    mat[7] = (1.0f - c) * yz - xs;
 
     mat[2] = (1.0f - c) * zx - ys;
     mat[5] = (1.0f - c) * yz + xs;

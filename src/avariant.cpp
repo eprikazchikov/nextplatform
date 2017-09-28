@@ -94,8 +94,7 @@ AVariant::AVariant(uint32_t type, void *copy) {
 
 AVariant::~AVariant() {
     PROFILE_FUNCTION()
-    AMetaType::destroy(mData.type, mData.so);
-    mData.type  = 0;
+    clear();
 }
 
 AVariant::AVariant(const AVariant &value) {
@@ -106,6 +105,7 @@ AVariant::AVariant(const AVariant &value) {
 
 AVariant &AVariant::operator=(const AVariant &value) {
     PROFILE_FUNCTION()
+    clear();
     mData.type  = value.mData.type;
     mData.so    = AMetaType::create(value.mData.type, value.mData.so);
     return *this;
@@ -122,6 +122,11 @@ bool AVariant::operator==(const AVariant &right) const {
 bool AVariant::operator!=(const AVariant &right) const {
     PROFILE_FUNCTION()
     return !(*this == right);
+}
+
+void AVariant::clear() {
+    AMetaType::destroy(mData.type, mData.so);
+    mData.type  = 0;
 }
 
 uint32_t AVariant::type() const {

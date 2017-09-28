@@ -35,7 +35,8 @@ win32: {
     Release:LIBS += bin/anext.lib
 
     INCLUDEPATH  += \
-        inc
+        inc \
+        #../glm/inc
 
     defined(BUILD_WITH_EASY_PROFILER) {
         INCLUDEPATH += \

@@ -23,6 +23,6 @@
     #define PROFILE_STOP
 #endif
 
-typedef double areal;
+typedef float areal;
 
 #endif // ACOMMON_H

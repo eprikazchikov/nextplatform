@@ -20,30 +20,20 @@
 #ifndef PLANE_H_HEADER_INCLUDED
 #define PLANE_H_HEADER_INCLUDED
 
-class APlane {
+#include "acommon.h"
+
+#include "vector3.h"
+
+class NEXT_LIBRARY_EXPORT APlane {
 public:
-    APlane ()                                                               {}
-    APlane (const AVector3D &v1, const AVector3D &v2, const AVector3D &v3)  {
-        set_points(v1, v2, v3);
-    }
+    APlane                      ();
+    APlane                      (const AVector3D &v1, const AVector3D &v2, const AVector3D &v3);
 
-    float distance(const AVector3D &p) {
-        return normal.dot(p) - d;
-    }
+    areal                       distance                    (const AVector3D &p);
 
-    void set_points(const AVector3D &v1, const AVector3D &v2, const AVector3D &v3) {
-        AVector3D aux1, aux2;
-        aux1    = v2 - v1;
-        aux2    = v3 - v1;
-        normal  = aux1.cross(aux2);
-        //normal.normalize();
-        point   = v1;
-        d       = normal.dot(point);
-    }
-
-    AVector3D normal;
-    AVector3D point;
-    float d;
+    AVector3D                   normal;
+    AVector3D                   point;
+    float                       d;
 };
 
 #endif /* PLANE_H_HEADER_INCLUDED */

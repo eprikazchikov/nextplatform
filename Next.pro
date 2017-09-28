@@ -36,7 +36,8 @@ SOURCES += \
     src/math/ray.cpp \
     src/amath.cpp \
     src/math/aabb.cpp \
-    src/math/obb.cpp
+    src/math/obb.cpp \
+    src/math/plane.cpp
 
 HEADERS += \
     inc/aobject.h \

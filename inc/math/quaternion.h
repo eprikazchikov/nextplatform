@@ -29,19 +29,24 @@ class NEXT_LIBRARY_EXPORT AQuaternion {
 public:
     AQuaternion                 ();
     AQuaternion                 (const AVector3D &dir, areal angle);
+    AQuaternion                 (const AVector3D &euler);
     AQuaternion                 (const AMatrix3D &m);
 
     inline bool                 operator==                  (const AQuaternion &v) const;
     inline bool                 operator!=                  (const AQuaternion &v) const;
 	
     inline AQuaternion          operator*                   (const AQuaternion &q) const;
+    inline AVector3D            operator*                   (const AVector3D &v) const;
 
     areal                      &operator[]                  (int i);
     const areal                 operator[]                  (int i) const;
 	
+    AQuaternion                 inverse                     () const;
+
     void                        mix                         (const AQuaternion &q0, const AQuaternion &q1, areal t);
 	
     AMatrix3D                   toMatrix                    () const;
+    AVector3D                   euler                       () const;
 	
     union {
         struct {

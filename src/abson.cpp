@@ -125,7 +125,7 @@ AVariant ABson::load(const AByteArray &data, uint32_t &offset, AMetaType::Type t
         if(!list.empty()) {
             list.pop_front();
         }
-        result  = list;
+        return list;
     }
 
     return result;

@@ -77,6 +77,8 @@ public:
     bool                        operator==                  (const AVariant &right) const;
     bool                        operator!=                  (const AVariant &right) const;
 
+    void                        clear                       ();
+
     uint32_t                    type                        () const;
 
     uint32_t                    userType                    () const;

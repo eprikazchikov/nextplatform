@@ -21,34 +21,67 @@ AQuaternion::AQuaternion(const AVector3D &dir, areal angle) {
     }
 }
 
+AQuaternion::AQuaternion(const AVector3D &euler) {
+    AVector3D rad2(euler.x * DEG2RAD * 0.5f, euler.y * DEG2RAD * 0.5f, euler.z * DEG2RAD * 0.5f);
+    AVector3D c(cos(rad2.x), cos(rad2.y), cos(rad2.z));
+    AVector3D s(sin(rad2.x), sin(rad2.y), sin(rad2.z));
+
+    w = c.x * c.y * c.z + s.x * s.y * s.z;
+    x = s.x * c.y * c.z - c.x * s.y * s.z;
+    y = c.x * s.y * c.z + s.x * c.y * s.z;
+    z = c.x * c.y * s.z - s.x * s.y * c.z;
+}
+
 AQuaternion::AQuaternion(const AMatrix3D &m) {
-    areal t = m.mat[0] + m.mat[4] + m.mat[8];
-    if(t > 0) {
-        areal s = 0.5f / (areal)sqrt(t);
-        w   = 0.25f / s;
-        x   = ( m.mat[7] - m.mat[5] ) * s;
-        y   = ( m.mat[2] - m.mat[6] ) * s;
-        z   = ( m.mat[3] - m.mat[1] ) * s;
-    } else {
-        if ( m.mat[0] > m.mat[4] && m.mat[0] > m.mat[8] ) {
-            areal s = (areal)2.0 * (areal)sqrt( 1.0f + m.mat[0] - m.mat[4] - m.mat[8] );
-            w = (m.mat[7] - m.mat[5] ) / s;
-            x = 0.25f * s;
-            y = (m.mat[1] + m.mat[3] ) / s;
-            z = (m.mat[2] + m.mat[6] ) / s;
-        } else if (m.mat[4] > m.mat[8]) {
-            areal s = (areal)2.0 * (areal)sqrt( 1.0f + m.mat[4] - m.mat[0] - m.mat[8] );
-            w = (m.mat[2] - m.mat[6] ) / s;
-            x = (m.mat[1] + m.mat[3] ) / s;
-            y = 0.25f * s;
-            z = (m.mat[5] + m.mat[7] ) / s;
-        } else {
-            areal s = (areal)2.0 * (areal)sqrt( 1.0f + m.mat[8] - m.mat[0] - m.mat[4] );
-            w = (m.mat[3] - m.mat[1] ) / s;
-            x = (m.mat[2] + m.mat[6] ) / s;
-            y = (m.mat[5] + m.mat[7] ) / s;
-            z = 0.25f * s;
-        }
+    areal W = m[0] + m[4] + m[8];
+    areal X = m[0] - m[4] - m[8];
+    areal Y = m[4] - m[0] - m[8];
+    areal Z = m[8] - m[0] - m[4];
+
+    int index = 0;
+    areal four = W;
+    if(X > four) {
+        four    = X;
+        index   = 1;
+    }
+    if(Y > four) {
+        four    = Y;
+        index   = 2;
+    }
+    if(Z > four) {
+        four    = Z;
+        index   = 3;
+    }
+
+    areal biggest   = sqrt(four + 1) * 0.5;
+    areal mult = 0.25 / biggest;
+
+    switch(index) {
+        case 0: {
+            w = biggest;
+            x = (m[5] - m[7]) * mult; // m[1][2] - m[2][1]
+            y = (m[6] - m[2]) * mult; // m[2][0] - m[0][2]
+            z = (m[1] - m[3]) * mult; // m[0][1] - m[1][0]
+        } break;
+        case 1: {
+            w = (m[5] - m[7]) * mult; // m[1][2] - m[2][1]
+            x = biggest;
+            y = (m[1] + m[3]) * mult; // m[0][1] + m[1][0]
+            z = (m[6] + m[2]) * mult; // m[2][0] + m[0][2]
+        } break;
+        case 2: {
+            w = (m[6] - m[2]) * mult; // m[2][0] - m[0][2]
+            x = (m[1] + m[3]) * mult; // m[0][1] + m[1][0]
+            y = biggest;
+            z = (m[5] + m[7]) * mult; // m[1][2] + m[2][1]
+        } break;
+        case 3: {
+            w = (m[1] - m[3]) * mult; // m[0][1] - m[1][0]
+            x = (m[6] + m[2]) * mult; // m[2][0] + m[0][2]
+            y = (m[5] + m[7]) * mult; // m[1][2] + m[2][1]
+            z = biggest;
+        } break;
+        default: break;
     }
 }
 
@@ -73,6 +106,21 @@ AQuaternion AQuaternion::operator*(const AQuaternion &q) const {
     ret.y = w * q.y + y * q.w + z * q.x - x * q.z;
     ret.z = w * q.z + z * q.w + x * q.y - y * q.x;
     ret.w = w * q.w - x * q.x - y * q.y - z * q.z;
+    return ret;
+}
+
+AVector3D AQuaternion::operator*(const AVector3D &v) const {
+    AVector3D vec(x, y, z);
+
+    AVector3D uv    = vec.cross(v);
+    AVector3D uuv   = vec.cross(uv);
+
+    return v + ((uv * w) + uuv) * 2;
+}
+
+AQuaternion AQuaternion::inverse() const {
+    AQuaternion ret;
+    ret.w = w; ret.x =-x; ret.y =-y; ret.z =-z;
     return ret;
 }
 
@@ -108,29 +156,30 @@ void AQuaternion::mix(const AQuaternion &q0, const AQuaternion &q1, areal t) {
 
 AMatrix3D AQuaternion::toMatrix() const {
     AMatrix3D ret;
-    areal x2 = x + x;
-    areal y2 = y + y;
-    areal z2 = z + z;
-    areal xx = x * x2;
-    areal yy = y * y2;
-    areal zz = z * z2;
-    areal xy = x * y2;
-    areal yz = y * z2;
-    areal xz = z * x2;
-    areal wx = w * x2;
-    areal wy = w * y2;
-    areal wz = w * z2;
+    areal qxx(x * x);
+    areal qyy(y * y);
+    areal qzz(z * z);
+    areal qxz(x * z);
+    areal qxy(x * y);
+    areal qyz(y * z);
+    areal qwx(w * x);
+    areal qwy(w * y);
+    areal qwz(w * z);
 
-    ret[0] = 1.0f - (yy + zz);
-    ret[3] = xy - wz;
-    ret[6] = xz + wy;
+    ret[0] = 1 - 2 * (qyy +  qzz);
+    ret[1] = 2 * (qxy + qwz);
+    ret[2] = 2 * (qxz - qwy);
 
-    ret[1] = xy + wz;
-    ret[4] = 1.0f - (xx + zz);
-    ret[7] = yz - wx;
+    ret[3] = 2 * (qxy - qwz);
+    ret[4] = 1 - 2 * (qxx +  qzz);
+    ret[5] = 2 * (qyz + qwx);
 
-    ret[2] = xz - wy;
-    ret[5] = yz + wx;
-    ret[8] = 1.0f - (xx + yy);
+    ret[6] = 2 * (qxz + qwy);
+    ret[7] = 2 * (qyz - qwx);
+    ret[8] = 1 - 2 * (qxx +  qyy);
     return ret;
+}
+
+AVector3D AQuaternion::euler() const {
+    return toMatrix().euler();
 }
