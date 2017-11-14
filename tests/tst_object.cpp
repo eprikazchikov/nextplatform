@@ -21,7 +21,7 @@
 
 #include "tst_common.h"
 
-#include "auri.h"
+#include "core/auri.h"
 
 #include <QtTest>
 
@@ -130,12 +130,9 @@ void ObjectTest::Disconnect_all() {
     AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
     AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
     QCOMPARE((int)obj1.getReceivers().size(), 2);
-    QCOMPARE((int)obj3.getSenders().size(), 1);
 
     AObject::disconnect(&obj1, 0, 0, 0);
     QCOMPARE((int)obj1.getReceivers().size(), 0);
-    QCOMPARE((int)obj2.getSenders().size(), 0);
-    QCOMPARE((int)obj3.getSenders().size(), 0);
 }
 
 void ObjectTest::Disconnect_by_signal() {
@@ -146,12 +143,9 @@ void ObjectTest::Disconnect_by_signal() {
     AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
     AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
     QCOMPARE((int)obj1.getReceivers().size(), 2);
-    QCOMPARE((int)obj3.getSenders().size(), 1);
 
     AObject::disconnect(&obj1, _SIGNAL(signal(bool)), 0, 0);
     QCOMPARE((int)obj1.getReceivers().size(), 0);
-    QCOMPARE((int)obj2.getSenders().size(), 0);
-    QCOMPARE((int)obj3.getSenders().size(), 0);
 }
 
 void ObjectTest::Disconnect_by_receiver() {
@@ -162,11 +156,9 @@ void ObjectTest::Disconnect_by_receiver() {
     AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
     AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
     QCOMPARE((int)obj1.getReceivers().size(), 2);
-    QCOMPARE((int)obj3.getSenders().size(), 1);
 
     AObject::disconnect(&obj1, 0, &obj3, 0);
     QCOMPARE((int)obj1.getReceivers().size(), 1);
-    QCOMPARE((int)obj3.getSenders().size(), 0);
 }
 
 void ObjectTest::Child_destructor() {
@@ -197,26 +189,11 @@ void ObjectTest::Reciever_destructor() {
 
     AObject::connect(obj1, _SIGNAL(signal(bool)), obj2, _SIGNAL(signal(bool)));
     QCOMPARE((int)obj1->getReceivers().size(),  1);
-    QCOMPARE((int)obj2->getSenders().size(),  1);
 
     delete obj2;
     QCOMPARE((int)obj1->getReceivers().size(),  0);
 
     delete obj1;
-}
-
-void ObjectTest::Sender_destructor() {
-    ATestObject *obj1   = new ATestObject;
-    ATestObject *obj2   = new ATestObject;
-
-    AObject::connect(obj1, _SIGNAL(signal(bool)), obj2, _SIGNAL(signal(bool)));
-    QCOMPARE((int)obj1->getReceivers().size(),  1);
-    QCOMPARE((int)obj2->getSenders().size(),  1);
-
-    delete obj1;
-    QCOMPARE((int)obj2->getSenders().size(),  0);
-
-    delete obj2;
 }
 
 void ObjectTest::Emit_signal() {

@@ -27,7 +27,7 @@
 
 #include "acommon.h"
 
-#include "amath.h"
+#include "math/amath.h"
 #include "ametatype.h"
 
 using namespace std;

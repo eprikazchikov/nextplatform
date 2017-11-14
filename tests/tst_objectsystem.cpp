@@ -2,28 +2,21 @@
 
 #include "tst_common.h"
 
-#include "aobjectsystem.h"
+#include "core/aobjectsystem.h"
 
-#include "ajson.h"
-#include "abson.h"
+#include "core/ajson.h"
+#include "core/abson.h"
 
 #include <QtTest>
 
-const string gTestPath  = "Test/Asset/Path";
 ATestObject *resource;
 
 void ObjectSystemTest::initTestCase() {
     resource   = AObjectSystem::objectCreate<ATestObject>();
     resource->setName("TestResource");
-    //AObjectSystem::instance()->m_ResourceCache[gTestPath]   = resource;
 }
 
 void ObjectSystemTest::cleanupTestCase() {
-    //auto it = AObjectSystem::instance()->m_ResourceCache.find(gTestPath);
-    //if(it != AObjectSystem::instance()->m_ResourceCache.end()) {
-    //    AObjectSystem::instance()->m_ResourceCache.erase(it);
-    //}
-
     delete resource;
 }
 
@@ -57,17 +50,12 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
     obj2->setParent(obj1);
     obj3->setParent(obj2);
 
-    //obj1->setResource(resource);
-    //obj1->setProperty("DynamicProperty", AVariant::fromValue(resource));
 
     AObject::connect(obj1, _SIGNAL(signal(bool)), obj2, _SLOT(setSlot(bool)));
     AObject::connect(obj1, _SIGNAL(signal(bool)), obj3, _SIGNAL(signal(bool)));
     AObject::connect(obj2, _SIGNAL(signal(bool)), obj3, _SLOT(setSlot(bool)));
 
-    string data     = AJson::save(AObjectSystem::toVariant(obj1), 0);
-    AByteArray bytes  = ABson::save(AObjectSystem::toVariant(obj1));
-    //qDebug() << data.c_str();
-    //AObject *result = AObjectSystem::toObject(AJson::load(data));
+    AByteArray bytes = ABson::save(AObjectSystem::toVariant(obj1));
     uint32_t offset = 0;
     AObject *result = AObjectSystem::toObject(ABson::load(bytes, offset));
     AObject *object = dynamic_cast<AObject*>(obj1);
@@ -104,7 +92,6 @@ class ATestObjectEx : public ATestObject {
 
     A_NOMETHODS()
     A_NOPROPERTIES()
-
 };
 
 void ObjectSystemTest::Override_Object() {

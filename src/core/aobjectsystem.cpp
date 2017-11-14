@@ -1,11 +1,9 @@
-#include "aobjectsystem.h"
+#include "core/aobjectsystem.h"
 
-#include "aobject.h"
-#include "auri.h"
-#include "abson.h"
-#include "ajson.h"
-
-AObjectSystem *AObjectSystem::s_Instance    = nullptr;
+#include "core/aobject.h"
+#include "core/auri.h"
+#include "core/abson.h"
+#include "core/ajson.h"
 
 class AObjectSystemPrivate {
 public:
@@ -20,15 +18,19 @@ public:
     bool                        m_Exit;
 
     uint32_t                    m_NextID;
+
+    static AObjectSystem       *s_Instance;
 };
+
+AObjectSystem *AObjectSystemPrivate::s_Instance    = nullptr;
 
 AObjectSystem::AObjectSystem(const string &name) :
         p_ptr(new AObjectSystemPrivate()) {
     PROFILE_FUNCTION()
-    if(AObjectSystem::s_Instance != nullptr) {
-        throw "There should be only one ObjectSystem object";
+    if(AObjectSystemPrivate::s_Instance != nullptr) {
+        throw "There should be only one AObjectSystem object";
     }
-    AObjectSystem::s_Instance   = this;
+    AObjectSystemPrivate::s_Instance   = this;
     setName(name);
     p_ptr->m_NextID = 1000;
 }
@@ -36,7 +38,7 @@ AObjectSystem::AObjectSystem(const string &name) :
 AObjectSystem::~AObjectSystem() {
     PROFILE_FUNCTION()
     factoryClear();
-    AObjectSystem::s_Instance   = nullptr;
+    AObjectSystemPrivate::s_Instance   = nullptr;
 }
 
 int32_t AObjectSystem::exec() {
@@ -49,7 +51,7 @@ int32_t AObjectSystem::exec() {
 
 AObjectSystem *AObjectSystem::instance() {
     PROFILE_FUNCTION()
-    return AObjectSystem::s_Instance;
+    return AObjectSystemPrivate::s_Instance;
 }
 
 AObject *AObjectSystem::objectCreate(const string &uri, const string &name, AObject *parent) {
@@ -136,7 +138,7 @@ AVariant AObjectSystem::toVariant(const AObject *object) {
 
         // Save links
         AVariantList links;
-        for(const auto &l : it->getSenders()) {
+        for(const auto &l : it->getReceivers()) {
             AVariantList link;
 
             AObject *sender   = l.sender;

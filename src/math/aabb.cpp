@@ -1,4 +1,4 @@
-#include "amath.h"
+#include "math/amath.h"
 
 AABox::AABox() :
     pos(0.0f),

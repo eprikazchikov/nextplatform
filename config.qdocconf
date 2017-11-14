@@ -1,0 +1,43 @@
+
+project = Next
+description = Next Reference Documentation
+
+outputdir = html
+outputformats = HTML
+
+#				  "<nav class=\"navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top\">\n" \
+#				  "<div class=\"collapse navbar-collapse\" id=\"navbarsExampleDefault\">\n" \
+#				  "<form class=\"form-inline my-2 my-lg-0\">\n" \
+#				  "<input class=\"form-control mr-sm-2\" type=\"text\" placeholder=\"Search\">\n" \
+#                  "<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>\n" \
+#                  "</form>\n" \
+#				  "</div>\n" \
+#				  "</nav>\n" \
+
+HTML.stylesheets += doc/css/bootstrap.css \
+					doc/css/bootstrap-theme.css \
+					doc/css/online.css
+
+HTML.headerstyles += "<link href=\"style/bootstrap.css\" rel=\"stylesheet\">\n" \
+                     "<link href=\"style/bootstrap-theme.css\" rel=\"stylesheet\">\n" \
+					 "<link href=\"style/online.css\" rel=\"stylesheet\">\n"
+					
+HTML.postheader = "<div class=\"container\">\n"
+				  
+HTML.footer 	= "</div>\n" \
+				  "<script src=\"https://code.jquery.com/jquery-3.1.1.slim.min.js\" integrity=\"sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n\" crossorigin=\"anonymous\"></script>\n" \
+				  "<script>window.jQuery || document.write('<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js\"><\/script>')</script>\n" \
+				  "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js\" integrity=\"sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb\" crossorigin=\"anonymous\"></script>\n" \
+				  "<script src=\"js/bootstrap.min.js\"></script>\n" \
+				  "<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->\n" \
+				  "<script src=\"../../assets/js/ie10-viewport-bug-workaround.js\"></script>\n"
+
+headerdirs  = .
+sourcedirs  = .
+
+sources.fileextensions = "*.cpp *.qdoc *.mm *.qml"
+headers.fileextensions = "*.h *.ch *.h++ *.hh *.hpp *.hxx"
+
+exampledirs = .
+
+imagedirs   = ./images

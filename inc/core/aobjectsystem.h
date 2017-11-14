@@ -23,6 +23,11 @@ public:
 
     virtual int32_t                     exec                    ();
 
+    GroupMap                            factories               () const;
+
+    uint32_t                            nextID                  ();
+
+public:
     static AObjectSystem               *instance                ();
 
     static AObject                     *objectCreate            (const string &uri, const string &name = string(), AObject *parent = 0);
@@ -51,12 +56,8 @@ public:
         AObjectSystem::instance()->factoryRemove(name, string("thor://") + group + "/" + name);
     }
 
-    GroupMap                            factories               () const;
-
     static AVariant                     toVariant               (const AObject *object);
     static AObject                     *toObject                (const AVariant &variant);
-
-    uint32_t                            nextID                  ();
 
 private:
     friend class ObjectSystemTest;
@@ -68,8 +69,6 @@ private:
     void                                factoryClear            ();
 
     AObjectSystemPrivate               *p_ptr;
-
-    static AObjectSystem               *s_Instance;
 };
 
 #endif // AOBJECTSYSTEM_H

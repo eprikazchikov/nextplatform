@@ -1,4 +1,4 @@
-#include "amath.h"
+#include "math/amath.h"
 
 AMatrix4D::AMatrix4D() {
     identity();
@@ -9,13 +9,6 @@ AMatrix4D::AMatrix4D(const AMatrix3D &m) {
     mat[1] = m[1]; mat[5] = m[4]; mat[ 9] = m[7]; mat[13] = 0.0;
     mat[2] = m[2]; mat[6] = m[5]; mat[10] = m[8]; mat[14] = 0.0;
     mat[3] = 0.0;  mat[7] = 0.0;  mat[11] = 0.0;  mat[15] = 1.0;
-}
-
-AMatrix4D::AMatrix4D(const AMatrix4D &m) {
-    mat[0] = m[0]; mat[4] = m[4]; mat[ 8] = m[ 8]; mat[12] = m[12];
-    mat[1] = m[1]; mat[5] = m[5]; mat[ 9] = m[ 9]; mat[13] = m[13];
-    mat[2] = m[2]; mat[6] = m[6]; mat[10] = m[10]; mat[14] = m[14];
-    mat[3] = m[3]; mat[7] = m[7]; mat[11] = m[11]; mat[15] = m[15];
 }
 
 bool AMatrix4D::operator==(const AMatrix4D &v) const {

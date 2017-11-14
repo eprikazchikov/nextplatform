@@ -27,24 +27,23 @@ public:
     AVector2D                   ();
     AVector2D                   (areal v);
     AVector2D                   (areal x, areal y);
-    AVector2D                   (const AVector2D &v);
 
-    inline bool                 operator==                  (const AVector2D &v) const;
-    inline bool                 operator!=                  (const AVector2D &v) const;
-    inline bool                 operator>                   (const AVector2D &v) const;
-    inline bool                 operator<                   (const AVector2D &v) const;
+    inline bool                 operator==                  (const AVector2D &vector) const;
+    inline bool                 operator!=                  (const AVector2D &vector) const;
+    inline bool                 operator>                   (const AVector2D &vector) const;
+    inline bool                 operator<                   (const AVector2D &vector) const;
 
-    inline const AVector2D      operator*                   (areal f) const;
-    inline const AVector2D      operator*                   (AVector2D &v) const;
-    inline const AVector2D      operator/                   (areal f) const;
-    inline const AVector2D      operator+                   (const AVector2D &v) const;
+    inline const AVector2D      operator*                   (areal factor) const;
+    inline const AVector2D      operator*                   (AVector2D &vector) const;
+    inline const AVector2D      operator/                   (areal factor) const;
+    inline const AVector2D      operator+                   (const AVector2D &vector) const;
     inline const AVector2D      operator-                   () const;
-    inline const AVector2D      operator-                   (const AVector2D &v) const;
+    inline const AVector2D      operator-                   (const AVector2D &vector) const;
 
-    AVector2D                  &operator*=                  (areal f);
-    AVector2D                  &operator/=                  (areal f);
-    AVector2D                  &operator+=                  (const AVector2D &v);
-    AVector2D                  &operator-=                  (const AVector2D &v);
+    AVector2D                  &operator*=                  (areal factor);
+    AVector2D                  &operator/=                  (areal divisor);
+    AVector2D                  &operator+=                  (const AVector2D &vector);
+    AVector2D                  &operator-=                  (const AVector2D &vector);
     
     areal                      &operator[]                  (int i);
     const areal                 operator[]                  (int i) const;
@@ -54,8 +53,8 @@ public:
 
     areal                       normalize                   ();
 
-    areal                       cross                       (const AVector2D &v) const;
-    areal                       dot                         (const AVector2D &v) const;
+    areal                       cross                       (const AVector2D &vector) const;
+    areal                       dot                         (const AVector2D &vector) const;
 
     union {
         struct {

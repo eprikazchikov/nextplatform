@@ -30,27 +30,24 @@ public:
     AVector3D                   (areal v);
     AVector3D                   (areal x, areal y, areal z);
     AVector3D                   (const AVector2D &v, areal z);
-    AVector3D                   (const AVector3D &v);
     AVector3D                   (const areal *v);
 
-    inline bool                 operator==                  (const AVector2D &v) const;
+    inline bool                 operator==                  (const AVector3D &vector) const;
+    inline bool                 operator!=                  (const AVector3D &vector) const;
+    inline bool                 operator>                   (const AVector3D &vector) const;
+    inline bool                 operator<                   (const AVector3D &vector) const;
 
-    inline bool                 operator==                  (const AVector3D &v) const;
-    inline bool                 operator!=                  (const AVector3D &v) const;
-    inline bool                 operator>                   (const AVector3D &v) const;
-    inline bool                 operator<                   (const AVector3D &v) const;
-
-    inline const AVector3D      operator*                   (areal f) const;
-    inline const AVector3D      operator*                   (const AVector3D &v) const;
-    inline const AVector3D      operator/                   (areal f) const;
-    inline const AVector3D      operator+                   (const AVector3D &v) const;
+    inline const AVector3D      operator*                   (areal factor) const;
+    inline const AVector3D      operator*                   (const AVector3D &vector) const;
+    inline const AVector3D      operator/                   (areal divisor) const;
+    inline const AVector3D      operator+                   (const AVector3D &vector) const;
     inline const AVector3D      operator-                   () const;
-    inline const AVector3D      operator-                   (const AVector3D &v) const;
+    inline const AVector3D      operator-                   (const AVector3D &vector) const;
 
-    AVector3D                  &operator*=                  (areal f);
-    AVector3D                  &operator/=                  (areal f);
-    AVector3D                  &operator+=                  (const AVector3D &v);
-    AVector3D                  &operator-=                  (const AVector3D &v);
+    AVector3D                  &operator*=                  (areal factor);
+    AVector3D                  &operator/=                  (areal divisor);
+    AVector3D                  &operator+=                  (const AVector3D &vector);
+    AVector3D                  &operator-=                  (const AVector3D &vector);
     
     areal                      &operator[]                  (int i);
     const areal                 operator[]                  (int i) const;
@@ -60,8 +57,8 @@ public:
 
     areal                       normalize                   ();
 
-    AVector3D                   cross                       (const AVector3D &v) const;
-    areal                       dot                         (const AVector3D &v) const;
+    AVector3D                   cross                       (const AVector3D &vector) const;
+    areal                       dot                         (const AVector3D &vector) const;
 
     union {
         struct {

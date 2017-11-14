@@ -1,4 +1,4 @@
-#include "ametaproperty.h"
+#include "core/ametaproperty.h"
 
 AMetaProperty::AMetaProperty(const Table *table) :
         m_pTable(table) {

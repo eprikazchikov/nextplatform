@@ -1,4 +1,4 @@
-#include "auri.h"
+#include "core/auri.h"
 
 AUri::AUri(const string &uri) {
     PROFILE_FUNCTION()

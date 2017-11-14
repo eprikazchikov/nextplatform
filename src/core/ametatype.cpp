@@ -1,9 +1,9 @@
-#include "ametatype.h"
+#include "core/ametatype.h"
 
 #include <list>
 
-#include "amath.h"
-#include "avariant.h"
+#include "math/amath.h"
+#include "core/avariant.h"
 
 #define DECLARE_BUILT_TYPE(TYPE) \
     { \

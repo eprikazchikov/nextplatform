@@ -1,7 +1,7 @@
-#include "ajson.h"
+#include "core/ajson.h"
 
-#include "avariant.h"
-#include "aobjectsystem.h"
+#include "core/avariant.h"
+#include "core/aobjectsystem.h"
 
 #define J_TRUE  "true"
 #define J_FALSE "false"

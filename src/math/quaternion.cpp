@@ -1,11 +1,29 @@
-#include "amath.h"
+#include "math/amath.h"
 
+/*!
+    \class AQuaternion
+    \brief The AQuaternion class represents rotations in 3D space.
+    \since Next 1.0
+    \inmodule Math
+
+    Quaternions consist of a 3D rotation axis specified by the \c x, \c y, and \c z coordinates,
+    and a \c w representing the rotation angle.
+
+    \sa AVector2D, AVector3D, AVector4D, AMatrix3D
+*/
+
+/*!
+    Constructs an identity quaternion.
+*/
 AQuaternion::AQuaternion() :
     x(0),
     y(0),
     z(0),
     w(1) {
 }
+/*!
+    Constructs a quaternion with rotation axis \a dir and \a angle in rotation degrees.
+*/
 AQuaternion::AQuaternion(const AVector3D &dir, areal angle) {
     areal length = dir.length();
     if(length != 0.0) {
@@ -20,7 +38,9 @@ AQuaternion::AQuaternion(const AVector3D &dir, areal angle) {
         w = 1.0;
     }
 }
-
+/*!
+    Constructs a quaternion by Euler angles represented by AVector3D(pitch, yaw, roll) \a euler in rotation degrees.
+*/
 AQuaternion::AQuaternion(const AVector3D &euler) {
     AVector3D rad2(euler.x * DEG2RAD * 0.5f, euler.y * DEG2RAD * 0.5f, euler.z * DEG2RAD * 0.5f);
     AVector3D c(cos(rad2.x), cos(rad2.y), cos(rad2.z));
@@ -31,12 +51,14 @@ AQuaternion::AQuaternion(const AVector3D &euler) {
     y = c.x * s.y * c.z + s.x * c.y * s.z;
     z = c.x * c.y * s.z - s.x * s.y * c.z;
 }
-
-AQuaternion::AQuaternion(const AMatrix3D &m) {
-    areal W = m[0] + m[4] + m[8];
-    areal X = m[0] - m[4] - m[8];
-    areal Y = m[4] - m[0] - m[8];
-    areal Z = m[8] - m[0] - m[4];
+/*!
+    Constructs a quaternion by rotation matrix represented by AMatrix3D \a matrix.
+*/
+AQuaternion::AQuaternion(const AMatrix3D &matrix) {
+    areal W = matrix[0] + matrix[4] + matrix[8];
+    areal X = matrix[0] - matrix[4] - matrix[8];
+    areal Y = matrix[4] - matrix[0] - matrix[8];
+    areal Z = matrix[8] - matrix[0] - matrix[4];
 
     int index = 0;
     areal four = W;
@@ -59,71 +81,93 @@ AQuaternion::AQuaternion(const AMatrix3D &m) {
     switch(index) {
         case 0: {
             w = biggest;
-            x = (m[5] - m[7]) * mult; // m[1][2] - m[2][1]
-            y = (m[6] - m[2]) * mult; // m[2][0] - m[0][2]
-            z = (m[1] - m[3]) * mult; // m[0][1] - m[1][0]
+            x = (matrix[5] - matrix[7]) * mult; // m[1][2] - m[2][1]
+            y = (matrix[6] - matrix[2]) * mult; // m[2][0] - m[0][2]
+            z = (matrix[1] - matrix[3]) * mult; // m[0][1] - m[1][0]
         } break;
         case 1: {
-            w = (m[5] - m[7]) * mult; // m[1][2] - m[2][1]
+            w = (matrix[5] - matrix[7]) * mult; // m[1][2] - m[2][1]
             x = biggest;
-            y = (m[1] + m[3]) * mult; // m[0][1] + m[1][0]
-            z = (m[6] + m[2]) * mult; // m[2][0] + m[0][2]
+            y = (matrix[1] + matrix[3]) * mult; // m[0][1] + m[1][0]
+            z = (matrix[6] + matrix[2]) * mult; // m[2][0] + m[0][2]
         } break;
         case 2: {
-            w = (m[6] - m[2]) * mult; // m[2][0] - m[0][2]
-            x = (m[1] + m[3]) * mult; // m[0][1] + m[1][0]
+            w = (matrix[6] - matrix[2]) * mult; // m[2][0] - m[0][2]
+            x = (matrix[1] + matrix[3]) * mult; // m[0][1] + m[1][0]
             y = biggest;
-            z = (m[5] + m[7]) * mult; // m[1][2] + m[2][1]
+            z = (matrix[5] + matrix[7]) * mult; // m[1][2] + m[2][1]
         } break;
         case 3: {
-            w = (m[1] - m[3]) * mult; // m[0][1] - m[1][0]
-            x = (m[6] + m[2]) * mult; // m[2][0] + m[0][2]
-            y = (m[5] + m[7]) * mult; // m[1][2] + m[2][1]
+            w = (matrix[1] - matrix[3]) * mult; // m[0][1] - m[1][0]
+            x = (matrix[6] + matrix[2]) * mult; // m[2][0] + m[0][2]
+            y = (matrix[5] + matrix[7]) * mult; // m[1][2] + m[2][1]
             z = biggest;
         } break;
         default: break;
     }
 }
-
-/// Comparison operators
-bool AQuaternion::operator==(const AQuaternion &v) const {
-    return (x == v.x) && (y == v.y) && (z == v.z) && (w == v.w);
+/*!
+    Returns true if this quaternion is equal to given \a quaternion; otherwise returns false.
+    This operator uses an exact floating-point comparison.
+*/
+bool AQuaternion::operator==(const AQuaternion &quaternion) const {
+    return (x == quaternion.x) && (y == quaternion.y) && (z == quaternion.z) && (w == quaternion.w);
 }
-bool AQuaternion::operator!=(const AQuaternion &v) const {
-    return (x != v.x) || (y != v.y) || (z != v.z) || (w != v.w);
+/*!
+    Returns true if this quaternion is NOT equal to given \a quaternion; otherwise returns false.
+    This operator uses an exact floating-point comparison.
+*/
+bool AQuaternion::operator!=(const AQuaternion &quaternion) const {
+    return (x != quaternion.x) || (y != quaternion.y) || (z != quaternion.z) || (w != quaternion.w);
 }
-
+/*!
+    Returns the component of the quaternion at index position i as a modifiable reference.
+    \a i must be a valid index position in the quaternion (i.e., 0 <= i < 4).
+*/
 areal &AQuaternion::operator[](int i) {
     return q[i];
 }
+/*!
+    Returns the component of the quaternion at index position.
+    \a i must be a valid index position in the quaternion (i.e., 0 <= i < 4).
+*/
 const areal AQuaternion::operator[](int i) const {
     return q[i];
 }
-
-AQuaternion AQuaternion::operator*(const AQuaternion &q) const {
+/*!
+    Multiplies this quaternion and \a quaternion using quaternion multiplication.
+    The result corresponds to applying both of the rotations specified by this quaternion and \a quaternion.
+*/
+AQuaternion AQuaternion::operator*(const AQuaternion &quaternion) const {
     AQuaternion ret;
-    ret.x = w * q.x + x * q.x + y * q.z - z * q.y;
-    ret.y = w * q.y + y * q.w + z * q.x - x * q.z;
-    ret.z = w * q.z + z * q.w + x * q.y - y * q.x;
-    ret.w = w * q.w - x * q.x - y * q.y - z * q.z;
+    ret.x = w * quaternion.x + x * quaternion.x + y * quaternion.z - z * quaternion.y;
+    ret.y = w * quaternion.y + y * quaternion.w + z * quaternion.x - x * quaternion.z;
+    ret.z = w * quaternion.z + z * quaternion.w + x * quaternion.y - y * quaternion.x;
+    ret.w = w * quaternion.w - x * quaternion.x - y * quaternion.y - z * quaternion.z;
     return ret;
 }
-
-AVector3D AQuaternion::operator*(const AVector3D &v) const {
+/*!
+    Rotates a \a vector vec with this quaternion to produce a new vector in 3D space.
+*/
+AVector3D AQuaternion::operator*(const AVector3D &vector) const {
     AVector3D vec(x, y, z);
 
-    AVector3D uv    = vec.cross(v);
+    AVector3D uv    = vec.cross(vector);
     AVector3D uuv   = vec.cross(uv);
 
-    return v + ((uv * w) + uuv) * 2;
+    return vector + ((uv * w) + uuv) * 2;
 }
-
+/*!
+    Returns the inverse of this quaternion.
+*/
 AQuaternion AQuaternion::inverse() const {
     AQuaternion ret;
     ret.w = w; ret.x =-x; ret.y =-y; ret.z =-z;
     return ret;
 }
-
+/*!
+    Linear inerpolation between \a q0 and \a q1 with \a t factor.
+*/
 void AQuaternion::mix(const AQuaternion &q0, const AQuaternion &q1, areal t) {
     areal k0,k1,cosomega = q0.x * q1.x + q0.y * q1.y + q0.z * q1.z + q0.w * q1.w;
     AQuaternion q;
@@ -153,7 +197,9 @@ void AQuaternion::mix(const AQuaternion &q0, const AQuaternion &q1, areal t) {
     z = q0.z * k0 + q.z * k1;
     w = q0.w * k0 + q.w * k1;
 }
-
+/*!
+    Returns the rotation matrix for this quaternion.
+*/
 AMatrix3D AQuaternion::toMatrix() const {
     AMatrix3D ret;
     areal qxx(x * x);
@@ -179,7 +225,9 @@ AMatrix3D AQuaternion::toMatrix() const {
     ret[8] = 1 - 2 * (qxx +  qyy);
     return ret;
 }
-
+/*!
+    Returns the Euler angles represented by AVector3D(pitch, yaw, roll) in rotation degrees.
+*/
 AVector3D AQuaternion::euler() const {
     return toMatrix().euler();
 }

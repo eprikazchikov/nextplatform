@@ -14,57 +14,59 @@ TEMPLATE = lib
 CONFIG += c++11
 
 SOURCES += \
-    src/avariant.cpp \
-    src/aobject.cpp \
-    src/aobjectsystem.cpp \
-    src/ajson.cpp \
-    src/auri.cpp \
-    src/atools.cpp \
-    src/abson.cpp \
-    src/ametaobject.cpp \
-    src/ametatype.cpp \
-    src/ametaproperty.cpp \
-    src/ametamethod.cpp \
-    src/aevent.cpp \
-    src/athreadpool.cpp \
+    src/core/abson.cpp \
+    src/core/aevent.cpp \
+    src/core/ajson.cpp \
+    src/core/ametamethod.cpp \
+    src/core/ametaobject.cpp \
+    src/core/ametaproperty.cpp \
+    src/core/ametatype.cpp \
+    src/core/aobject.cpp \
+    src/core/aobjectsystem.cpp \
+    src/core/athreadpool.cpp \
+    src/core/atools.cpp \
+    src/core/auri.cpp \
+    src/core/avariant.cpp \
+    src/math/aabb.cpp \
+    src/math/amath.cpp \
+    src/math/matrix3.cpp \
+    src/math/matrix4.cpp \
+    src/math/obb.cpp \
+    src/math/plane.cpp \
+    src/math/quaternion.cpp \
+    src/math/ray.cpp \
     src/math/vector2.cpp \
     src/math/vector3.cpp \
-    src/math/vector4.cpp \
-    src/math/matrix3.cpp \
-    src/math/quaternion.cpp \
-    src/math/matrix4.cpp \
-    src/math/ray.cpp \
-    src/amath.cpp \
-    src/math/aabb.cpp \
-    src/math/obb.cpp \
-    src/math/plane.cpp
+    src/math/vector4.cpp
+
 
 HEADERS += \
-    inc/aobject.h \
-    inc/avariant.h \
-    inc/aobjectsystem.h \
-    inc/ajson.h \
-    inc/auri.h \
-    inc/atools.h \
-    inc/abson.h \
-    inc/ametaobject.h \
-    inc/ametatype.h \
-    inc/ametaproperty.h \
-    inc/ametamethod.h \
-    inc/aevent.h \
-    inc/athreadpool.h \
-    inc/acommon.h \
+    inc/core/abson.h \
+    inc/core/aevent.h \
+    inc/core/ajson.h \
+    inc/core/ametamethod.h \
+    inc/core/ametaobject.h \
+    inc/core/ametaproperty.h \
+    inc/core/ametatype.h \
+    inc/core/aobject.h \
+    inc/core/aobjectsystem.h \
+    inc/core/athreadpool.h \
+    inc/core/atools.h \
+    inc/core/auri.h \
+    inc/core/avariant.h \
     inc/math/aabb.h \
-    inc/math/obb.h \
-    inc/math/plane.h \
-    inc/math/ray.h \
-    inc/amath.h \
+    inc/math/amath.h \
     inc/math/matrix3.h \
     inc/math/matrix4.h \
+    inc/math/obb.h \
+    inc/math/plane.h \
     inc/math/quaternion.h \
+    inc/math/ray.h \
     inc/math/vector2.h \
     inc/math/vector3.h \
-    inc/math/vector4.h
+    inc/math/vector4.h \
+    inc/acommon.h
+
 
 INCLUDEPATH += \
     inc

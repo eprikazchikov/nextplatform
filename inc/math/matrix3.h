@@ -28,22 +28,21 @@ class AVector4D;
 class NEXT_LIBRARY_EXPORT AMatrix3D {
 public:
     AMatrix3D                   ();
-    AMatrix3D                   (const AMatrix3D &m);
 
-    inline bool                 operator==                  (const AMatrix3D &v) const;
-    inline bool                 operator!=                  (const AMatrix3D &v) const;
+    inline bool                 operator==                  (const AMatrix3D &matrix) const;
+    inline bool                 operator!=                  (const AMatrix3D &matrix) const;
 
-    inline const AVector3D      operator*                   (const AVector3D &v) const;
-    inline const AVector4D      operator*                   (const AVector4D &v) const;
-    inline const AMatrix3D      operator*                   (areal f) const;
-    inline const AMatrix3D      operator*                   (const AMatrix3D &m) const;
-    inline const AMatrix3D      operator+                   (const AMatrix3D &m) const;
-    inline const AMatrix3D      operator-                   (const AMatrix3D &m) const;
+    inline const AVector3D      operator*                   (const AVector3D &vector) const;
+    inline const AVector4D      operator*                   (const AVector4D &vector) const;
+    inline const AMatrix3D      operator*                   (areal factor) const;
+    inline const AMatrix3D      operator*                   (const AMatrix3D &matrix) const;
+    inline const AMatrix3D      operator+                   (const AMatrix3D &matrix) const;
+    inline const AMatrix3D      operator-                   (const AMatrix3D &matrix) const;
 	
-    AMatrix3D                  &operator*=                  (areal f);
-    AMatrix3D                  &operator*=                  (const AMatrix3D &m);
-    AMatrix3D                  &operator+=                  (const AMatrix3D &m);
-    AMatrix3D                  &operator-=                  (const AMatrix3D &m);
+    AMatrix3D                  &operator*=                  (areal factor);
+    AMatrix3D                  &operator*=                  (const AMatrix3D &matrix);
+    AMatrix3D                  &operator+=                  (const AMatrix3D &matrix);
+    AMatrix3D                  &operator-=                  (const AMatrix3D &matrix);
 	
     areal                      &operator[]                  (int i);
     const areal                 operator[]                  (int i) const;
@@ -56,7 +55,7 @@ public:
     void                        identity                    ();
     void                        rotate                      (const AVector3D &axis, areal angle);
     void                        rotate                      (const AVector3D &angles);
-    void                        scale                       (const AVector3D &v);
+    void                        scale                       (const AVector3D &vector);
 
     void                        orthonormalize              ();
 

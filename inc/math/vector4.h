@@ -32,24 +32,23 @@ public:
     AVector4D                   (areal x, areal y, areal z, areal w);
     AVector4D                   (const AVector2D &v, areal z, areal w);
     AVector4D                   (const AVector3D &v, areal w);
-    AVector4D                   (const AVector4D &v);
 
-    inline bool                 operator==                  (const AVector4D &v) const;
-    inline bool                 operator!=                  (const AVector4D &v) const;
-    inline bool                 operator>                   (const AVector4D &v) const;
-    inline bool                 operator<                   (const AVector4D &v) const;
+    inline bool                 operator==                  (const AVector4D &vector) const;
+    inline bool                 operator!=                  (const AVector4D &vector) const;
+    inline bool                 operator>                   (const AVector4D &vector) const;
+    inline bool                 operator<                   (const AVector4D &vector) const;
 
-    inline const AVector4D      operator*                   (areal f) const;
-    inline const AVector4D      operator*                   (const AVector4D &v) const;
-    inline const AVector4D      operator/                   (areal f) const;
-    inline const AVector4D      operator+                   (const AVector4D &v) const;
+    inline const AVector4D      operator*                   (areal factor) const;
+    inline const AVector4D      operator*                   (const AVector4D &vector) const;
+    inline const AVector4D      operator/                   (areal divisor) const;
+    inline const AVector4D      operator+                   (const AVector4D &vector) const;
     inline const AVector4D      operator-                   () const;
-    inline const AVector4D      operator-                   (const AVector4D &v) const;
+    inline const AVector4D      operator-                   (const AVector4D &vector) const;
 
-    AVector4D                  &operator*=                  (areal f);
-    AVector4D                  &operator/=                  (areal f);
-    AVector4D                  &operator+=                  (const AVector4D &v);
-    AVector4D                  &operator-=                  (const AVector4D &v);
+    AVector4D                  &operator*=                  (areal factor);
+    AVector4D                  &operator/=                  (areal divisor);
+    AVector4D                  &operator+=                  (const AVector4D &vector);
+    AVector4D                  &operator-=                  (const AVector4D &vector);
 
     areal                      &operator[]                  (int i);
     const areal                 operator[]                  (int i) const;
@@ -59,7 +58,7 @@ public:
 
     areal                       normalize                   ();
 
-    areal                       dot                         (const AVector4D &v) const;
+    areal                       dot                         (const AVector4D &vector) const;
 
     union {
         struct {

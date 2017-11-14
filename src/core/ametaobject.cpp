@@ -1,6 +1,6 @@
-#include "ametaobject.h"
+#include "core/ametaobject.h"
 
-#include "aobject.h"
+#include "core/aobject.h"
 
 AMetaObject::AMetaObject(const char *name, const AMetaObject *super, const Constructor constructor, const AMetaMethod::Table *methods, const AMetaProperty::Table *props) :
         m_pName(name),

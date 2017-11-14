@@ -1,5 +1,5 @@
-#include "aobjectsystem.h"
-#include "auri.h"
+#include "core/aobjectsystem.h"
+#include "core/auri.h"
 
 inline bool operator==(const AObject::Link &left, const AObject::Link &right) {
     bool result = true;
@@ -18,6 +18,16 @@ public:
         m_pCurrentSender(nullptr),
         m_UUID(0) {
 
+    }
+
+    bool isLinkExist(const AObject::Link &link) const {
+        PROFILE_FUNCTION()
+        for(const auto &it : m_lRecievers) {
+            if(it == link) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /// Enable object flag
@@ -51,8 +61,6 @@ AObject::AObject() :
 
 AObject::~AObject() {
     PROFILE_FUNCTION()
-    onDestroyed();
-
     {
         unique_lock<mutex> locker(p_ptr->m_Mutex);
         while(!p_ptr->m_EventQueue.empty()) {
@@ -112,7 +120,7 @@ AObject *AObject::clone() {
         clone->setName(it->name());
         clone->setParent(result);
     }
-    for(auto it : getSenders()) {
+    for(auto it : p_ptr->m_lSenders) {
         AMetaMethod signal  = it.sender->metaObject()->method(it.signal);
         AMetaMethod method  = result->metaObject()->method(it.method);
         connect(it.sender, (to_string(1) + signal.signature()).c_str(),
@@ -168,7 +176,7 @@ void AObject::connect(AObject *sender, const char *signal, AObject *receiver, co
             link.receiver   = receiver;
             link.method     = rcv;
 
-            if(!sender->isLinkExist(link)) {
+            if(!sender->p_ptr->isLinkExist(link)) {
                 {
                     unique_lock<mutex> locker(sender->p_ptr->m_Mutex);
                     sender->p_ptr->m_lRecievers.push_back(link);
@@ -227,11 +235,6 @@ const AObject::ObjectList &AObject::getChildren() const {
 const AObject::LinkList &AObject::getReceivers() const {
     PROFILE_FUNCTION()
     return p_ptr->m_lRecievers;
-}
-
-const AObject::LinkList &AObject::getSenders() const {
-    PROFILE_FUNCTION()
-    return p_ptr->m_lSenders;
 }
 
 AObject *AObject::find(const string &path) {
@@ -312,8 +315,8 @@ void AObject::emitSignal(const char *signal, const AVariant &args) {
             if(method.type() == AMetaMethod::Signal) {
                 link->receiver->emitSignal(string(char(method.type() + 0x30) + method.signature()).c_str(), args);
             } else {
-                AMethodCallEvent *event = new AMethodCallEvent(link->method, link->sender, args);
-                link->receiver->postEvent(event);
+                // Queued Connection
+                link->receiver->postEvent(new AMethodCallEvent(link->method, link->sender, args));
             }
         }
     }
@@ -354,14 +357,14 @@ void AObject::processEvents() {
     }
 }
 
-void AObject::setEnable(bool state) {
-    PROFILE_FUNCTION()
-    p_ptr->m_bEnable   = state;
-}
-
 bool AObject::event(AEvent *) {
     PROFILE_FUNCTION()
     return false;
+}
+
+void AObject::setEnable(bool state) {
+    PROFILE_FUNCTION()
+    p_ptr->m_bEnable   = state;
 }
 
 void AObject::loadUserData(const AVariantMap &) {
@@ -396,24 +399,9 @@ void AObject::onCreated() {
 
 }
 
-void AObject::onDestroyed() {
-    PROFILE_FUNCTION()
-
-}
-
 AObject *AObject::sender() const {
     PROFILE_FUNCTION()
     return p_ptr->m_pCurrentSender;
-}
-
-bool AObject::isLinkExist(const Link &link) const {
-    PROFILE_FUNCTION()
-    for(const auto &it : p_ptr->m_lRecievers) {
-        if(it == link) {
-            return true;
-        }
-    }
-    return false;
 }
 
 void AObject::setUUID(uint32_t id) {

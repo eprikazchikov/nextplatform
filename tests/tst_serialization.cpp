@@ -1,8 +1,8 @@
 #include "tst_serialization.h"
 
-#include "aobjectsystem.h"
-#include "abson.h"
-#include "ajson.h"
+#include "core/aobjectsystem.h"
+#include "core/abson.h"
+#include "core/ajson.h"
 
 #include <QtTest>
 

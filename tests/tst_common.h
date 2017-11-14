@@ -1,9 +1,9 @@
 #ifndef TST_COMMON_H
 #define TST_COMMON_H
 
-#include "aobject.h"
+#include "core/aobject.h"
 
-#include "aobjectsystem.h"
+#include "core/aobjectsystem.h"
 
 #include <QTest>
 
@@ -95,25 +95,6 @@ inline bool compare(const AObject &left, const AObject &right) {
             for(const auto &li : left.getReceivers()) {
                 result  = false;
                 for(const auto &ri : right.getReceivers()) {
-                    if(compare(li, ri)) {
-                        result  = true;
-                        break;
-                    }
-                }
-                if(!result) {
-                    return result;
-                }
-            }
-        } else {
-            return false;
-        }
-    }
-
-    {
-        if(left.getSenders().size() == right.getSenders().size()) {
-            for(const auto &li : left.getSenders()) {
-                result  = false;
-                for(const auto &ri : right.getSenders()) {
                     if(compare(li, ri)) {
                         result  = true;
                         break;

@@ -1,4 +1,4 @@
-#include "amath.h"
+#include "math/amath.h"
 
 APlane::APlane() {
 

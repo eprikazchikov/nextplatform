@@ -1,6 +1,6 @@
-#include "ametamethod.h"
+#include "core/ametamethod.h"
 
-#include "avariant.h"
+#include "core/avariant.h"
 
 AMetaMethod::AMetaMethod(const Table *table) :
         m_pTable(table) {

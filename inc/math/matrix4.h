@@ -28,10 +28,8 @@ class AMatrix3D;
 
 class NEXT_LIBRARY_EXPORT AMatrix4D {
 public:
-	
     AMatrix4D                   ();
     AMatrix4D                   (const AMatrix3D &m);
-    AMatrix4D                   (const AMatrix4D &m);
 
     inline bool                 operator==                  (const AMatrix4D &v) const;
     inline bool                 operator!=                  (const AMatrix4D &v) const;

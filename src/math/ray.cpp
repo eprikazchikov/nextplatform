@@ -1,7 +1,8 @@
-#include "amath.h"
+#include "math/amath.h"
 
 ARay::ARay() {
 }
+
 ARay::ARay(const AVector3D &p, const AVector3D &d) :
         pos(p),
         dir(d) {
@@ -24,8 +25,9 @@ bool ARay::intersect(const AVector3D &p, areal r, AVector3D *pt) {
         areal t0    = tca - thc;
         areal t1    = tca + thc;
 
-        if(t0 < 0.001)
+        if(t0 < 0.001) {
             t0      = t1;
+        }
 
         *pt         = pos + dir * t0;
     }

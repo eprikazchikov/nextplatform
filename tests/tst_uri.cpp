@@ -1,6 +1,6 @@
 #include "tst_uri.h"
 
-#include "auri.h"
+#include "core/auri.h"
 
 #include <QTest>
 

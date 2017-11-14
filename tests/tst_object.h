@@ -35,7 +35,6 @@ private slots:
     void Disconnect_by_receiver();
     void Child_destructor();
     void Reciever_destructor();
-    void Sender_destructor();
     void Emit_signal();
     void Find_object();
     void Clone_object();

@@ -30,10 +30,10 @@ public:
     AQuaternion                 ();
     AQuaternion                 (const AVector3D &dir, areal angle);
     AQuaternion                 (const AVector3D &euler);
-    AQuaternion                 (const AMatrix3D &m);
+    AQuaternion                 (const AMatrix3D &matrix);
 
-    inline bool                 operator==                  (const AQuaternion &v) const;
-    inline bool                 operator!=                  (const AQuaternion &v) const;
+    inline bool                 operator==                  (const AQuaternion &quaternion) const;
+    inline bool                 operator!=                  (const AQuaternion &quaternion) const;
 	
     inline AQuaternion          operator*                   (const AQuaternion &q) const;
     inline AVector3D            operator*                   (const AVector3D &v) const;

@@ -27,12 +27,12 @@
 #include <list>
 #include <mutex>
 
-#include <acommon.h>
+#include "acommon.h"
 
-#include <avariant.h>
+#include "avariant.h"
 
-#include <ametaobject.h>
-#include <aevent.h>
+#include "ametaobject.h"
+#include "aevent.h"
 
 #define A_REGISTER(Class, Super, Group) \
     A_OBJECT(Class, Super) \
@@ -151,7 +151,6 @@ public:
 public:
     virtual const ObjectList       &getChildren                 () const;
     virtual const LinkList         &getReceivers                () const;
-    virtual const LinkList         &getSenders                  () const;
 
     virtual void                    setParent                   (AObject *parent);
     virtual string                  typeName                    () const;
@@ -175,18 +174,15 @@ protected:
     void                            processEvents               ();
 
     virtual void                    onCreated                   ();
-    virtual void                    onDestroyed                 ();
 
     AObject                        *sender                      () const;
 
 private:
     friend class ObjectTest;
-    friend class AThreadPool;
+    friend class AThreadPoolPrivate;
     friend class AObjectSystem;
 
 private:
-    bool                        isLinkExist                 (const Link &link) const;
-
     void                        setUUID                     (uint32_t id);
 
     bool                        operator==                  (const AObject &) const { return false; }
