@@ -23,26 +23,25 @@
 #include "acommon.h"
 
 #include "vector3.h"
-#include "matrix3.h"
+#include "quaternion.h"
 
-class AMatrix4D;
+class Matrix4;
 
-class NEXT_LIBRARY_EXPORT AOBox {
+class NEXT_LIBRARY_EXPORT OBBox {
 public:
-    AOBox                       ();
-    AOBox                       (const AVector3D &p, const AVector3D &s);
-    AOBox                       (const AVector3D &p, const AVector3D &s, const AMatrix3D &r);
+    OBBox                       ();
+    OBBox                       (const Vector3 &center, const Vector3 &size);
+    OBBox                       (const Vector3 &center, const Vector3 &size, const Quaternion &rotation);
 
-    inline const AOBox          operator*                   (areal f);
-    inline const AOBox          operator*                   (const AVector3D &v);
+    const OBBox                 operator*                   (areal factor);
+    const OBBox                 operator*                   (const Vector3 &vector);
 
-    void                        box                         (AVector3D &min, AVector3D &max) const;
-    void                        setBox                      (const AVector3D &min, const AVector3D &max);
+    void                        box                         (Vector3 &min, Vector3 &max) const;
+    void                        setBox                      (const Vector3 &min, const Vector3 &max);
 
-    AVector3D                   pos;
-    AVector3D                   size;
-    AMatrix3D                   rot;
-    areal                       radius;
+    Vector3                    center;
+    Vector3                    size;
+    Quaternion                  rotation;
 };
 
 #endif // OBB_H_HEADER_INCLUDED

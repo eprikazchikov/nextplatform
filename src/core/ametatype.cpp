@@ -2,7 +2,7 @@
 
 #include <list>
 
-#include "math/amath.h"
+#include "math/math.h"
 #include "core/avariant.h"
 
 #define DECLARE_BUILT_TYPE(TYPE) \
@@ -23,84 +23,84 @@ typedef map<uint32_t, AMetaType::Table> TypeMap;
 typedef map<string, uint32_t>           NameMap;
 typedef map<uint32_t, map<uint32_t, AMetaType::converterCallback>> ConverterMap;
 
-uint32_t AMetaType::s_NextId = AMetaType::UserType;
+uint32_t AMetaType::s_NextId = AMetaType::USERTYPE;
 static TypeMap s_Types = {
-    {AMetaType::Bool,       DECLARE_BUILT_TYPE(bool)},
-    {AMetaType::Int,        DECLARE_BUILT_TYPE(int)},
-    {AMetaType::Double,     DECLARE_BUILT_TYPE(double)},
-    {AMetaType::String,     DECLARE_BUILT_TYPE(string)},
-    {AMetaType::VariantMap, DECLARE_BUILT_TYPE(AVariantMap)},
-    {AMetaType::VariantList,DECLARE_BUILT_TYPE(AVariantList)},
-    {AMetaType::ByteArray,  DECLARE_BUILT_TYPE(AByteArray)},
-    {AMetaType::Vector2D,   DECLARE_BUILT_TYPE(AVector2D)},
-    {AMetaType::Vector3D,   DECLARE_BUILT_TYPE(AVector3D)},
-    {AMetaType::Vector4D,   DECLARE_BUILT_TYPE(AVector4D)},
-    {AMetaType::Quaternion, DECLARE_BUILT_TYPE(AQuaternion)},
-    {AMetaType::Matrix3D,   DECLARE_BUILT_TYPE(AMatrix3D)},
-    {AMetaType::Matrix4D,   DECLARE_BUILT_TYPE(AMatrix4D)}
+    {AMetaType::BOOLEAN,    DECLARE_BUILT_TYPE(bool)},
+    {AMetaType::INTEGER,    DECLARE_BUILT_TYPE(int)},
+    {AMetaType::DOUBLE,     DECLARE_BUILT_TYPE(double)},
+    {AMetaType::STRING,     DECLARE_BUILT_TYPE(string)},
+    {AMetaType::VARIANTMAP, DECLARE_BUILT_TYPE(AVariantMap)},
+    {AMetaType::VARIANTLIST,DECLARE_BUILT_TYPE(AVariantList)},
+    {AMetaType::BYTEARRAY,  DECLARE_BUILT_TYPE(AByteArray)},
+    {AMetaType::VECTOR2,    DECLARE_BUILT_TYPE(Vector2)},
+    {AMetaType::VECTOR3,    DECLARE_BUILT_TYPE(Vector3)},
+    {AMetaType::VECTOR4,    DECLARE_BUILT_TYPE(Vector4)},
+    {AMetaType::QUATERNION, DECLARE_BUILT_TYPE(Quaternion)},
+    {AMetaType::MATRIX3,    DECLARE_BUILT_TYPE(Matrix3)},
+    {AMetaType::MATRIX4,    DECLARE_BUILT_TYPE(Matrix4)}
 };
 
 static ConverterMap s_Converters= {
-    {AMetaType::Bool,      {{AMetaType::Int,        &AMetaType::toBoolean},
-                            {AMetaType::Double,     &AMetaType::toBoolean},
-                            {AMetaType::String,     &AMetaType::toBoolean}}},
+    {AMetaType::BOOLEAN,   {{AMetaType::INTEGER,    &AMetaType::toBoolean},
+                            {AMetaType::DOUBLE,     &AMetaType::toBoolean},
+                            {AMetaType::STRING,     &AMetaType::toBoolean}}},
 
-    {AMetaType::Int,       {{AMetaType::Bool,       &AMetaType::toInteger},
-                            {AMetaType::Double,     &AMetaType::toInteger},
-                            {AMetaType::String,     &AMetaType::toInteger}}},
+    {AMetaType::INTEGER,   {{AMetaType::BOOLEAN,    &AMetaType::toInteger},
+                            {AMetaType::DOUBLE,     &AMetaType::toInteger},
+                            {AMetaType::STRING,     &AMetaType::toInteger}}},
 
-    {AMetaType::Double,    {{AMetaType::Bool,       &AMetaType::toDouble},
-                            {AMetaType::Int,        &AMetaType::toDouble},
-                            {AMetaType::String,     &AMetaType::toDouble}}},
+    {AMetaType::DOUBLE,    {{AMetaType::BOOLEAN,    &AMetaType::toDouble},
+                            {AMetaType::INTEGER,    &AMetaType::toDouble},
+                            {AMetaType::STRING,     &AMetaType::toDouble}}},
 
-    {AMetaType::String,    {{AMetaType::Bool,       &AMetaType::toString},
-                            {AMetaType::Int,        &AMetaType::toString},
-                            {AMetaType::Double,     &AMetaType::toString}}},
+    {AMetaType::STRING,    {{AMetaType::BOOLEAN,    &AMetaType::toString},
+                            {AMetaType::INTEGER,    &AMetaType::toString},
+                            {AMetaType::DOUBLE,     &AMetaType::toString}}},
 
-    {AMetaType::VariantList,{{AMetaType::Vector2D,  &AMetaType::toList},
-                             {AMetaType::Vector3D,  &AMetaType::toList},
-                             {AMetaType::Vector4D,  &AMetaType::toList},
-                             {AMetaType::Quaternion,&AMetaType::toList},
-                             {AMetaType::Matrix3D,  &AMetaType::toList},
-                             {AMetaType::Matrix4D,  &AMetaType::toList}}},
+    {AMetaType::VARIANTLIST,{{AMetaType::VECTOR2,   &AMetaType::toList},
+                             {AMetaType::VECTOR3,   &AMetaType::toList},
+                             {AMetaType::VECTOR4,   &AMetaType::toList},
+                             {AMetaType::QUATERNION,&AMetaType::toList},
+                             {AMetaType::MATRIX3,   &AMetaType::toList},
+                             {AMetaType::MATRIX4,   &AMetaType::toList}}},
 
-    {AMetaType::Vector2D,   {{AMetaType::Int,       &AMetaType::toVector2D},
-                             {AMetaType::Double,    &AMetaType::toVector2D},
-                             {AMetaType::VariantList,&AMetaType::toVector2D}}},
+    {AMetaType::VECTOR2,    {{AMetaType::INTEGER,   &AMetaType::toVector2},
+                             {AMetaType::DOUBLE,    &AMetaType::toVector2},
+                             {AMetaType::VARIANTLIST,&AMetaType::toVector2}}},
 
-    {AMetaType::Vector3D,   {{AMetaType::Int,       &AMetaType::toVector3D},
-                             {AMetaType::Double,    &AMetaType::toVector3D},
-                             {AMetaType::VariantList,&AMetaType::toVector3D},
-                             {AMetaType::Vector2D,  &AMetaType::toVector3D}}},
+    {AMetaType::VECTOR3,    {{AMetaType::INTEGER,   &AMetaType::toVector3},
+                             {AMetaType::DOUBLE,    &AMetaType::toVector3},
+                             {AMetaType::VARIANTLIST,&AMetaType::toVector3},
+                             {AMetaType::VECTOR2,  &AMetaType::toVector3}}},
 
-    {AMetaType::Vector4D,   {{AMetaType::Int,       &AMetaType::toVector4D},
-                             {AMetaType::Double,    &AMetaType::toVector4D},
-                             {AMetaType::VariantList,&AMetaType::toVector4D},
-                             {AMetaType::Vector2D,  &AMetaType::toVector4D},
-                             {AMetaType::Vector3D,  &AMetaType::toVector4D}}},
+    {AMetaType::VECTOR4,    {{AMetaType::INTEGER,   &AMetaType::toVector4},
+                             {AMetaType::DOUBLE,    &AMetaType::toVector4},
+                             {AMetaType::VARIANTLIST,&AMetaType::toVector4},
+                             {AMetaType::VECTOR2,  &AMetaType::toVector4},
+                             {AMetaType::MATRIX3,  &AMetaType::toVector4}}},
 
-    {AMetaType::Quaternion, {{AMetaType::VariantList,&AMetaType::toQuaternion},
-                             {AMetaType::Vector3D,  &AMetaType::toQuaternion}}},
+    {AMetaType::QUATERNION, {{AMetaType::VARIANTLIST,&AMetaType::toQuaternion},
+                             {AMetaType::MATRIX3,  &AMetaType::toQuaternion}}},
 
-    {AMetaType::Matrix3D,   {{AMetaType::VariantList,&AMetaType::toMatrix3D}}},
+    {AMetaType::MATRIX3,    {{AMetaType::VARIANTLIST,&AMetaType::toMatrix3}}},
 
-    {AMetaType::Matrix4D,   {{AMetaType::VariantList,&AMetaType::toMatrix4D}}}
+    {AMetaType::MATRIX4,    {{AMetaType::VARIANTLIST,&AMetaType::toMatrix4}}}
 };
 
 static NameMap s_Names = {
-    {"bool",            AMetaType::Bool},
-    {"int",             AMetaType::Int},
-    {"double",          AMetaType::Double},
-    {"string",          AMetaType::String},
-    {"map",             AMetaType::VariantMap},
-    {"list",            AMetaType::VariantList},
-    {"AByteArray",      AMetaType::ByteArray},
-    {"AVector2D",       AMetaType::Vector2D},
-    {"AVector3D",       AMetaType::Vector3D},
-    {"AVector4D",       AMetaType::Vector4D},
-    {"AQuaternion",     AMetaType::Quaternion},
-    {"AMatrix3D",       AMetaType::Matrix3D},
-    {"AMatrix4D",       AMetaType::Matrix4D}
+    {"bool",           AMetaType::BOOLEAN},
+    {"int",            AMetaType::INTEGER},
+    {"double",         AMetaType::DOUBLE},
+    {"string",         AMetaType::STRING},
+    {"map",            AMetaType::VARIANTMAP},
+    {"list",           AMetaType::VARIANTLIST},
+    {"AByteArray",     AMetaType::BYTEARRAY},
+    {"Vector2",       AMetaType::VECTOR2},
+    {"Vector3",       AMetaType::VECTOR3},
+    {"Vector4",       AMetaType::VECTOR4},
+    {"Quaternion",     AMetaType::QUATERNION},
+    {"Matrix3",       AMetaType::MATRIX3},
+    {"Matrix4",       AMetaType::MATRIX4}
 };
 
 AMetaType::AMetaType(const Table *table) :
@@ -174,7 +174,7 @@ uint32_t AMetaType::type(const char *name) {
     if(it != s_Names.end()) {
         return it->second;
     }
-    return Invalid;
+    return INVALID;
 }
 uint32_t AMetaType::type(const type_info &type) {
     PROFILE_FUNCTION()
@@ -183,7 +183,7 @@ uint32_t AMetaType::type(const type_info &type) {
             return it.first;
         }
     }
-    return Invalid;
+    return INVALID;
 }
 
 const char *AMetaType::name(uint32_t type) {
@@ -293,13 +293,13 @@ bool AMetaType::toBoolean(void *to, const void *from, const uint32_t fromType) {
     bool result = true;
     bool *r     = static_cast<bool *>(to);
     switch(fromType) {
-        case Int:   { *r        = *(static_cast<const int *>(from)) != 0; } break;
-        case Double:{ *r        = *(static_cast<const double *>(from)) != 0; } break;
-        case String:{
+        case INTEGER: { *r  = *(static_cast<const int *>(from)) != 0; } break;
+        case DOUBLE:  { *r  = *(static_cast<const double *>(from)) != 0; } break;
+        case STRING:  {
             string s  = *(static_cast<const string *>(from));
             *r = (s != "false" || s != "0" || !s.empty());
         }  break;
-        default:    { result    = false; } break;
+        default:      { result  = false; } break;
     }
     return result;
 }
@@ -309,9 +309,9 @@ bool AMetaType::toInteger(void *to, const void *from, const uint32_t fromType) {
     bool result = true;
     int *r      = static_cast<int *>(to);
     switch(fromType) {
-        case Bool:  { *r        = (*(static_cast<const bool *>(from))) ? 1 : 0; } break;
-        case Double:{ double f  = *(static_cast<const double *>(from)); *r = int(f); f -= *r; *r += (f >= 0.5f) ? 1 : 0; } break;
-        case String:{
+        case BOOLEAN: { *r      = (*(static_cast<const bool *>(from))) ? 1 : 0; } break;
+        case DOUBLE: { double f = *(static_cast<const double *>(from)); *r = int(f); f -= *r; *r += (f >= 0.5f) ? 1 : 0; } break;
+        case STRING: {
             string s  = *(static_cast<const string *>(from));
             *r        = stoi(s);
         } break;
@@ -325,10 +325,10 @@ bool AMetaType::toDouble(void *to, const void *from, const uint32_t fromType) {
     bool result = true;
     double *r   = static_cast<double *>(to);
     switch(fromType) {
-        case Bool:  { *r        = double(*(static_cast<const bool *>(from))); } break;
-        case Int:   { *r        = double(*(static_cast<const int *>(from))); } break;
-        case String:{ *r        = stod(*(static_cast<const string *>(from))); } break;
-        default:    { result    = false; } break;
+        case BOOLEAN: { *r  = double(*(static_cast<const bool *>(from))); } break;
+        case INTEGER: { *r  = double(*(static_cast<const int *>(from))); } break;
+        case STRING:  { *r  = stod(*(static_cast<const string *>(from))); } break;
+        default:      { result  = false; } break;
     }
     return result;
 }
@@ -338,10 +338,10 @@ bool AMetaType::toString(void *to, const void *from, const uint32_t fromType) {
     bool result = true;
     string *r   = static_cast<string *>(to);
     switch(fromType) {
-        case Bool:  { *r        = (*(static_cast<const bool *>(from))) ? "true" : "false"; } break;
-        case Double:{ string s  = to_string(*(static_cast<const double *>(from))); *r = s; } break;
-        case Int:   { *r        = to_string(*(static_cast<const int *>(from))); } break;
-        default:    { result    = false; } break;
+        case BOOLEAN: { *r        = (*(static_cast<const bool *>(from))) ? "true" : "false"; } break;
+        case DOUBLE:  { string s  = to_string(*(static_cast<const double *>(from))); *r = s; } break;
+        case INTEGER: { *r        = to_string(*(static_cast<const int *>(from))); } break;
+        default:      { result    = false; } break;
     }
     return result;
 }
@@ -351,38 +351,38 @@ bool AMetaType::toList(void *to, const void *from, const uint32_t fromType) {
     bool result = true;
     AVariantList *r = static_cast<AVariantList *>(to);
     switch(fromType) {
-        case Vector2D: {
-            const AVector2D v = *(reinterpret_cast<const AVector2D *>(from));
+        case VECTOR2: {
+            const Vector2 v = *(reinterpret_cast<const Vector2 *>(from));
             for(int i = 0; i < 2; i++) {
                 r->push_back(v[i]);
             }
         } break;
-        case Vector3D: {
-            const AVector3D v = *(reinterpret_cast<const AVector3D *>(from));
+        case VECTOR3: {
+            const Vector3 v = *(reinterpret_cast<const Vector3 *>(from));
             for(int i = 0; i < 3; i++) {
                 r->push_back(v[i]);
             }
         } break;
-        case Vector4D: {
-            const AVector4D v = *(reinterpret_cast<const AVector4D *>(from));
+        case VECTOR4: {
+            const Vector4 v = *(reinterpret_cast<const Vector4 *>(from));
             for(int i = 0; i < 4; i++) {
                 r->push_back(v[i]);
             }
         } break;
-        case Quaternion: {
-            const AQuaternion v = *(reinterpret_cast<const AQuaternion *>(from));
+        case QUATERNION: {
+            const Quaternion v = *(reinterpret_cast<const Quaternion *>(from));
             for(int i = 0; i < 4; i++) {
                 r->push_back(v[i]);
             }
         } break;
-        case Matrix3D: {
-            const AMatrix3D v = *(reinterpret_cast<const AMatrix3D *>(from));
+        case MATRIX3: {
+            const Matrix3 v = *(reinterpret_cast<const Matrix3 *>(from));
             for(int i = 0; i < 9; i++) {
                 r->push_back(v[i]);
             }
         } break;
-        case Matrix4D:{
-            const AMatrix4D v = *(reinterpret_cast<const AMatrix4D *>(from));
+        case MATRIX4:{
+            const Matrix4 v = *(reinterpret_cast<const Matrix4 *>(from));
             for(int i = 0; i < 16; i++) {
                 r->push_back(v[i]);
             }
@@ -392,14 +392,14 @@ bool AMetaType::toList(void *to, const void *from, const uint32_t fromType) {
     return result;
 }
 
-bool AMetaType::toVector2D(void *to, const void *from, const uint32_t fromType) {
+bool AMetaType::toVector2(void *to, const void *from, const uint32_t fromType) {
     PROFILE_FUNCTION()
-    bool result     = true;
-    AVector2D *r    = static_cast<AVector2D *>(to);
+    bool result    = true;
+    Vector2 *r    = static_cast<Vector2 *>(to);
     switch(fromType) {
-        case Int:   { *r  = AVector2D(*(static_cast<const int *>(from))); } break;
-        case Double:{ *r  = AVector2D(*(static_cast<const double *>(from))); } break;
-        case VariantList: {
+        case INTEGER: { *r  = Vector2(*(static_cast<const int *>(from))); } break;
+        case DOUBLE:  { *r  = Vector2(*(static_cast<const double *>(from))); } break;
+        case VARIANTLIST: {
             const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 2; i++, it++) {
@@ -411,53 +411,53 @@ bool AMetaType::toVector2D(void *to, const void *from, const uint32_t fromType) 
     return result;
 }
 
-bool AMetaType::toVector3D(void *to, const void *from, const uint32_t fromType) {
+bool AMetaType::toVector3(void *to, const void *from, const uint32_t fromType) {
     PROFILE_FUNCTION()
     bool result     = true;
-    AVector3D *r    = static_cast<AVector3D *>(to);
+    Vector3 *r    = static_cast<Vector3 *>(to);
     switch(fromType) {
-        case Int:   { *r  = AVector3D(*(static_cast<const int *>(from))); } break;
-        case Double:{ *r  = AVector3D(*(static_cast<const double *>(from))); } break;
-        case VariantList: {
+        case INTEGER: { *r  = Vector3(*(static_cast<const int *>(from))); } break;
+        case DOUBLE:  { *r  = Vector3(*(static_cast<const double *>(from))); } break;
+        case VARIANTLIST: {
             const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 3; i++, it++) {
                 (*r)[i] = (*it).toDouble();
             }
         } break;
-        case Vector2D:  { *r = AVector3D(*(static_cast<const AVector2D *>(from)), 0.0); } break;
+        case VECTOR2:  { *r = Vector3(*(static_cast<const Vector2 *>(from)), 0.0); } break;
         default:    { result    = false; } break;
     }
     return result;
 }
 
-bool AMetaType::toVector4D(void *to, const void *from, const uint32_t fromType) {
+bool AMetaType::toVector4(void *to, const void *from, const uint32_t fromType) {
     PROFILE_FUNCTION()
     bool result     = true;
-    AVector4D *r    = static_cast<AVector4D *>(to);
+    Vector4 *r    = static_cast<Vector4 *>(to);
     switch(fromType) {
-        case Int:   { *r  = AVector4D(*(static_cast<const int *>(from))); } break;
-        case Double:{ *r  = AVector4D(*(static_cast<const double *>(from))); } break;
-        case VariantList: {
+        case INTEGER:{ *r  = Vector4(*(static_cast<const int *>(from))); } break;
+        case DOUBLE: { *r  = Vector4(*(static_cast<const double *>(from))); } break;
+        case VARIANTLIST: {
             const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 4; i++, it++) {
                 (*r)[i] = (*it).toDouble();
             }
         } break;
-        case Vector2D:  { *r = AVector4D(*(static_cast<const AVector2D *>(from)), 0.0, 1.0); } break;
-        case Vector3D:  { *r = AVector4D(*(static_cast<const AVector3D *>(from)), 1.0); } break;
+        case VECTOR2:   { *r = Vector4(*(static_cast<const Vector2 *>(from)), 0.0, 1.0); } break;
+        case VECTOR3:   { *r = Vector4(*(static_cast<const Vector3 *>(from)), 1.0); } break;
         default:    { result    = false; } break;
     }
     return result;
 }
 
-bool AMetaType::toMatrix3D(void *to, const void *from, const uint32_t fromType) {
+bool AMetaType::toMatrix3(void *to, const void *from, const uint32_t fromType) {
     PROFILE_FUNCTION()
     bool result     = true;
-    AMatrix3D *r    = static_cast<AMatrix3D *>(to);
+    Matrix3 *r    = static_cast<Matrix3 *>(to);
     switch(fromType) {
-        case VariantList: {
+        case VARIANTLIST: {
             const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 9; i++, it++) {
@@ -469,12 +469,12 @@ bool AMetaType::toMatrix3D(void *to, const void *from, const uint32_t fromType) 
     return result;
 }
 
-bool AMetaType::toMatrix4D(void *to, const void *from, const uint32_t fromType) {
+bool AMetaType::toMatrix4(void *to, const void *from, const uint32_t fromType) {
     PROFILE_FUNCTION()
     bool result     = true;
-    AMatrix4D *r    = static_cast<AMatrix4D *>(to);
+    Matrix4 *r    = static_cast<Matrix4 *>(to);
     switch(fromType) {
-        case VariantList: {
+        case VARIANTLIST: {
             const AVariantList *list    = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 16; i++, it++) {
@@ -489,16 +489,16 @@ bool AMetaType::toMatrix4D(void *to, const void *from, const uint32_t fromType) 
 bool AMetaType::toQuaternion(void *to, const void *from, const uint32_t fromType) {
     PROFILE_FUNCTION()
     bool result     = true;
-    AQuaternion *r  = static_cast<AQuaternion *>(to);
+    Quaternion *r  = static_cast<Quaternion *>(to);
     switch(fromType) {
-        case VariantList: {
+        case VARIANTLIST: {
             const AVariantList *list  = reinterpret_cast<const AVariantList *>(from);
             auto it = list->begin();
             for(int i = 0; i < 4; i++, it++) {
                 (*r)[i] = (*it).toDouble();
             }
         } break;
-        case Vector3D:  { AMatrix3D m; m.rotate(*(static_cast<const AVector3D *>(from))); *r = AQuaternion(m); } break;
+        case VECTOR3: { Matrix3 m; m.rotate(*(static_cast<const Vector3 *>(from))); *r = Quaternion(m); } break;
         default:    { result    = false; } break;
     }
     return result;

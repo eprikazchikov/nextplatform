@@ -1,6 +1,8 @@
 #include "core/aobjectsystem.h"
 #include "core/auri.h"
 
+#include <mutex>
+
 inline bool operator==(const AObject::Link &left, const AObject::Link &right) {
     bool result = true;
     result &= (left.sender      == right.sender);

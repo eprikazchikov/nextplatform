@@ -1,8 +1,8 @@
-#include "math/amath.h"
+#include "math/math.h"
 
 /*!
-    \class AVector3D
-    \brief The AVector3D class represents a vector or vertex in 3D space.
+    \class Vector3
+    \brief The Vector3 class represents a vector or vertex in 3D space.
     \since Next 1.0
     \inmodule Math
 
@@ -10,21 +10,21 @@
     drawing. They consist of three coordinates, traditionally called
     x, y, and z.
 
-    The AVector3D class can also be used to represent vertices in 3D space.
+    The Vector3 class can also be used to represent vertices in 3D space.
     We therefore do not need to provide a separate vertex class.
 
-    \note By design values in the AVector3D instance are stored as \c float.
-    This means that on platforms where the \c areal arguments to AVector3D
+    \note By design values in the Vector3 instance are stored as \c float.
+    This means that on platforms where the \c areal arguments to Vector3
     functions are represented by \c double values, it is possible to
     lose precision.
 
-    \sa AVector2D, AVector4D, AQuaternion
+    \sa Vector2, Vector4, Quaternion
 */
 
 /*!
     Constructs a null vector, i.e. with coordinates (0, 0, 0).
 */
-AVector3D::AVector3D() :
+Vector3::Vector3() :
     x(0),
     y(0),
     z(0) {
@@ -32,7 +32,7 @@ AVector3D::AVector3D() :
 /*!
     Constructs a vector with coordinates (\a v).
 */
-AVector3D::AVector3D(areal v) :
+Vector3::Vector3(areal v) :
     x(v),
     y(v),
     z(v) {
@@ -40,7 +40,7 @@ AVector3D::AVector3D(areal v) :
 /*!
     Constructs a vector with coordinates (\a x, \a y, \a z).
 */
-AVector3D::AVector3D(areal x, areal y, areal z) :
+Vector3::Vector3(areal x, areal y, areal z) :
     x(x),
     y(y),
     z(z) {
@@ -49,9 +49,9 @@ AVector3D::AVector3D(areal x, areal y, areal z) :
     Constructs a 3D vector from the specified 2D \a v. The z
     coordinate is set to \a z.
 
-    \sa AVector2D::AVector2D()
+    \sa Vector2::Vector2()
 */
-AVector3D::AVector3D(const AVector2D &v, areal z) :
+Vector3::Vector3(const Vector2 &v, areal z) :
     x(v.x),
     y(v.y),
     z(z) {
@@ -59,7 +59,7 @@ AVector3D::AVector3D(const AVector2D &v, areal z) :
 /*!
     Constructs a 3D vector from \a v (areal[3] array).
 */
-AVector3D::AVector3D(const areal *v) :
+Vector3::Vector3(const areal *v) :
     x(v[0]),
     y(v[1]),
     z(v[2]) {
@@ -68,28 +68,28 @@ AVector3D::AVector3D(const areal *v) :
     Returns true if this vector is equal to given \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector3D::operator==(const AVector3D &vector) const {
+bool Vector3::operator==(const Vector3 &vector) const {
     return (x == vector.x) && (y == vector.y) && (z == vector.z);
 }
 /*!
     Returns true if this vector is NOT equal to given \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector3D::operator!=(const AVector3D &vector) const {
+bool Vector3::operator!=(const Vector3 &vector) const {
     return !(*this == vector);
 }
 /*!
     Returns true if this vector is bigger than given \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector3D::operator> (const AVector3D &vector) const {
+bool Vector3::operator> (const Vector3 &vector) const {
     return (x > vector.x) && (y > vector.y) && (z > vector.z);
 }
 /*!
     Returns true if this vector is less than \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector3D::operator< (const AVector3D &vector) const {
+bool Vector3::operator< (const Vector3 &vector) const {
     return (x < vector.x) && (y < vector.y) && (z < vector.z);
 }
 /*!
@@ -97,50 +97,50 @@ bool AVector3D::operator< (const AVector3D &vector) const {
 
     \sa operator*=()
 */
-const AVector3D AVector3D::operator*(areal factor) const {
-    return AVector3D(x * factor, y * factor, z * factor);
+const Vector3 Vector3::operator*(areal factor) const {
+    return Vector3(x * factor, y * factor, z * factor);
 }
 /*!
     Returns a copy of this vector, multiplied by the given \a vector.
 
     \sa operator*=()
 */
-const AVector3D AVector3D::operator*(const AVector3D &vector) const {
-    return AVector3D(x * vector.x, y * vector.y, z * vector.z);
+const Vector3 Vector3::operator*(const Vector3 &vector) const {
+    return Vector3(x * vector.x, y * vector.y, z * vector.z);
 }
 /*!
     Returns a copy of this vector, divided by the given \a divisor.
 
     \sa operator/=()
 */
-const AVector3D AVector3D::operator/(areal divisor) const {
-    return AVector3D(x / divisor, y / divisor, z / divisor);
+const Vector3 Vector3::operator/(areal divisor) const {
+    return Vector3(x / divisor, y / divisor, z / divisor);
 }
 /*!
-    Returns a AVector3D object that is the sum of the this vector and \a vector; each component is added separately.
+    Returns a Vector3 object that is the sum of the this vector and \a vector; each component is added separately.
 
     \sa operator+=()
 */
-const AVector3D AVector3D::operator+(const AVector3D &vector) const {
-    return AVector3D(x + vector.x, y + vector.y, z + vector.z);
+const Vector3 Vector3::operator+(const Vector3 &vector) const {
+    return Vector3(x + vector.x, y + vector.y, z + vector.z);
 }
 /*!
-    Returns a AVector3D object that is formed by changing the sign of
+    Returns a Vector3 object that is formed by changing the sign of
     all three components of the this vector.
 
-    Equivalent to \c {AVector3D(0,0,0) - vector}.
+    Equivalent to \c {Vector3(0,0,0) - vector}.
 */
-const AVector3D AVector3D::operator-() const {
-    return AVector3D(-x, -y, -z);
+const Vector3 Vector3::operator-() const {
+    return Vector3(-x, -y, -z);
 }
 /*!
-    Returns a AVector3D object that is formed by subtracting \a vector from this vector;
+    Returns a Vector3 object that is formed by subtracting \a vector from this vector;
     each component is subtracted separately.
 
     \sa operator-=()
 */
-const AVector3D AVector3D::operator-(const AVector3D &vector) const {
-    return AVector3D(x - vector.x, y - vector.y, z - vector.z);
+const Vector3 Vector3::operator-(const Vector3 &vector) const {
+    return Vector3(x - vector.x, y - vector.y, z - vector.z);
 }
 /*!
     Multiplies this vector's coordinates by the given \a factor, and
@@ -148,7 +148,7 @@ const AVector3D AVector3D::operator-(const AVector3D &vector) const {
 
     \sa operator/=()
 */
-AVector3D &AVector3D::operator*=(areal factor) {
+Vector3 &Vector3::operator*=(areal factor) {
     return *this = *this * factor;
 }
 /*!
@@ -157,7 +157,7 @@ AVector3D &AVector3D::operator*=(areal factor) {
 
     \sa operator*=()
 */
-AVector3D &AVector3D::operator/=(areal divisor) {
+Vector3 &Vector3::operator/=(areal divisor) {
     return *this = *this / divisor;
 }
 /*!
@@ -166,7 +166,7 @@ AVector3D &AVector3D::operator/=(areal divisor) {
 
     \sa operator-=()
 */
-AVector3D &AVector3D::operator+=(const AVector3D &vector) {
+Vector3 &Vector3::operator+=(const Vector3 &vector) {
     return *this = *this + vector;
 }
 /*!
@@ -175,21 +175,21 @@ AVector3D &AVector3D::operator+=(const AVector3D &vector) {
 
     \sa operator+=()
 */
-AVector3D &AVector3D::operator-=(const AVector3D &vector) {
+Vector3 &Vector3::operator-=(const Vector3 &vector) {
     return *this = *this - vector;
 }
 /*!
     Returns the component of the vector at index position i as a modifiable reference.
     \a i must be a valid index position in the vector (i.e., 0 <= i < 3).
 */
-areal &AVector3D::operator[](int i) {
+areal &Vector3::operator[](int i) {
     return v[i];
 }
 /*!
     Returns the component of the vector at index position.
     \a i must be a valid index position in the vector (i.e., 0 <= i < 3).
 */
-const areal AVector3D::operator[](int i) const {
+const areal Vector3::operator[](int i) const {
     return v[i];
 }
 /*!
@@ -197,7 +197,7 @@ const areal AVector3D::operator[](int i) const {
 
     \sa sqrLength()
 */
-areal AVector3D::length() const {
+areal Vector3::length() const {
     return (areal)sqrt(sqrLength());
 }
 /*!
@@ -205,8 +205,8 @@ areal AVector3D::length() const {
 
     \sa length()
 */
-areal AVector3D::sqrLength() const {
-    return x * x + y * y + z * z;
+areal Vector3::sqrLength() const {
+    return dot(*this);
 }
 /*!
     Normalizes the currect vector in place.
@@ -214,7 +214,7 @@ areal AVector3D::sqrLength() const {
 
     \sa length()
 */
-areal AVector3D::normalize() {
+areal Vector3::normalize() {
     areal len = length();
     if (len == 0.0)
         return 0.0;
@@ -227,8 +227,8 @@ areal AVector3D::normalize() {
 
     \sa dot()
 */
-AVector3D AVector3D::cross(const AVector3D &vector) const {
-    return AVector3D(y * vector.z - z * vector.y,
+Vector3 Vector3::cross(const Vector3 &vector) const {
+    return Vector3(y * vector.z - z * vector.y,
                      z * vector.x - x * vector.z,
                      x * vector.y - y * vector.x);
 }
@@ -237,6 +237,6 @@ AVector3D AVector3D::cross(const AVector3D &vector) const {
 
     \sa cross()
 */
-areal AVector3D::dot(const AVector3D &vector) const {
+areal Vector3::dot(const Vector3 &vector) const {
     return x * vector.x + y * vector.y + z * vector.z;
 }

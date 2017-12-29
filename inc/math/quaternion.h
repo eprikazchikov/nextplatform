@@ -22,31 +22,31 @@
 
 #include "acommon.h"
 
-class AVector3D;
-class AMatrix3D;
+class Vector3;
+class Matrix3;
 
-class NEXT_LIBRARY_EXPORT AQuaternion {
+class NEXT_LIBRARY_EXPORT Quaternion {
 public:
-    AQuaternion                 ();
-    AQuaternion                 (const AVector3D &dir, areal angle);
-    AQuaternion                 (const AVector3D &euler);
-    AQuaternion                 (const AMatrix3D &matrix);
+    Quaternion                  ();
+    Quaternion                  (const Vector3 &dir, areal angle);
+    Quaternion                  (const Vector3 &euler);
+    Quaternion                  (const Matrix3 &matrix);
 
-    inline bool                 operator==                  (const AQuaternion &quaternion) const;
-    inline bool                 operator!=                  (const AQuaternion &quaternion) const;
+    inline bool                 operator==                  (const Quaternion &quaternion) const;
+    inline bool                 operator!=                  (const Quaternion &quaternion) const;
 	
-    inline AQuaternion          operator*                   (const AQuaternion &q) const;
-    inline AVector3D            operator*                   (const AVector3D &v) const;
+    inline Quaternion           operator*                   (const Quaternion &quaternion) const;
+    inline Vector3             operator*                   (const Vector3 &vector) const;
 
     areal                      &operator[]                  (int i);
     const areal                 operator[]                  (int i) const;
 	
-    AQuaternion                 inverse                     () const;
+    Quaternion                  inverse                     () const;
 
-    void                        mix                         (const AQuaternion &q0, const AQuaternion &q1, areal t);
+    void                        mix                         (const Quaternion &q0, const Quaternion &q1, areal t);
 	
-    AMatrix3D                   toMatrix                    () const;
-    AVector3D                   euler                       () const;
+    Matrix3                    toMatrix                    () const;
+    Vector3                    euler                       () const;
 	
     union {
         struct {

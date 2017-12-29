@@ -2,7 +2,7 @@
 
 AVariant::Data::Data() {
     PROFILE_FUNCTION()
-    type    = AMetaType::Invalid;
+    type    = AMetaType::INVALID;
     so      = nullptr;
 }
 
@@ -56,34 +56,34 @@ AVariant::AVariant(const AByteArray &value) {
     *this   = fromValue<AByteArray>(value);
 }
 
-AVariant::AVariant(const AVector2D &value) {
+AVariant::AVariant(const Vector2 &value) {
     PROFILE_FUNCTION()
-    *this   = fromValue<AVector2D>(value);
+    *this   = fromValue<Vector2>(value);
 }
 
-AVariant::AVariant(const AVector3D &value) {
+AVariant::AVariant(const Vector3 &value) {
     PROFILE_FUNCTION()
-    *this   = fromValue<AVector3D>(value);
+    *this   = fromValue<Vector3>(value);
 }
 
-AVariant::AVariant(const AVector4D &value) {
+AVariant::AVariant(const Vector4 &value) {
     PROFILE_FUNCTION()
-    *this   = fromValue<AVector4D>(value);
+    *this   = fromValue<Vector4>(value);
 }
 
-AVariant::AVariant(const AQuaternion &value) {
+AVariant::AVariant(const Quaternion &value) {
     PROFILE_FUNCTION()
-    *this   = fromValue<AQuaternion>(value);
+    *this   = fromValue<Quaternion>(value);
 }
 
-AVariant::AVariant(const AMatrix3D &value) {
+AVariant::AVariant(const Matrix3 &value) {
     PROFILE_FUNCTION()
-    *this   = fromValue<AMatrix3D>(value);
+    *this   = fromValue<Matrix3>(value);
 }
 
-AVariant::AVariant(const AMatrix4D &value) {
+AVariant::AVariant(const Matrix4 &value) {
     PROFILE_FUNCTION()
-    *this   = fromValue<AMatrix4D>(value);
+    *this   = fromValue<Matrix4>(value);
 }
 
 AVariant::AVariant(uint32_t type, void *copy) {
@@ -131,7 +131,7 @@ void AVariant::clear() {
 
 uint32_t AVariant::type() const {
     PROFILE_FUNCTION()
-    return (mData.type < AMetaType::UserType) ? mData.type : AMetaType::UserType;
+    return (mData.type < AMetaType::USERTYPE) ? mData.type : AMetaType::USERTYPE;
 }
 
 uint32_t AVariant::userType() const {
@@ -146,7 +146,7 @@ void *AVariant::data() const {
 
 bool AVariant::isValid() const {
     PROFILE_FUNCTION()
-    return (mData.type != AMetaType::Invalid && mData.so);
+    return (mData.type != AMetaType::INVALID && mData.so);
 }
 
 bool AVariant::canConvert(uint32_t type) const {
@@ -192,32 +192,32 @@ const AByteArray AVariant::toByteArray() const {
     return value<AByteArray>();
 }
 
-const AVector2D AVariant::toVector2D() const {
+const Vector2 AVariant::toVector2() const {
     PROFILE_FUNCTION()
-    return value<AVector2D>();
+    return value<Vector2>();
 }
 
-const AVector3D AVariant::toVector3D() const {
+const Vector3 AVariant::toVector3() const {
     PROFILE_FUNCTION()
-    return value<AVector3D>();
+    return value<Vector3>();
 }
 
-const AVector4D AVariant::toVector4D() const {
+const Vector4 AVariant::toVector4() const {
     PROFILE_FUNCTION()
-    return value<AVector4D>();
+    return value<Vector4>();
 }
 
-const AQuaternion AVariant::toQuaternion() const {
+const Quaternion AVariant::toQuaternion() const {
     PROFILE_FUNCTION()
-    return value<AQuaternion>();
+    return value<Quaternion>();
 }
 
-const AMatrix3D AVariant::toMatrix3D() const {
+const Matrix3 AVariant::toMatrix3() const {
     PROFILE_FUNCTION()
-    return value<AMatrix3D>();
+    return value<Matrix3>();
 }
 
-const AMatrix4D AVariant::toMatrix4D() const {
+const Matrix4 AVariant::toMatrix4() const {
     PROFILE_FUNCTION()
-    return value<AMatrix4D>();
+    return value<Matrix4>();
 }

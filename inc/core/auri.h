@@ -1,11 +1,14 @@
 #ifndef AURI_H
 #define AURI_H
 
-#include <regex>
 
-#include <acommon.h>
+#include <string>
+
+#include "acommon.h"
 
 using namespace std;
+
+class AUriPrivate;
 
 class NEXT_LIBRARY_EXPORT AUri {
 public:
@@ -18,11 +21,10 @@ public:
     string                      fragment                    () const;
     string                      name                        () const;
 
-protected:
-    string                      mUri;
+private:
+    friend class AUriPrivate;
 
-    smatch                      mResult;
-
+    AUriPrivate                *p_ptr;
 };
 
 #endif // AURI_H

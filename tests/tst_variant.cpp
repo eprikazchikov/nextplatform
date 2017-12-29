@@ -42,34 +42,34 @@ void VariantTest::Set_Get_Basic_Check() {
 
 void VariantTest::Set_Get_Advanced_Check() {
     {
-        AVector2D vector(1.0f, 2.0f);
+        Vector2 vector(1.0f, 2.0f);
         AVariant value      = vector;
-        QCOMPARE(value.toVector2D(), vector);
+        QCOMPARE(value.toVector2(), vector);
     }
     {
-        AVector3D vector(1.0f, 2.0f, 3.0f);
+        Vector3 vector(1.0f, 2.0f, 3.0f);
         AVariant value      = vector;
-        QCOMPARE(value.toVector3D(), vector);
+        QCOMPARE(value.toVector3(), vector);
     }
     {
-        AVector4D vector(1.0f, 2.0f, 3.0f, 4.0f);
+        Vector4 vector(1.0f, 2.0f, 3.0f, 4.0f);
         AVariant value      = vector;
-        QCOMPARE(value.toVector4D(), vector);
+        QCOMPARE(value.toVector4(), vector);
     }
     {
-        AQuaternion quaternion(AVector3D(1.0f, 2.0f, 3.0f), 4.0f);
+        Quaternion quaternion(Vector3(1.0f, 2.0f, 3.0f), 4.0f);
         AVariant value      = quaternion;
         QCOMPARE(value.toQuaternion(), quaternion);
     }
     {
-        AMatrix3D matrix    = AMatrix3D();
+        Matrix3 matrix    = Matrix3();
         AVariant value      = matrix;
-        QCOMPARE(value.toMatrix3D(), matrix);
+        QCOMPARE(value.toMatrix3(), matrix);
     }
     {
-        AMatrix4D matrix;
+        Matrix4 matrix;
         AVariant value      = matrix;
-        QCOMPARE(value.toMatrix4D(),    matrix);
+        QCOMPARE(value.toMatrix4(),    matrix);
     }
 }
 

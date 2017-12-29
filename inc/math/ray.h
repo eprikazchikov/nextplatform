@@ -24,25 +24,24 @@
 
 #include "vector3.h"
 
-class APlane;
-class AABox;
+class Plane;
+class AABBox;
 
-class NEXT_LIBRARY_EXPORT ARay {
+class NEXT_LIBRARY_EXPORT Ray {
 public:
-    ARay                        ();
-    ARay                        (const AVector3D &p, const AVector3D &d);
+    Ray                        (const Vector3 &position, const Vector3 &direction);
 
-    bool                        intersect                   (const AVector3D &p, areal r, AVector3D *pt);
-    bool                        intersect                   (const APlane &p, AVector3D *pt, bool back = false);
-    bool                        intersect                   (const AABox &b, AVector3D *pt);
-    bool                        intersect                   (const AVector3D &v1, const AVector3D &v2, const AVector3D &v3, AVector3D *pt, bool back = false);
+    bool                        intersect                   (const Vector3 &position, areal radius, Vector3 *pt);
+    bool                        intersect                   (const Plane &plane, Vector3 *pt, bool back = false);
+    bool                        intersect                   (const AABBox &box, Vector3 *pt);
+    bool                        intersect                   (const Vector3 &v1, const Vector3 &v2, const Vector3 &v3, Vector3 *pt, bool back = false);
 
-    ARay                        reflect                     (const AVector3D &n, const AVector3D &p);
-    ARay                        refract                     (const AVector3D &n, const AVector3D &p, areal c0, areal c1);
-    ARay                        diffuse                     (const AVector3D &n, const AVector3D &p, areal min, areal max);
+    Ray                        reflect                     (const Vector3 &normal, const Vector3 &point);
+    Ray                        refract                     (const Vector3 &normal, const Vector3 &point, areal ior);
+    Ray                        diffuse                     (const Vector3 &normal, const Vector3 &point, areal min, areal max);
 
-    AVector3D                   pos;
-    AVector3D                   dir;
+    Vector3                    pos;
+    Vector3                    dir;
 };
 
 #endif // RAY_H_HEADER_INCLUDED

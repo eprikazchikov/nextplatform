@@ -1,4 +1,4 @@
-#include "math/amath.h"
+#include "math/math.h"
 
 /*!
     \module Math
@@ -8,7 +8,7 @@
     \brief Contains classes for math operations.
 */
 
-namespace amath {
+namespace math {
     int gausianKernel(areal radius, areal *samples, uint8_t maxSamples) {
         if(samples) {
             int32_t integerRadius   = maxSamples - 1;

@@ -27,7 +27,7 @@
 
 #include "acommon.h"
 
-#include "math/amath.h"
+#include "math/math.h"
 #include "ametatype.h"
 
 using namespace std;
@@ -59,12 +59,12 @@ public:
     AVariant                    (const AVariantList &value);
     AVariant                    (const AByteArray &value);
 
-    AVariant                    (const AVector2D &value);
-    AVariant                    (const AVector3D &value);
-    AVariant                    (const AVector4D &value);
-    AVariant                    (const AQuaternion &value);
-    AVariant                    (const AMatrix3D &value);
-    AVariant                    (const AMatrix4D &value);
+    AVariant                    (const Vector2 &value);
+    AVariant                    (const Vector3 &value);
+    AVariant                    (const Vector4 &value);
+    AVariant                    (const Quaternion &value);
+    AVariant                    (const Matrix3 &value);
+    AVariant                    (const Matrix4 &value);
 
     AVariant                    (uint32_t type, void *copy);
 
@@ -115,7 +115,7 @@ public:
     static AVariant             fromValue                   (const T &value) {
         AVariant result;
         result.mData.type   = AMetaType::type<T>();
-        if(result.mData.type != AMetaType::Invalid) {
+        if(result.mData.type != AMetaType::INVALID) {
             result.mData.so = AMetaType::create(result.mData.type, reinterpret_cast<const void *>(&value));
         }
         return result;
@@ -131,12 +131,12 @@ public:
     const AVariantList          toList                      () const;
     const AByteArray            toByteArray                 () const;
 
-    const AVector2D             toVector2D                  () const;
-    const AVector3D             toVector3D                  () const;
-    const AVector4D             toVector4D                  () const;
-    const AQuaternion           toQuaternion                () const;
-    const AMatrix3D             toMatrix3D                  () const;
-    const AMatrix4D             toMatrix4D                  () const;
+    const Vector2             toVector2                  () const;
+    const Vector3             toVector3                  () const;
+    const Vector4             toVector4                  () const;
+    const Quaternion           toQuaternion                () const;
+    const Matrix3             toMatrix3                  () const;
+    const Matrix4             toMatrix4                  () const;
 
 protected:
     Data                        mData;

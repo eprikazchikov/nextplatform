@@ -1,128 +1,196 @@
-#include "math/amath.h"
+#include "math/math.h"
 
-AMatrix4D::AMatrix4D() {
+/*!
+    \class Matrix3
+    \brief The Matrix4 class represents a 4x4 transform matrix in 3D space.
+    \since Next 1.0
+    \inmodule Math
+
+    Internally the data is stored as column-major format,
+    so as to be optimal for passing to OpenGL functions, which expect \b column-major data.
+
+    \sa Vector3, Vector4, Quaternion, Matrix3
+*/
+/*!
+    Constructs an identity matrix.
+*/
+Matrix4::Matrix4() {
     identity();
 }
-
-AMatrix4D::AMatrix4D(const AMatrix3D &m) {
-    mat[0] = m[0]; mat[4] = m[3]; mat[ 8] = m[6]; mat[12] = 0.0;
-    mat[1] = m[1]; mat[5] = m[4]; mat[ 9] = m[7]; mat[13] = 0.0;
-    mat[2] = m[2]; mat[6] = m[5]; mat[10] = m[8]; mat[14] = 0.0;
-    mat[3] = 0.0;  mat[7] = 0.0;  mat[11] = 0.0;  mat[15] = 1.0;
+/*!
+    Constructs a transform matrix with rotation \a matrix.
+*/
+Matrix4::Matrix4(const Matrix3 &matrix) {
+    mat[0] = matrix[0]; mat[4] = matrix[3]; mat[ 8] = matrix[6]; mat[12] = 0.0;
+    mat[1] = matrix[1]; mat[5] = matrix[4]; mat[ 9] = matrix[7]; mat[13] = 0.0;
+    mat[2] = matrix[2]; mat[6] = matrix[5]; mat[10] = matrix[8]; mat[14] = 0.0;
+    mat[3] = 0.0;       mat[7] = 0.0;       mat[11] = 0.0;       mat[15] = 1.0;
 }
-
-bool AMatrix4D::operator==(const AMatrix4D &v) const {
+/*!
+    Returns true if this matrix is equal to given \a matrix; otherwise returns false.
+    This operator uses an exact floating-point comparison.
+*/
+bool Matrix4::operator==(const Matrix4 &vector) const {
     for(int i = 0; i < 16; i++) {
-        if(mat[i] != v.mat[i]) {
+        if(mat[i] != vector.mat[i]) {
             return false;
         }
     }
     return true;
 }
-bool AMatrix4D::operator!=(const AMatrix4D &v) const {
-    return !(*this == v);
+/*!
+    Returns true if this matrix is NOT equal to given \a matrix; otherwise returns false.
+    This operator uses an exact floating-point comparison.
+*/
+bool Matrix4::operator!=(const Matrix4 &vector) const {
+    return !(*this == vector);
 }
+/*!
+    Returns the result of multiplying this matrix and the given 3D \a vector.
+*/
+const Vector3 Matrix4::operator*(const Vector3 &vector) const {
+    Vector3 ret;
+    ret[0] = mat[0] * vector[0] + mat[4] * vector[1] + mat[ 8] * vector[2] + mat[12];
+    ret[1] = mat[1] * vector[0] + mat[5] * vector[1] + mat[ 9] * vector[2] + mat[13];
+    ret[2] = mat[2] * vector[0] + mat[6] * vector[1] + mat[10] * vector[2] + mat[14];
+    return ret;
+}
+/*!
+    Returns the result of multiplying this matrix and the given 4D \a vector.
+*/
+const Vector4 Matrix4::operator*(const Vector4 &vector) const {
+    Vector4 ret;
+    ret[0] = mat[0] * vector[0] + mat[4] * vector[1] + mat[8]  * vector[2] + mat[12] * vector[3];
+    ret[1] = mat[1] * vector[0] + mat[5] * vector[1] + mat[9]  * vector[2] + mat[13] * vector[3];
+    ret[2] = mat[2] * vector[0] + mat[6] * vector[1] + mat[10] * vector[2] + mat[14] * vector[3];
+    ret[3] = mat[3] * vector[0] + mat[7] * vector[1] + mat[11] * vector[2] + mat[15] * vector[3];
+    return ret;
+}
+/*!
+    Returns the result of multiplying this matrix and the given \a factor.
+*/
+const Matrix4 Matrix4::operator*(areal factor) const {
+    Matrix4 ret;
+    ret[0] = mat[0] * factor; ret[4] = mat[4] * factor; ret[8]  = mat[8]  * factor; ret[12] = mat[12] * factor;
+    ret[1] = mat[1] * factor; ret[5] = mat[5] * factor; ret[9]  = mat[9]  * factor; ret[13] = mat[13] * factor;
+    ret[2] = mat[2] * factor; ret[6] = mat[6] * factor; ret[10] = mat[10] * factor; ret[14] = mat[14] * factor;
+    ret[3] = mat[3] * factor; ret[7] = mat[7] * factor; ret[11] = mat[11] * factor; ret[15] = mat[15] * factor;
+    return ret;
+}
+/*!
+    Returns the result of multiplying this matrix by the given \a matrix.
 
-const AVector3D AMatrix4D::operator*(const AVector3D &v) const {
-    AVector3D ret;
-    ret[0] = mat[0] * v[0] + mat[4] * v[1] + mat[ 8] * v[2] + mat[12];
-    ret[1] = mat[1] * v[0] + mat[5] * v[1] + mat[ 9] * v[2] + mat[13];
-    ret[2] = mat[2] * v[0] + mat[6] * v[1] + mat[10] * v[2] + mat[14];
+    Note that matrix multiplication is not commutative, i.e. a*b != b*a.
+*/
+const Matrix4 Matrix4::operator*(const Matrix4 &matrix) const {
+    Matrix4 ret;
+    ret[0]  = mat[0] * matrix[0]  + mat[4] * matrix[1]  + mat[8]  * matrix[2]  + mat[12] * matrix[3];
+    ret[1]  = mat[1] * matrix[0]  + mat[5] * matrix[1]  + mat[9]  * matrix[2]  + mat[13] * matrix[3];
+    ret[2]  = mat[2] * matrix[0]  + mat[6] * matrix[1]  + mat[10] * matrix[2]  + mat[14] * matrix[3];
+    ret[3]  = mat[3] * matrix[0]  + mat[7] * matrix[1]  + mat[11] * matrix[2]  + mat[15] * matrix[3];
+    ret[4]  = mat[0] * matrix[4]  + mat[4] * matrix[5]  + mat[8]  * matrix[6]  + mat[12] * matrix[7];
+    ret[5]  = mat[1] * matrix[4]  + mat[5] * matrix[5]  + mat[9]  * matrix[6]  + mat[13] * matrix[7];
+    ret[6]  = mat[2] * matrix[4]  + mat[6] * matrix[5]  + mat[10] * matrix[6]  + mat[14] * matrix[7];
+    ret[7]  = mat[3] * matrix[4]  + mat[7] * matrix[5]  + mat[11] * matrix[6]  + mat[15] * matrix[7];
+    ret[8]  = mat[0] * matrix[8]  + mat[4] * matrix[9]  + mat[8]  * matrix[10] + mat[12] * matrix[11];
+    ret[9]  = mat[1] * matrix[8]  + mat[5] * matrix[9]  + mat[9]  * matrix[10] + mat[13] * matrix[11];
+    ret[10] = mat[2] * matrix[8]  + mat[6] * matrix[9]  + mat[10] * matrix[10] + mat[14] * matrix[11];
+    ret[11] = mat[3] * matrix[8]  + mat[7] * matrix[9]  + mat[11] * matrix[10] + mat[15] * matrix[11];
+    ret[12] = mat[0] * matrix[12] + mat[4] * matrix[13] + mat[8]  * matrix[14] + mat[12] * matrix[15];
+    ret[13] = mat[1] * matrix[12] + mat[5] * matrix[13] + mat[9]  * matrix[14] + mat[13] * matrix[15];
+    ret[14] = mat[2] * matrix[12] + mat[6] * matrix[13] + mat[10] * matrix[14] + mat[14] * matrix[15];
+    ret[15] = mat[3] * matrix[12] + mat[7] * matrix[13] + mat[11] * matrix[14] + mat[15] * matrix[15];
     return ret;
 }
-const AVector4D AMatrix4D::operator*(const AVector4D &v) const {
-    AVector4D ret;
-    ret[0] = mat[0] * v[0] + mat[4] * v[1] + mat[8] * v[2] + mat[12] * v[3];
-    ret[1] = mat[1] * v[0] + mat[5] * v[1] + mat[9] * v[2] + mat[13] * v[3];
-    ret[2] = mat[2] * v[0] + mat[6] * v[1] + mat[10] * v[2] + mat[14] * v[3];
-    ret[3] = mat[3] * v[0] + mat[7] * v[1] + mat[11] * v[2] + mat[15] * v[3];
+/*!
+    Returns the sum of this matrix and the given \a matrix.
+*/
+const Matrix4 Matrix4::operator+(const Matrix4 &matrix) const {
+    Matrix4 ret;
+    ret[0] = mat[0] + matrix[0]; ret[4] = mat[4] + matrix[4]; ret[8]  = mat[8]  + matrix[8];  ret[12] = mat[12] + matrix[12];
+    ret[1] = mat[1] + matrix[1]; ret[5] = mat[5] + matrix[5]; ret[9]  = mat[9]  + matrix[9];  ret[13] = mat[13] + matrix[13];
+    ret[2] = mat[2] + matrix[2]; ret[6] = mat[6] + matrix[6]; ret[10] = mat[10] + matrix[10]; ret[14] = mat[14] + matrix[14];
+    ret[3] = mat[3] + matrix[3]; ret[7] = mat[7] + matrix[7]; ret[11] = mat[11] + matrix[11]; ret[15] = mat[15] + matrix[15];
     return ret;
 }
-const AMatrix4D AMatrix4D::operator*(areal f) const {
-    AMatrix4D ret;
-    ret[0] = mat[0] * f; ret[4] = mat[4] * f; ret[8] = mat[8] * f; ret[12] = mat[12] * f;
-    ret[1] = mat[1] * f; ret[5] = mat[5] * f; ret[9] = mat[9] * f; ret[13] = mat[13] * f;
-    ret[2] = mat[2] * f; ret[6] = mat[6] * f; ret[10] = mat[10] * f; ret[14] = mat[14] * f;
-    ret[3] = mat[3] * f; ret[7] = mat[7] * f; ret[11] = mat[11] * f; ret[15] = mat[15] * f;
+/*!
+    Returns the difference of this matrix and the given \a matrix.
+*/
+const Matrix4 Matrix4::operator-(const Matrix4 &matrix) const {
+    Matrix4 ret;
+    ret[0] = mat[0] - matrix[0]; ret[4] = mat[4] - matrix[4]; ret[8]  = mat[8]  - matrix[8];  ret[12] = mat[12] - matrix[12];
+    ret[1] = mat[1] - matrix[1]; ret[5] = mat[5] - matrix[5]; ret[9]  = mat[9]  - matrix[9];  ret[13] = mat[13] - matrix[13];
+    ret[2] = mat[2] - matrix[2]; ret[6] = mat[6] - matrix[6]; ret[10] = mat[10] - matrix[10]; ret[14] = mat[14] - matrix[14];
+    ret[3] = mat[3] - matrix[3]; ret[7] = mat[7] - matrix[7]; ret[11] = mat[11] - matrix[11]; ret[15] = mat[15] - matrix[15];
     return ret;
 }
-const AMatrix4D AMatrix4D::operator*(const AMatrix4D &m) const {
-    AMatrix4D ret;
-    ret[0] = mat[0] * m[0] + mat[4] * m[1] + mat[8] * m[2] + mat[12] * m[3];
-    ret[1] = mat[1] * m[0] + mat[5] * m[1] + mat[9] * m[2] + mat[13] * m[3];
-    ret[2] = mat[2] * m[0] + mat[6] * m[1] + mat[10] * m[2] + mat[14] * m[3];
-    ret[3] = mat[3] * m[0] + mat[7] * m[1] + mat[11] * m[2] + mat[15] * m[3];
-    ret[4] = mat[0] * m[4] + mat[4] * m[5] + mat[8] * m[6] + mat[12] * m[7];
-    ret[5] = mat[1] * m[4] + mat[5] * m[5] + mat[9] * m[6] + mat[13] * m[7];
-    ret[6] = mat[2] * m[4] + mat[6] * m[5] + mat[10] * m[6] + mat[14] * m[7];
-    ret[7] = mat[3] * m[4] + mat[7] * m[5] + mat[11] * m[6] + mat[15] * m[7];
-    ret[8] = mat[0] * m[8] + mat[4] * m[9] + mat[8] * m[10] + mat[12] * m[11];
-    ret[9] = mat[1] * m[8] + mat[5] * m[9] + mat[9] * m[10] + mat[13] * m[11];
-    ret[10] = mat[2] * m[8] + mat[6] * m[9] + mat[10] * m[10] + mat[14] * m[11];
-    ret[11] = mat[3] * m[8] + mat[7] * m[9] + mat[11] * m[10] + mat[15] * m[11];
-    ret[12] = mat[0] * m[12] + mat[4] * m[13] + mat[8] * m[14] + mat[12] * m[15];
-    ret[13] = mat[1] * m[12] + mat[5] * m[13] + mat[9] * m[14] + mat[13] * m[15];
-    ret[14] = mat[2] * m[12] + mat[6] * m[13] + mat[10] * m[14] + mat[14] * m[15];
-    ret[15] = mat[3] * m[12] + mat[7] * m[13] + mat[11] * m[14] + mat[15] * m[15];
-    return ret;
+/*!
+    Multiplies all elements of this matrix by \a factor.
+*/
+Matrix4 &Matrix4::operator*=(areal factor) {
+    return *this = *this * factor;
 }
-const AMatrix4D AMatrix4D::operator+(const AMatrix4D &m) const {
-    AMatrix4D ret;
-    ret[0] = mat[0] + m[0]; ret[4] = mat[4] + m[4]; ret[8] = mat[8] + m[8]; ret[12] = mat[12] + m[12];
-    ret[1] = mat[1] + m[1]; ret[5] = mat[5] + m[5]; ret[9] = mat[9] + m[9]; ret[13] = mat[13] + m[13];
-    ret[2] = mat[2] + m[2]; ret[6] = mat[6] + m[6]; ret[10] = mat[10] + m[10]; ret[14] = mat[14] + m[14];
-    ret[3] = mat[3] + m[3]; ret[7] = mat[7] + m[7]; ret[11] = mat[11] + m[11]; ret[15] = mat[15] + m[15];
-    return ret;
+/*!
+    Returns the result of multiplying this matrix by the given \a matrix.
+*/
+Matrix4 &Matrix4::operator*=(const Matrix4 &matrix) {
+    return *this = *this * matrix;
 }
-const AMatrix4D AMatrix4D::operator-(const AMatrix4D &m) const {
-    AMatrix4D ret;
-    ret[0] = mat[0] - m[0]; ret[4] = mat[4] - m[4]; ret[8] = mat[8] - m[8]; ret[12] = mat[12] - m[12];
-    ret[1] = mat[1] - m[1]; ret[5] = mat[5] - m[5]; ret[9] = mat[9] - m[9]; ret[13] = mat[13] - m[13];
-    ret[2] = mat[2] - m[2]; ret[6] = mat[6] - m[6]; ret[10] = mat[10] - m[10]; ret[14] = mat[14] - m[14];
-    ret[3] = mat[3] - m[3]; ret[7] = mat[7] - m[7]; ret[11] = mat[11] - m[11]; ret[15] = mat[15] - m[15];
-    return ret;
+/*!
+    Adds the contents of \a matrix to this matrix.
+*/
+Matrix4 &Matrix4::operator+=(const Matrix4 &matrix) {
+    return *this = *this + matrix;
 }
-
-AMatrix4D &AMatrix4D::operator*=(areal f) {
-    return *this = *this * f;
+/*!
+    Subtracts the contents of \a matrix from this matrix.
+*/
+Matrix4 &Matrix4::operator-=(const Matrix4 &matrix) {
+    return *this = *this - matrix;
 }
-AMatrix4D &AMatrix4D::operator*=(const AMatrix4D &m) {
-    return *this = *this * m;
-}
-AMatrix4D &AMatrix4D::operator+=(const AMatrix4D &m) {
-    return *this = *this + m;
-}
-AMatrix4D &AMatrix4D::operator-=(const AMatrix4D &m) {
-    return *this = *this - m;
-}
-
-areal &AMatrix4D::operator[](int i) {
+/*!
+    Returns the component of the matrix at index position i as a modifiable reference.
+    \a i must be a valid index position in the matrix (i.e., 0 <= i < 16).
+    Data is stored as column-major format so this function retrieving data from rows in colmns.
+*/
+areal &Matrix4::operator[](int i) {
     return mat[i];
 }
-const areal AMatrix4D::operator[](int i) const {
+/*!
+    Returns the component of the matrix at index position.
+    \a i must be a valid index position in the matrix (i.e., 0 <= i < 16).
+    Data is stored as column-major format so this function retrieving data from rows in colmns.
+*/
+const areal Matrix4::operator[](int i) const {
     return mat[i];
 }
-
-AMatrix3D AMatrix4D::rotation() const {
-    AMatrix3D ret;
+/*!
+    Returns rotation matrix from this matrix.
+*/
+Matrix3 Matrix4::rotation() const {
+    Matrix3 ret;
     ret[0] = mat[0]; ret[3] = mat[4]; ret[6] = mat[ 8];
     ret[1] = mat[1]; ret[4] = mat[5]; ret[7] = mat[ 9];
     ret[2] = mat[2]; ret[5] = mat[6]; ret[8] = mat[10];
     return ret;
 }
-
-AMatrix4D AMatrix4D::transpose() const {
-    AMatrix4D ret;
-    ret[0] = mat[0]; ret[4] = mat[1]; ret[8] = mat[2]; ret[12] = mat[3];
-    ret[1] = mat[4]; ret[5] = mat[5]; ret[9] = mat[6]; ret[13] = mat[7];
-    ret[2] = mat[8]; ret[6] = mat[9]; ret[10] = mat[10]; ret[14] = mat[11];
+/*!
+    Returns this matrix, transposed about its diagonal.
+*/
+Matrix4 Matrix4::transpose() const {
+    Matrix4 ret;
+    ret[0] = mat[0];  ret[4] = mat[1];  ret[8]  = mat[2];  ret[12] = mat[3];
+    ret[1] = mat[4];  ret[5] = mat[5];  ret[9]  = mat[6];  ret[13] = mat[7];
+    ret[2] = mat[8];  ret[6] = mat[9];  ret[10] = mat[10]; ret[14] = mat[11];
     ret[3] = mat[12]; ret[7] = mat[13]; ret[11] = mat[14]; ret[15] = mat[15];
     return ret;
 }
-
-areal AMatrix4D::determinant() const {
+/*!
+    Returns the matrix determinant.
+*/
+areal Matrix4::determinant() const {
     areal det;
-    det = mat[0] * mat[5] * mat[10];
+    det  = mat[0] * mat[5] * mat[10];
     det += mat[4] * mat[9] * mat[2];
     det += mat[8] * mat[1] * mat[6];
     det -= mat[8] * mat[5] * mat[2];
@@ -130,21 +198,23 @@ areal AMatrix4D::determinant() const {
     det -= mat[0] * mat[9] * mat[6];
     return det;
 }
-
-AMatrix4D AMatrix4D::inverse() const {
-    AMatrix4D ret;
+/*!
+    Returns an inverted copy of this matrix.
+*/
+Matrix4 Matrix4::inverse() const {
+    Matrix4 ret;
     areal idet = 1.0f / determinant();
-    ret[0] =  (mat[5] * mat[10] - mat[9] * mat[6]) * idet;
-    ret[1] = -(mat[1] * mat[10] - mat[9] * mat[2]) * idet;
-    ret[2] =  (mat[1] * mat[6] - mat[5] * mat[2]) * idet;
-    ret[3] = 0.0;
-    ret[4] = -(mat[4] * mat[10] - mat[8] * mat[6]) * idet;
-    ret[5] =  (mat[0] * mat[10] - mat[8] * mat[2]) * idet;
-    ret[6] = -(mat[0] * mat[6] - mat[4] * mat[2]) * idet;
-    ret[7] = 0.0;
-    ret[8] =  (mat[4] * mat[9] - mat[8] * mat[5]) * idet;
-    ret[9] = -(mat[0] * mat[9] - mat[8] * mat[1]) * idet;
-    ret[10] =  (mat[0] * mat[5] - mat[4] * mat[1]) * idet;
+    ret[0]  =  (mat[5] * mat[10] - mat[9] * mat[6]) * idet;
+    ret[1]  = -(mat[1] * mat[10] - mat[9] * mat[2]) * idet;
+    ret[2]  =  (mat[1] * mat[6]  - mat[5] * mat[2]) * idet;
+    ret[3]  = 0.0;
+    ret[4]  = -(mat[4] * mat[10] - mat[8] * mat[6]) * idet;
+    ret[5]  =  (mat[0] * mat[10] - mat[8] * mat[2]) * idet;
+    ret[6]  = -(mat[0] * mat[6]  - mat[4] * mat[2]) * idet;
+    ret[7]  = 0.0;
+    ret[8]  =  (mat[4] * mat[9]  - mat[8] * mat[5]) * idet;
+    ret[9]  = -(mat[0] * mat[9]  - mat[8] * mat[1]) * idet;
+    ret[10] =  (mat[0] * mat[5]  - mat[4] * mat[1]) * idet;
     ret[11] = 0.0;
     ret[12] = -(mat[12] * ret[0] + mat[13] * ret[4] + mat[14] * ret[8]);
     ret[13] = -(mat[12] * ret[1] + mat[13] * ret[5] + mat[14] * ret[9]);
@@ -152,52 +222,68 @@ AMatrix4D AMatrix4D::inverse() const {
     ret[15] = 1.0;
     return ret;
 }
-
-void AMatrix4D::zero() {
+/*!
+    Clear this matrix, with 0.0 value for all components.
+*/
+void Matrix4::zero() {
     mat[0] = 0.0; mat[4] = 0.0; mat[8 ] = 0.0; mat[12] = 0.0;
     mat[1] = 0.0; mat[5] = 0.0; mat[9 ] = 0.0; mat[13] = 0.0;
     mat[2] = 0.0; mat[6] = 0.0; mat[10] = 0.0; mat[14] = 0.0;
     mat[3] = 0.0; mat[7] = 0.0; mat[11] = 0.0; mat[15] = 0.0;
 }
-
-void AMatrix4D::identity() {
+/*!
+    Resets this matrix to an identity matrix.
+*/
+void Matrix4::identity() {
     mat[0] = 1.0; mat[4] = 0.0; mat[8 ] = 0.0; mat[12] = 0.0;
     mat[1] = 0.0; mat[5] = 1.0; mat[9 ] = 0.0; mat[13] = 0.0;
     mat[2] = 0.0; mat[6] = 0.0; mat[10] = 1.0; mat[14] = 0.0;
     mat[3] = 0.0; mat[7] = 0.0; mat[11] = 0.0; mat[15] = 1.0;
 }
-
-void AMatrix4D::rotate(const AVector3D &v, areal angle) {
-    AMatrix3D m;
-    m.rotate(v, angle);
+/*!
+    Rotate this matrix around \a axis to \a angle in degrees.
+*/
+void Matrix4::rotate(const Vector3 &axis, areal angle) {
+    Matrix3 m;
+    m.rotate(axis, angle);
     *this   = m;
 }
-
-void AMatrix4D::rotate(const AVector3D &angles) {
-    AMatrix3D m;
+/*!
+    Rotate this matrix with Euler \a angles represented by Vector3(pitch, yaw, roll) in degrees.
+*/
+void Matrix4::rotate(const Vector3 &angles) {
+    Matrix3 m;
     m.rotate(angles);
     *this   = m;
 }
-
-void AMatrix4D::scale(const AVector3D &v) {
-    mat[0] = v.x; mat[4] = 0.0; mat[8] = 0.0; mat[12] = 0.0;
-    mat[1] = 0.0; mat[5] = v.y; mat[9] = 0.0; mat[13] = 0.0;
-    mat[2] = 0.0; mat[6] = 0.0; mat[10] = v.z; mat[14] = 0.0;
+/*!
+    Scales the coordinate system by \a vector.
+*/
+void Matrix4::scale(const Vector3 &vector) {
+    mat[0] = vector.x;  mat[4] = 0.0;       mat[8]  = 0.0;      mat[12] = 0.0;
+    mat[1] = 0.0;       mat[5] = vector.y;  mat[9]  = 0.0;      mat[13] = 0.0;
+    mat[2] = 0.0;       mat[6] = 0.0;       mat[10] = vector.z; mat[14] = 0.0;
+    mat[3] = 0.0;       mat[7] = 0.0;       mat[11] = 0.0;      mat[15] = 1.0;
+}
+/*!
+    Move the coordinate system to \a vector.
+*/
+void Matrix4::translate(const Vector3 &vector) {
+    mat[0] = 1.0; mat[4] = 0.0; mat[8]  = 0.0; mat[12] = vector.x;
+    mat[1] = 0.0; mat[5] = 1.0; mat[9]  = 0.0; mat[13] = vector.y;
+    mat[2] = 0.0; mat[6] = 0.0; mat[10] = 1.0; mat[14] = vector.z;
     mat[3] = 0.0; mat[7] = 0.0; mat[11] = 0.0; mat[15] = 1.0;
 }
-
-void AMatrix4D::translate(const AVector3D &v) {
-    mat[0] = 1.0; mat[4] = 0.0; mat[8] = 0.0; mat[12] = v.x;
-    mat[1] = 0.0; mat[5] = 1.0; mat[9] = 0.0; mat[13] = v.y;
-    mat[2] = 0.0; mat[6] = 0.0; mat[10] = 1.0; mat[14] = v.z;
-    mat[3] = 0.0; mat[7] = 0.0; mat[11] = 0.0; mat[15] = 1.0;
-}
-
-AVector3D AMatrix4D::euler() {
+/*!
+    Returns an Euler angles represented by Vector3(pitch, yaw, roll) in rotation degrees.
+*/
+Vector3 Matrix4::euler() {
     return rotation().euler();
 }
-
-void AMatrix4D::reflect(const AVector4D &plane) {
+/*!
+    Constructs a matrix that reflects the coordinate system about a plane.
+*/
+void Matrix4::reflect(const Vector4 &plane) {
     areal x = plane.x;
     areal y = plane.y;
     areal z = plane.z;
@@ -209,13 +295,15 @@ void AMatrix4D::reflect(const AVector4D &plane) {
     mat[2] = -x * z2;       mat[6] = -y * z2;       mat[10] = 1.0f - z * z2;    mat[14] = -plane.w * z2;
     mat[3] = 0.0;           mat[7] = 0.0;           mat[11] = 0.0;              mat[15] = 1.0;
 }
-
-void AMatrix4D::direction(const AVector3D &dir, AVector3D &up) {
-    AVector3D z = dir;
+/*!
+    Creates a rotation matrix based on \a direction and \a up vectors.
+*/
+void Matrix4::direction(const Vector3 &direction, Vector3 &up) {
+    Vector3 z = direction;
     z.normalize();
-    AVector3D x = up.cross(z);
+    Vector3 x = up.cross(z);
     x.normalize();
-    AVector3D y = z.cross(x);
+    Vector3 y = z.cross(x);
     y.normalize();
 
     mat[0 ] = x.x; mat[4 ] = x.y; mat[8 ] = x.z; mat[12] = 0.0;
@@ -223,8 +311,12 @@ void AMatrix4D::direction(const AVector3D &dir, AVector3D &up) {
     mat[2 ] = z.x; mat[6 ] = z.y; mat[10] = z.z; mat[14] = 0.0;
     mat[3 ] = 0.0; mat[7 ] = 0.0; mat[11] = 0.0; mat[15] = 1.0;
 }
-
-void AMatrix4D::perspective(areal fov, areal aspect, areal znear, areal zfar) {
+/*!
+    Creates a perspective projection matrix.
+    \a fov is the vertical field-of-view in degrees of the perspective matrix,
+    \a aspect is the aspect ratio (width divided by height). \a znear and \a zfar set up the depth clipping planes.
+*/
+void Matrix4::perspective(areal fov, areal aspect, areal znear, areal zfar) {
     float sine, cotangent, deltaZ;
     float radians   = fov / 2 * DEG2RAD;
 
@@ -241,8 +333,11 @@ void AMatrix4D::perspective(areal fov, areal aspect, areal znear, areal zfar) {
     mat[14]         = -(2.0 * zfar * znear) / (zfar - znear);
     mat[15]         = 0;
 }
-
-void AMatrix4D::ortho(areal left, areal right, areal bottom, areal top, areal znear, areal zfar) {
+/*!
+    Creates an orthogonal projection matrix.
+    Creates a view showing the area between \a left, \a right, \a top and \a bottom, with \a znear and \a zfar set up the depth clipping planes.
+*/
+void Matrix4::ortho(areal left, areal right, areal bottom, areal top, areal znear, areal zfar) {
     //identity();
 
     mat[0]          =  2.0f / (right - left);
@@ -252,12 +347,14 @@ void AMatrix4D::ortho(areal left, areal right, areal bottom, areal top, areal zn
     mat[13]         = -((top + bottom) / (top - bottom));
     mat[14]         = -((zfar + znear) / (zfar - znear));
 }
-
-void AMatrix4D::lookAt(AVector3D &eye, AVector3D &target, AVector3D &up) {
-    AMatrix4D m0, m1;
+/*!
+    Creates a transformation matrix that corresponds to a camera viewing the target from the source.
+    Receiving \a eye point, a \a target point, and an \a up vector.
+*/
+void Matrix4::lookAt(Vector3 &eye, Vector3 &target, Vector3 &up) {
+    Matrix4 m0, m1;
 
     m0.direction(eye - target, up);
-
     m1.translate(-eye);
     *this = m0 * m1;
 }

@@ -24,24 +24,24 @@
 
 #include "vector3.h"
 
-class AMatrix4D;
+class Matrix4;
 
-class NEXT_LIBRARY_EXPORT AABox {
+class NEXT_LIBRARY_EXPORT AABBox {
 public:
-    AABox                       ();
-    AABox                       (const AVector3D &p, const AVector3D &s);
+    AABBox                       ();
+    AABBox                       (const Vector3 &center, const Vector3 &size);
 
-    inline const AABox          operator*                   (areal f) const;
-    inline const AABox          operator*                   (const AVector3D &v) const;
-    inline const AABox          operator*                   (const AMatrix4D &m) const;
+    const AABBox                operator*                   (areal factor) const;
+    const AABBox                operator*                   (const Vector3 &vector) const;
+    const AABBox                operator*                   (const Matrix4 &matrix) const;
 
-    bool                        intersect                   (const AVector3D &p, areal r) const;
+    bool                        intersect                   (const Vector3 &position, areal radius) const;
 
-    void                        box                         (AVector3D &min, AVector3D &max) const;
-    void                        setBox                      (const AVector3D &min, const AVector3D &max);
+    void                        box                         (Vector3 &min, Vector3 &max) const;
+    void                        setBox                      (const Vector3 &min, const Vector3 &max);
 
-    AVector3D                   pos;
-    AVector3D                   size;
+    Vector3                    center;
+    Vector3                    size;
 };
 
 #endif /* AABB_H_HEADER_INCLUDED */

@@ -22,28 +22,28 @@
 
 #include "acommon.h"
 
-class NEXT_LIBRARY_EXPORT AVector2D {
+class NEXT_LIBRARY_EXPORT Vector2 {
 public:
-    AVector2D                   ();
-    AVector2D                   (areal v);
-    AVector2D                   (areal x, areal y);
+    Vector2                   ();
+    Vector2                   (areal v);
+    Vector2                   (areal x, areal y);
 
-    inline bool                 operator==                  (const AVector2D &vector) const;
-    inline bool                 operator!=                  (const AVector2D &vector) const;
-    inline bool                 operator>                   (const AVector2D &vector) const;
-    inline bool                 operator<                   (const AVector2D &vector) const;
+    bool                        operator==                  (const Vector2 &vector) const;
+    bool                        operator!=                  (const Vector2 &vector) const;
+    bool                        operator>                   (const Vector2 &vector) const;
+    bool                        operator<                   (const Vector2 &vector) const;
 
-    inline const AVector2D      operator*                   (areal factor) const;
-    inline const AVector2D      operator*                   (AVector2D &vector) const;
-    inline const AVector2D      operator/                   (areal factor) const;
-    inline const AVector2D      operator+                   (const AVector2D &vector) const;
-    inline const AVector2D      operator-                   () const;
-    inline const AVector2D      operator-                   (const AVector2D &vector) const;
+    const Vector2              operator*                   (areal factor) const;
+    const Vector2              operator*                   (Vector2 &vector) const;
+    const Vector2              operator/                   (areal factor) const;
+    const Vector2              operator+                   (const Vector2 &vector) const;
+    const Vector2              operator-                   () const;
+    const Vector2              operator-                   (const Vector2 &vector) const;
 
-    AVector2D                  &operator*=                  (areal factor);
-    AVector2D                  &operator/=                  (areal divisor);
-    AVector2D                  &operator+=                  (const AVector2D &vector);
-    AVector2D                  &operator-=                  (const AVector2D &vector);
+    Vector2                   &operator*=                  (areal factor);
+    Vector2                   &operator/=                  (areal divisor);
+    Vector2                   &operator+=                  (const Vector2 &vector);
+    Vector2                   &operator-=                  (const Vector2 &vector);
     
     areal                      &operator[]                  (int i);
     const areal                 operator[]                  (int i) const;
@@ -53,8 +53,8 @@ public:
 
     areal                       normalize                   ();
 
-    areal                       cross                       (const AVector2D &vector) const;
-    areal                       dot                         (const AVector2D &vector) const;
+    areal                       cross                       (const Vector2 &vector) const;
+    areal                       dot                         (const Vector2 &vector) const;
 
     union {
         struct {

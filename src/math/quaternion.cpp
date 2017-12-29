@@ -1,21 +1,21 @@
-#include "math/amath.h"
+#include "math/math.h"
 
 /*!
-    \class AQuaternion
-    \brief The AQuaternion class represents rotations in 3D space.
+    \class Quaternion
+    \brief The Quaternion class represents rotations in 3D space.
     \since Next 1.0
     \inmodule Math
 
     Quaternions consist of a 3D rotation axis specified by the \c x, \c y, and \c z coordinates,
     and a \c w representing the rotation angle.
 
-    \sa AVector2D, AVector3D, AVector4D, AMatrix3D
+    \sa Vector2, Vector3, Vector4, Matrix3
 */
 
 /*!
     Constructs an identity quaternion.
 */
-AQuaternion::AQuaternion() :
+Quaternion::Quaternion() :
     x(0),
     y(0),
     z(0),
@@ -24,7 +24,7 @@ AQuaternion::AQuaternion() :
 /*!
     Constructs a quaternion with rotation axis \a dir and \a angle in rotation degrees.
 */
-AQuaternion::AQuaternion(const AVector3D &dir, areal angle) {
+Quaternion::Quaternion(const Vector3 &dir, areal angle) {
     areal length = dir.length();
     if(length != 0.0) {
         length = 1.0f / length;
@@ -39,12 +39,12 @@ AQuaternion::AQuaternion(const AVector3D &dir, areal angle) {
     }
 }
 /*!
-    Constructs a quaternion by Euler angles represented by AVector3D(pitch, yaw, roll) \a euler in rotation degrees.
+    Constructs a quaternion by Euler angles represented by Vector3(pitch, yaw, roll) \a euler in rotation degrees.
 */
-AQuaternion::AQuaternion(const AVector3D &euler) {
-    AVector3D rad2(euler.x * DEG2RAD * 0.5f, euler.y * DEG2RAD * 0.5f, euler.z * DEG2RAD * 0.5f);
-    AVector3D c(cos(rad2.x), cos(rad2.y), cos(rad2.z));
-    AVector3D s(sin(rad2.x), sin(rad2.y), sin(rad2.z));
+Quaternion::Quaternion(const Vector3 &euler) {
+    Vector3 rad2(euler.x * DEG2RAD * 0.5f, euler.y * DEG2RAD * 0.5f, euler.z * DEG2RAD * 0.5f);
+    Vector3 c(cos(rad2.x), cos(rad2.y), cos(rad2.z));
+    Vector3 s(sin(rad2.x), sin(rad2.y), sin(rad2.z));
 
     w = c.x * c.y * c.z + s.x * s.y * s.z;
     x = s.x * c.y * c.z - c.x * s.y * s.z;
@@ -52,9 +52,9 @@ AQuaternion::AQuaternion(const AVector3D &euler) {
     z = c.x * c.y * s.z - s.x * s.y * c.z;
 }
 /*!
-    Constructs a quaternion by rotation matrix represented by AMatrix3D \a matrix.
+    Constructs a quaternion by rotation matrix represented by Matrix3 \a matrix.
 */
-AQuaternion::AQuaternion(const AMatrix3D &matrix) {
+Quaternion::Quaternion(const Matrix3 &matrix) {
     areal W = matrix[0] + matrix[4] + matrix[8];
     areal X = matrix[0] - matrix[4] - matrix[8];
     areal Y = matrix[4] - matrix[0] - matrix[8];
@@ -110,36 +110,36 @@ AQuaternion::AQuaternion(const AMatrix3D &matrix) {
     Returns true if this quaternion is equal to given \a quaternion; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AQuaternion::operator==(const AQuaternion &quaternion) const {
+bool Quaternion::operator==(const Quaternion &quaternion) const {
     return (x == quaternion.x) && (y == quaternion.y) && (z == quaternion.z) && (w == quaternion.w);
 }
 /*!
     Returns true if this quaternion is NOT equal to given \a quaternion; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AQuaternion::operator!=(const AQuaternion &quaternion) const {
+bool Quaternion::operator!=(const Quaternion &quaternion) const {
     return (x != quaternion.x) || (y != quaternion.y) || (z != quaternion.z) || (w != quaternion.w);
 }
 /*!
     Returns the component of the quaternion at index position i as a modifiable reference.
     \a i must be a valid index position in the quaternion (i.e., 0 <= i < 4).
 */
-areal &AQuaternion::operator[](int i) {
+areal &Quaternion::operator[](int i) {
     return q[i];
 }
 /*!
     Returns the component of the quaternion at index position.
     \a i must be a valid index position in the quaternion (i.e., 0 <= i < 4).
 */
-const areal AQuaternion::operator[](int i) const {
+const areal Quaternion::operator[](int i) const {
     return q[i];
 }
 /*!
     Multiplies this quaternion and \a quaternion using quaternion multiplication.
     The result corresponds to applying both of the rotations specified by this quaternion and \a quaternion.
 */
-AQuaternion AQuaternion::operator*(const AQuaternion &quaternion) const {
-    AQuaternion ret;
+Quaternion Quaternion::operator*(const Quaternion &quaternion) const {
+    Quaternion ret;
     ret.x = w * quaternion.x + x * quaternion.x + y * quaternion.z - z * quaternion.y;
     ret.y = w * quaternion.y + y * quaternion.w + z * quaternion.x - x * quaternion.z;
     ret.z = w * quaternion.z + z * quaternion.w + x * quaternion.y - y * quaternion.x;
@@ -149,28 +149,28 @@ AQuaternion AQuaternion::operator*(const AQuaternion &quaternion) const {
 /*!
     Rotates a \a vector vec with this quaternion to produce a new vector in 3D space.
 */
-AVector3D AQuaternion::operator*(const AVector3D &vector) const {
-    AVector3D vec(x, y, z);
+Vector3 Quaternion::operator*(const Vector3 &vector) const {
+    Vector3 vec(x, y, z);
 
-    AVector3D uv    = vec.cross(vector);
-    AVector3D uuv   = vec.cross(uv);
+    Vector3 uv    = vec.cross(vector);
+    Vector3 uuv   = vec.cross(uv);
 
     return vector + ((uv * w) + uuv) * 2;
 }
 /*!
     Returns the inverse of this quaternion.
 */
-AQuaternion AQuaternion::inverse() const {
-    AQuaternion ret;
+Quaternion Quaternion::inverse() const {
+    Quaternion ret;
     ret.w = w; ret.x =-x; ret.y =-y; ret.z =-z;
     return ret;
 }
 /*!
     Linear inerpolation between \a q0 and \a q1 with \a t factor.
 */
-void AQuaternion::mix(const AQuaternion &q0, const AQuaternion &q1, areal t) {
+void Quaternion::mix(const Quaternion &q0, const Quaternion &q1, areal t) {
     areal k0,k1,cosomega = q0.x * q1.x + q0.y * q1.y + q0.z * q1.z + q0.w * q1.w;
-    AQuaternion q;
+    Quaternion q;
     if(cosomega < 0.0) {
         cosomega = -cosomega;
         q.x = -q1.x;
@@ -200,8 +200,8 @@ void AQuaternion::mix(const AQuaternion &q0, const AQuaternion &q1, areal t) {
 /*!
     Returns the rotation matrix for this quaternion.
 */
-AMatrix3D AQuaternion::toMatrix() const {
-    AMatrix3D ret;
+Matrix3 Quaternion::toMatrix() const {
+    Matrix3 ret;
     areal qxx(x * x);
     areal qyy(y * y);
     areal qzz(z * z);
@@ -226,8 +226,8 @@ AMatrix3D AQuaternion::toMatrix() const {
     return ret;
 }
 /*!
-    Returns the Euler angles represented by AVector3D(pitch, yaw, roll) in rotation degrees.
+    Returns the Euler angles represented by Vector3(pitch, yaw, roll) in rotation degrees.
 */
-AVector3D AQuaternion::euler() const {
+Vector3 Quaternion::euler() const {
     return toMatrix().euler();
 }

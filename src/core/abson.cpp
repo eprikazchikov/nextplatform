@@ -4,12 +4,12 @@
 
 AVariant appendProperty(const AVariant &container, const AVariant &data, const string &name) {
     switch(container.type()) {
-        case AMetaType::VariantList: {
+        case AMetaType::VARIANTLIST: {
             AVariantList list   = container.value<AVariantList>();
             list.push_back(data);
             return list;
         } break;
-        case AMetaType::VariantMap: {
+        case AMetaType::VARIANTMAP: {
             AVariantMap map = container.value<AVariantMap>();
             map[name]    = data;
             return map;
@@ -86,14 +86,14 @@ AVariant ABson::load(const AByteArray &data, uint32_t &offset, AMetaType::Type t
             case ARRAY: {
                 int32_t length;
                 memcpy(&length, &data[offset], sizeof(uint32_t));
-                AVariant container  = load(data, offset, (t == ARRAY) ? AMetaType::VariantList : AMetaType::VariantMap, false);
+                AVariant container  = load(data, offset, (t == ARRAY) ? AMetaType::VARIANTLIST : AMetaType::VARIANTMAP, false);
                 if(t == ARRAY) {
                     AVariantList list   = container.value<AVariantList>();
                     uint32_t containerType  = list.front().toInt();
                     list.pop_front();
-                    if(containerType != AMetaType::VariantList) {
+                    if(containerType != AMetaType::VARIANTLIST) {
                         void *object    = AMetaType::create(containerType);
-                        AMetaType::convert(&list, AMetaType::VariantList, object, containerType);
+                        AMetaType::convert(&list, AMetaType::VARIANTLIST, object, containerType);
                         result  = appendProperty(result, AVariant(containerType, object), name);
                     } else {
                         result  = appendProperty(result, list, name);
@@ -120,7 +120,7 @@ AVariant ABson::load(const AByteArray &data, uint32_t &offset, AMetaType::Type t
 
     }
 
-    if(first && result.type() == AMetaType::VariantList) {
+    if(first && result.type() == AMetaType::VARIANTLIST) {
         AVariantList list   = result.value<AVariantList>();
         if(!list.empty()) {
             list.pop_front();
@@ -136,18 +136,18 @@ AByteArray ABson::save(const AVariant &data) {
     AByteArray result;
 
     switch(data.type()) {
-        case AMetaType::Bool: {
+        case AMetaType::BOOLEAN: {
             result.push_back( (data.toBool()) ? 0x01 : 0x00 );
         } break;
-        case AMetaType::Double: {
+        case AMetaType::DOUBLE: {
             double value    = data.toDouble();
             result.assign( reinterpret_cast<char *>( &value ), reinterpret_cast<char *>( &value ) + sizeof( value ) );
         } break;
-        case AMetaType::Int: {
+        case AMetaType::INTEGER: {
             int32_t value   = data.toInt();
             result.assign( reinterpret_cast<char *>( &value ), reinterpret_cast<char *>( &value ) + sizeof( value ) );
         } break;
-        case AMetaType::String: {
+        case AMetaType::STRING: {
             string value    = data.toString();
             uint32_t size   = value.size() + 1;
             result.resize(size + sizeof(uint32_t));
@@ -155,7 +155,7 @@ AByteArray ABson::save(const AVariant &data) {
             memcpy(&result[0], &size, sizeof(uint32_t));
             memcpy(&result[sizeof(uint32_t)], value.c_str(), size);
         } break;
-        case AMetaType::ByteArray: {
+        case AMetaType::BYTEARRAY: {
             AByteArray value= data.toByteArray();
             uint32_t size   = value.size();
             result.resize(sizeof(uint32_t) + 1 + size);
@@ -166,7 +166,7 @@ AByteArray ABson::save(const AVariant &data) {
                 memcpy(&result[sizeof(uint32_t) + 1], &value[0], size);
             }
         } break;
-        case AMetaType::VariantMap: {
+        case AMetaType::VARIANTMAP: {
             uint32_t size   = sizeof(uint32_t);
             result.resize(size);
             uint32_t offset = size;
@@ -221,13 +221,13 @@ uint8_t ABson::type(const AVariant &data) {
     PROFILE_FUNCTION()
     uint8_t result;
     switch (data.type()) {
-        case AMetaType::Invalid:        result  = NONE; break;
-        case AMetaType::Bool:           result  = BOOL; break;
-        case AMetaType::Double:         result  = DOUBLE; break;
-        case AMetaType::Int:            result  = INT32; break;
-        case AMetaType::String:         result  = STRING; break;
-        case AMetaType::VariantMap:     result  = OBJECT; break;
-        case AMetaType::ByteArray:      result  = BINARY; break;
+        case AMetaType::INVALID:        result  = NONE; break;
+        case AMetaType::BOOLEAN:        result  = BOOL; break;
+        case AMetaType::DOUBLE:         result  = DOUBLE; break;
+        case AMetaType::INTEGER:        result  = INT32; break;
+        case AMetaType::STRING:         result  = STRING; break;
+        case AMetaType::VARIANTMAP:     result  = OBJECT; break;
+        case AMetaType::BYTEARRAY:      result  = BINARY; break;
         default:                        result  = ARRAY; break;
     }
     return result;

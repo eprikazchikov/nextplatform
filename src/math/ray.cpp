@@ -1,27 +1,40 @@
-#include "math/amath.h"
+#include "math/math.h"
 
-ARay::ARay() {
+/*!
+    \class Ray
+    \brief The Ray class represents a ray in 3D space.
+    \since Next 1.0
+    \inmodule Math
+
+    Ray is an infinity line starting from \a position pos and going to some \a direction
+
+    \sa Vector3, Plane, AABBox
+*/
+/*!
+    Constructs a ray with \a position and \a direction.
+*/
+Ray::Ray(const Vector3 &position, const Vector3 &direction) :
+        pos(position),
+        dir(direction) {
 }
-
-ARay::ARay(const AVector3D &p, const AVector3D &d) :
-        pos(p),
-        dir(d) {
-}
-
-bool ARay::intersect(const AVector3D &p, areal r, AVector3D *pt) {
-    AVector3D l = p - pos;
+/*!
+    Returns true if this ray intersects the given sphere at \a position and \a radius; otherwise returns false.
+    Output argument \a pt contain a closest point of intersection.
+*/
+bool Ray::intersect(const Vector3 &position, areal radius, Vector3 *pt) {
+    Vector3 l = position - pos;
     areal tca   = l.dot(dir);
     if(tca < 0) {
         return false;
     }
 
     areal d2    = l.dot(l) - tca * tca;
-    if(d2 > r * r) {
+    if(d2 > radius * radius) {
         return false;
     }
 
     if(pt) {
-        areal thc   = sqrt(r * r - d2);
+        areal thc   = sqrt(radius * radius - d2);
         areal t0    = tca - thc;
         areal t1    = tca + thc;
 
@@ -34,9 +47,12 @@ bool ARay::intersect(const AVector3D &p, areal r, AVector3D *pt) {
 
     return true;
 }
-
-bool ARay::intersect(const APlane &p, AVector3D *pt, bool back) {
-    AVector3D n = p.normal;
+/*!
+    Returns true if this ray intersects the given \a plane; otherwise returns false.
+    Output argument \a pt contain a point of intersection. Argument \a back is a flag to use backface culling.
+*/
+bool Ray::intersect(const Plane &plane, Vector3 *pt, bool back) {
+    Vector3 n = plane.normal;
     areal d     = dir.dot(n);
     if(d >= 0.0f) {
         if(back) {
@@ -47,7 +63,7 @@ bool ARay::intersect(const APlane &p, AVector3D *pt, bool back) {
         }
     }
 
-    areal t = -n.dot(pos - p.point) / d;
+    areal t = -n.dot(pos - plane.point) / d;
     if(t <= 0.0) {
         return false;
     }
@@ -58,14 +74,17 @@ bool ARay::intersect(const APlane &p, AVector3D *pt, bool back) {
 
     return true;
 }
-
-bool ARay::intersect(const AABox &b, AVector3D *pt) {
-    AVector3D min, max;
-    b.box(min, max);
+/*!
+    Returns true if this ray intersects the given Axis Aligned Bounding \a box; otherwise returns false.
+    Output argument \a pt contain a point of intersection.
+*/
+bool Ray::intersect(const AABBox &box, Vector3 *pt) {
+    Vector3 min, max;
+    box.box(min, max);
 
     bool inside = true;
     char quadrant[3];
-    AVector3D candidate;
+    Vector3 candidate;
 
     for(int i = 0; i < 3; i++) {
         if(pos[i] < min[i]) {
@@ -88,7 +107,7 @@ bool ARay::intersect(const AABox &b, AVector3D *pt) {
          return true;
     }
 
-    AVector3D maxT;
+    Vector3 maxT;
     for(int i = 0; i < 3; i++) {
         if(quadrant[i] != 2 && dir[i] != 0.0f) {
             maxT[i] = (candidate[i] - pos[i]) / dir[i];
@@ -108,7 +127,7 @@ bool ARay::intersect(const AABox &b, AVector3D *pt) {
         return false;
     }
 
-    AVector3D coord;
+    Vector3 coord;
     for(int i = 0; i < 3; i++) {
         if(whichPlane != i) {
             coord[i] = pos[i] + maxT[whichPlane] * dir[i];
@@ -125,23 +144,26 @@ bool ARay::intersect(const AABox &b, AVector3D *pt) {
 
     return true;
 }
-
-bool ARay::intersect(const AVector3D &v1, const AVector3D &v2, const AVector3D &v3, AVector3D *pt, bool back) {
-    AVector3D ip;
-    if(!intersect(APlane(v1, v2, v3), &ip, back)) {
+/*!
+    Returns true if this ray intersects the given triangle between \a v1, \a v2 and \a v3 points; otherwise returns false.
+    Output argument \a pt contain a point of intersection. Argument \a back is a flag to use backface culling.
+*/
+bool Ray::intersect(const Vector3 &v1, const Vector3 &v2, const Vector3 &v3, Vector3 *pt, bool back) {
+    Vector3 ip;
+    if(!intersect(Plane(v1, v2, v3), &ip, back)) {
         return false;
     }
 
-    AVector3D ve0   = v3 - v1;
-    AVector3D ve1   = v2 - v1;
-    AVector3D ve2   = ip - v1;
+    Vector3 ve0   = v3 - v1;
+    Vector3 ve1   = v2 - v1;
+    Vector3 ve2   = ip - v1;
     areal dot00     = ve0.dot(ve0);
     areal dot01     = ve0.dot(ve1);
     areal dot02     = ve0.dot(ve2);
     areal dot11     = ve1.dot(ve1);
     areal dot12     = ve1.dot(ve2);
     areal invDenom  = 1.0f / (dot00 * dot11 - dot01 * dot01);
-    AVector2D b     = AVector2D((dot11 * dot02 - dot01 * dot12) * invDenom, (dot00 * dot12 - dot01 * dot02) * invDenom);
+    Vector2 b     = Vector2((dot11 * dot02 - dot01 * dot12) * invDenom, (dot00 * dot12 - dot01 * dot02) * invDenom);
 
     if((b.x >= 0) && (b.y >= 0) && (b.x + b.y <= 1.0f)) {
         if(pt) {
@@ -151,44 +173,52 @@ bool ARay::intersect(const AVector3D &v1, const AVector3D &v2, const AVector3D &
     }
     return false;
 }
+/*!
+    Returns a new Ray object wich result of reflection of current ray.
+    Reflection calculating by \a normal vector of reflection surface and intersection \a point.
+*/
+Ray Ray::reflect(const Vector3 &normal, const Vector3 &point) {
+    Ray ret(0.0, 0.0);
 
-ARay ARay::reflect(const AVector3D &n, const AVector3D &p) {
-    ARay ret;
-
-    ret.pos     = p;
-    ret.dir     = dir - n * ((areal)2.0 * dir.dot(n));
+    ret.pos     = point;
+    ret.dir     = dir - normal * ((areal)2.0 * dir.dot(normal));
     ret.dir.normalize();
 
     return ret;
 }
+/*!
+    Returns a new Ray object wich result of refraction of current ray.
+    Refraction calculating by \a normal vector of reflection surface and intersection \a point.
+*/
+Ray Ray::refract(const Vector3 &normal, const Vector3 &point, areal ior) {
+    Ray ret(0.0, 0.0);
 
-ARay ARay::refract(const AVector3D &n, const AVector3D &p, areal c0, areal c1) {
-    ARay ret;
+    areal theta = normal.dot(dir);
+    areal k     = (areal)1.0 - ior * ior * ((areal)1.0 - theta * theta);
 
-    areal eta   = c0 / c1;
-    areal theta = n.dot(dir);
-    areal k     = (areal)1.0 - eta * eta * ((areal)1.0 - theta * theta);
-
-    ret.pos     = p;
-    ret.dir     = dir * eta - n * (eta * theta + sqrt(k));
+    ret.pos     = point;
+    ret.dir     = dir * ior - normal * (ior * theta + sqrt(k));
     ret.dir.normalize();
 
     return ret;
 }
-
-ARay ARay::diffuse(const AVector3D &n, const AVector3D &p, areal min, areal max) {
-    ARay ret;
+/*!
+    Returns a new Ray object wich result of random directed reflection of current ray.
+    Diffuse reflection calculating by \a normal vector of reflection surface and intersection \a point. With \a min and \a max constraints.
+*/
+Ray Ray::diffuse(const Vector3 &normal, const Vector3 &point, areal min, areal max) {
+    Ray ret(0.0, 0.0);
 
     areal r1    = (areal)2.0 * PI * RANGE(min, max);
     areal r2    = RANGE(min, max);
     areal r2s   = sqrt(r2);
 
-    AVector3D u = (fabs(n.x) > .1 ? AVector3D(0, 1, 0) : AVector3D(1)).cross(n);
+    Vector3 u = (fabs(normal.x) > .1 ? Vector3(0, 1, 0) : Vector3(1)).cross(normal);
     u.normalize();
-    AVector3D v = n.cross(u);
+    Vector3 v = normal.cross(u);
 
-    ret.pos     = p;
-    ret.dir     = u * cos(r1) * r2s + v * sin(r1) * r2s + n * sqrt(1 - r2);
+    ret.pos     = point;
+    ret.dir     = u * cos(r1) * r2s + v * sin(r1) * r2s + normal * sqrt(1 - r2);
     ret.dir.normalize();
 
     return ret;

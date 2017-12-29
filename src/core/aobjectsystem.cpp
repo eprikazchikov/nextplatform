@@ -130,7 +130,7 @@ AVariant AObjectSystem::toVariant(const AObject *object) {
             AMetaProperty p = meta->property(i);
             if(p.isValid()) {
                 AVariant v  = p.read(it);
-                if(v.userType() < AMetaType::UserType) {
+                if(v.userType() < AMetaType::USERTYPE) {
                     properties[p.name()] = v;
                 }
             }
@@ -199,7 +199,7 @@ AObject *AObjectSystem::toObject(const AVariant &variant) {
                 // Load base properties
                 for(const auto &it : (*i).toMap()) {
                     AVariant v  = it.second;
-                    if(v.type() < AMetaType::UserType) {
+                    if(v.type() < AMetaType::USERTYPE) {
                         object->setProperty(it.first.c_str(), v);
                     }
                 }

@@ -22,52 +22,52 @@
 
 #include "acommon.h"
 
-class AVector3D;
-class AVector4D;
-class AMatrix3D;
+class Vector3;
+class Vector4;
+class Matrix3;
 
-class NEXT_LIBRARY_EXPORT AMatrix4D {
+class NEXT_LIBRARY_EXPORT Matrix4 {
 public:
-    AMatrix4D                   ();
-    AMatrix4D                   (const AMatrix3D &m);
+    Matrix4                   ();
+    Matrix4                   (const Matrix3 &matrix);
 
-    inline bool                 operator==                  (const AMatrix4D &v) const;
-    inline bool                 operator!=                  (const AMatrix4D &v) const;
+    bool                        operator==                  (const Matrix4 &matrix) const;
+    bool                        operator!=                  (const Matrix4 &matrix) const;
 
-    inline const AVector3D      operator*                   (const AVector3D &v) const;
-    inline const AVector4D      operator*                   (const AVector4D &v) const;
-    inline const AMatrix4D      operator*                   (areal f) const;
-    inline const AMatrix4D      operator*                   (const AMatrix4D &m) const;
-    inline const AMatrix4D      operator+                   (const AMatrix4D &m) const;
-    inline const AMatrix4D      operator-                   (const AMatrix4D &m) const;
+    const Vector3              operator*                   (const Vector3 &vector) const;
+    const Vector4              operator*                   (const Vector4 &vector) const;
+    const Matrix4              operator*                   (areal factor) const;
+    const Matrix4              operator*                   (const Matrix4 &matrix) const;
+    const Matrix4              operator+                   (const Matrix4 &matrix) const;
+    const Matrix4              operator-                   (const Matrix4 &matrix) const;
 
-    AMatrix4D                  &operator*=                  (areal f);
-    AMatrix4D                  &operator*=                  (const AMatrix4D &m);
-    AMatrix4D                  &operator+=                  (const AMatrix4D &m);
-    AMatrix4D                  &operator-=                  (const AMatrix4D &m);
+    Matrix4                   &operator*=                  (areal factor);
+    Matrix4                   &operator*=                  (const Matrix4 &matrix);
+    Matrix4                   &operator+=                  (const Matrix4 &matrix);
+    Matrix4                   &operator-=                  (const Matrix4 &matrix);
 
     areal                      &operator[]                  (int i);
     const areal                 operator[]                  (int i) const;
 	
-    AMatrix3D                   rotation                    () const;
-    AMatrix4D                   transpose                   () const;
+    Matrix3                    rotation                    () const;
+    Matrix4                    transpose                   () const;
     areal                       determinant                 () const;
-    AMatrix4D                   inverse                     () const;
-    void                        reflect                     (const AVector4D &plane);
-    void                        direction                   (const AVector3D &dir, AVector3D &up);
+    Matrix4                    inverse                     () const;
+    void                        reflect                     (const Vector4 &plane);
+    void                        direction                   (const Vector3 &direction, Vector3 &up);
 
     void                        zero                        ();
     void                        identity                    ();
-    void                        rotate                      (const AVector3D &axis, areal angle);
-    void                        rotate                      (const AVector3D &angles);
-    void                        scale                       (const AVector3D &v);
-    void                        translate                   (const AVector3D &v);
+    void                        rotate                      (const Vector3 &axis, areal angle);
+    void                        rotate                      (const Vector3 &angles);
+    void                        scale                       (const Vector3 &vector);
+    void                        translate                   (const Vector3 &vector);
 
     void                        perspective                 (areal fov, areal aspect, areal znear, areal zfar);
     void                        ortho                       (areal left, areal right, areal bottom, areal top, areal znear, areal zfar);
-    void                        lookAt                      (AVector3D &eye, AVector3D &target, AVector3D &up);
+    void                        lookAt                      (Vector3 &eye, Vector3 &target, Vector3 &up);
 
-    AVector3D                   euler                       ();
+    Vector3                    euler                       ();
 
     areal                       mat[16];
 };

@@ -24,15 +24,15 @@
 
 #include "vector3.h"
 
-class NEXT_LIBRARY_EXPORT APlane {
+class NEXT_LIBRARY_EXPORT Plane {
 public:
-    APlane                      ();
-    APlane                      (const AVector3D &v1, const AVector3D &v2, const AVector3D &v3);
+    Plane                       ();
+    Plane                       (const Vector3 &v1, const Vector3 &v2, const Vector3 &v3);
 
-    areal                       distance                    (const AVector3D &p);
+    areal                       sqrDistance                 (const Vector3 &point);
 
-    AVector3D                   normal;
-    AVector3D                   point;
+    Vector3                    normal;
+    Vector3                    point;
     float                       d;
 };
 

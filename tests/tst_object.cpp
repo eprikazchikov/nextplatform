@@ -39,7 +39,7 @@ bool toList(void *to, const void *from, const uint32_t fromType) {
 
 void ObjectTest::Meta_type() {
     int type    = AMetaType::type<ATestObject *>();
-    bool result = AMetaType::registerConverter(type, AMetaType::VariantList, &toList);
+    bool result = AMetaType::registerConverter(type, AMetaType::VARIANTLIST, &toList);
 
     QCOMPARE(result, true);
 
@@ -74,7 +74,7 @@ void ObjectTest::Meta_property() {
         QCOMPARE(obj.getSlot(), value);
     }
     {
-        AVector2D value(1.0, 2.0);
+        Vector2 value(1.0, 2.0);
         meta->property(1).write(&obj, value);
         QCOMPARE(obj.getVector().x, value.x);
         QCOMPARE(obj.getVector().y, value.y);
@@ -258,7 +258,7 @@ void ObjectTest::Clone_object() {
     obj1.setName("MainObject");
     obj2.setName("TestComponent2");
     obj2.setParent(&obj1);
-    obj1.setVector(AVector2D(10.0, 20.0));
+    obj1.setVector(Vector2(10.0, 20.0));
     obj1.setProperty("dynamic1", 100);
     obj2.setProperty("dynamic2", true);
 

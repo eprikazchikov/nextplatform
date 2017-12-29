@@ -1,8 +1,8 @@
-#include "math/amath.h"
+#include "math/math.h"
 
 /*!
-    \class AVector2D
-    \brief The AVector2D class represents a vector or vertex in 2D space.
+    \class Vector2
+    \brief The Vector2 class represents a vector or vertex in 2D space.
     \since Next 1.0
     \inmodule Math
 
@@ -10,35 +10,35 @@
     drawing. They consist of three coordinates, traditionally called
     x and y.
 
-    The AVector2D class can also be used to represent vertices in 2D space.
+    The Vector2 class can also be used to represent vertices in 2D space.
     We therefore do not need to provide a separate vertex class.
 
-    \note By design values in the AVector2D instance are stored as \c float.
-    This means that on platforms where the \c areal arguments to AVector2D
+    \note By design values in the Vector2 instance are stored as \c float.
+    This means that on platforms where the \c areal arguments to Vector2
     functions are represented by \c double values, it is possible to
     lose precision.
 
-    \sa AVector3D, AVector4D, AQuaternion
+    \sa Vector3, Vector4, Quaternion
 */
 
 /*!
     Constructs a null vector, i.e. with coordinates (0, 0).
 */
-AVector2D::AVector2D() :
+Vector2::Vector2() :
     x(0),
     y(0) {
 }
 /*!
     Constructs a vector with coordinates (\a v).
 */
-AVector2D::AVector2D(areal v) :
+Vector2::Vector2(areal v) :
     x(v),
     y(v) {
 }
 /*!
     Constructs a vector with coordinates (\a x, \a y).
 */
-AVector2D::AVector2D(areal x, areal y) :
+Vector2::Vector2(areal x, areal y) :
     x(x),
     y(y) {
 }
@@ -46,28 +46,28 @@ AVector2D::AVector2D(areal x, areal y) :
     Returns true if this vector is equal to given \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector2D::operator==(const AVector2D &vector) const {
+bool Vector2::operator==(const Vector2 &vector) const {
     return (x == vector.x) && (y == vector.y);
 }
 /*!
     Returns true if this vector is NOT equal to given \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector2D::operator!=(const AVector2D &vector) const {
+bool Vector2::operator!=(const Vector2 &vector) const {
     return !(*this == vector);
 }
 /*!
     Returns true if this vector is bigger than given \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector2D::operator>(const AVector2D &vector) const {
+bool Vector2::operator>(const Vector2 &vector) const {
     return (x > vector.x) && (y > vector.y);
 }
 /*!
     Returns true if this vector is less than \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector2D::operator<(const AVector2D &vector) const {
+bool Vector2::operator<(const Vector2 &vector) const {
     return (x < vector.x) && (y < vector.y);
 }
 /*!
@@ -75,50 +75,50 @@ bool AVector2D::operator<(const AVector2D &vector) const {
 
     \sa operator*=()
 */
-const AVector2D AVector2D::operator*(areal factor) const {
-    return AVector2D(x * factor, y * factor);
+const Vector2 Vector2::operator*(areal factor) const {
+    return Vector2(x * factor, y * factor);
 }
 /*!
     Returns a copy of this vector, multiplied by the given \a vector.
 
     \sa operator*=()
 */
-const AVector2D AVector2D::operator*(AVector2D &vector) const {
-    return AVector2D(x * vector.x, y * vector.y);
+const Vector2 Vector2::operator*(Vector2 &vector) const {
+    return Vector2(x * vector.x, y * vector.y);
 }
 /*!
     Returns a copy of this vector, divided by the given \a divisor.
 
     \sa operator/=()
 */
-const AVector2D AVector2D::operator/(areal divisor) const {
-    return AVector2D(x / divisor, y / divisor);
+const Vector2 Vector2::operator/(areal divisor) const {
+    return Vector2(x / divisor, y / divisor);
 }
 /*!
-    Returns a AVector2D object that is the sum of the this vector and \a vector; each component is added separately.
+    Returns a Vector2 object that is the sum of the this vector and \a vector; each component is added separately.
 
     \sa operator+=()
 */
-const AVector2D AVector2D::operator+(const AVector2D &vector) const {
-    return AVector2D(x + vector.x, y + vector.y);
+const Vector2 Vector2::operator+(const Vector2 &vector) const {
+    return Vector2(x + vector.x, y + vector.y);
 }
 /*!
-    Returns a AVector2D object that is formed by changing the sign of
+    Returns a Vector2 object that is formed by changing the sign of
     all three components of the this vector.
 
-    Equivalent to \c {AVector2D(0,0) - vector}.
+    Equivalent to \c {Vector2(0,0) - vector}.
 */
-const AVector2D AVector2D::operator-() const {
-    return AVector2D(-x, -y);
+const Vector2 Vector2::operator-() const {
+    return Vector2(-x, -y);
 }
 /*!
-    Returns a AVector2D object that is formed by subtracting \a vector from this vector;
+    Returns a Vector2 object that is formed by subtracting \a vector from this vector;
     each component is subtracted separately.
 
     \sa operator-=()
 */
-const AVector2D AVector2D::operator-(const AVector2D &vector) const {
-    return AVector2D(x - vector.x, y - vector.y);
+const Vector2 Vector2::operator-(const Vector2 &vector) const {
+    return Vector2(x - vector.x, y - vector.y);
 }
 /*!
     Multiplies this vector's coordinates by the given \a factor, and
@@ -126,7 +126,7 @@ const AVector2D AVector2D::operator-(const AVector2D &vector) const {
 
     \sa operator/=()
 */
-AVector2D &AVector2D::operator*=(areal factor) {
+Vector2 &Vector2::operator*=(areal factor) {
     return *this = *this * factor;
 }
 /*!
@@ -135,7 +135,7 @@ AVector2D &AVector2D::operator*=(areal factor) {
 
     \sa operator*=()
 */
-AVector2D &AVector2D::operator/=(areal divisor) {
+Vector2 &Vector2::operator/=(areal divisor) {
     return *this = *this / divisor;
 }
 /*!
@@ -144,7 +144,7 @@ AVector2D &AVector2D::operator/=(areal divisor) {
 
     \sa operator-=()
 */
-AVector2D &AVector2D::operator+=(const AVector2D &vector) {
+Vector2 &Vector2::operator+=(const Vector2 &vector) {
     return *this = *this + vector;
 }
 /*!
@@ -153,21 +153,21 @@ AVector2D &AVector2D::operator+=(const AVector2D &vector) {
 
     \sa operator+=()
 */
-AVector2D &AVector2D::operator-=(const AVector2D &vector) {
+Vector2 &Vector2::operator-=(const Vector2 &vector) {
     return *this = *this - vector;
 }
 /*!
     Returns the component of the vector at index position i as a modifiable reference.
     \a i must be a valid index position in the vector (i.e., 0 <= i < 2).
 */
-areal &AVector2D::operator[](int i) {
+areal &Vector2::operator[](int i) {
     return v[i];
 }
 /*!
     Returns the component of the vector at index position.
     \a i must be a valid index position in the vector (i.e., 0 <= i < 2).
 */
-const areal AVector2D::operator[](int i) const {
+const areal Vector2::operator[](int i) const {
     return v[i];
 }
 /*!
@@ -175,7 +175,7 @@ const areal AVector2D::operator[](int i) const {
 
     \sa sqrLength()
 */
-areal AVector2D::length() const {
+areal Vector2::length() const {
     return (areal)sqrt(sqrLength());
 }
 /*!
@@ -183,7 +183,7 @@ areal AVector2D::length() const {
 
     \sa length()
 */
-areal AVector2D::sqrLength() const {
+areal Vector2::sqrLength() const {
     return x * x + y * y;
 }
 /*!
@@ -192,7 +192,7 @@ areal AVector2D::sqrLength() const {
 
     \sa length()
 */
-areal AVector2D::normalize() {
+areal Vector2::normalize() {
     areal len = length();
     if (len == 0.0)
         return 0.0;
@@ -205,7 +205,7 @@ areal AVector2D::normalize() {
 
     \sa dot()
 */
-areal AVector2D::cross(const AVector2D &vector) const {
+areal Vector2::cross(const Vector2 &vector) const {
     return x * vector.y - y * vector.x;
 }
 /*!
@@ -213,6 +213,6 @@ areal AVector2D::cross(const AVector2D &vector) const {
 
     \sa cross()
 */
-areal AVector2D::dot(const AVector2D &vector) const {
+areal Vector2::dot(const Vector2 &vector) const {
     return x * vector.x + y * vector.y;
 }

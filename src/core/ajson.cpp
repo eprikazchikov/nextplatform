@@ -19,13 +19,13 @@ void appendProperty(VariantStack &s, const AVariant &data, const string &name) {
         s.pop();
     }
     switch(v.type()) {
-        case AMetaType::VariantList: {
+        case AMetaType::VARIANTLIST: {
             AVariantList list = v.value<AVariantList>();
             list.push_back(data);
             s.push(list);
             return;
         }
-        case AMetaType::VariantMap: {
+        case AMetaType::VARIANTMAP: {
             AVariantMap map   = v.value<AVariantMap>();
             map[name]    = data;
             s.push(map);
@@ -91,9 +91,9 @@ AVariant AJson::load(const string &data) {
                 s.pop();
                 uint32_t type   = list.front().toInt();
                 list.pop_front();
-                if(type != AMetaType::VariantList) {
+                if(type != AMetaType::VARIANTLIST) {
                     void *object    = AMetaType::create(type);
-                    AMetaType::convert(&list, AMetaType::VariantList, object, type);
+                    AMetaType::convert(&list, AMetaType::VARIANTLIST, object, type);
                     appendProperty(s, AVariant(type, object), n.top());
                 } else {
                     appendProperty(s, list, n.top());
@@ -106,7 +106,7 @@ AVariant AJson::load(const string &data) {
                 state   = propertyValue;
             } break;
             case ',': {
-                if(s.top().type() == AMetaType::VariantList) {
+                if(s.top().type() == AMetaType::VARIANTLIST) {
                     state   = propertyValue;
                 } else {
                     state   = propertyName;
@@ -186,15 +186,15 @@ string AJson::save(const AVariant &data, int32_t depth) {
     PROFILE_FUNCTION()
     string result;
     switch(data.type()) {
-        case AMetaType::Bool:
-        case AMetaType::Double:
-        case AMetaType::Int: {
+        case AMetaType::BOOLEAN:
+        case AMetaType::DOUBLE:
+        case AMetaType::INTEGER: {
             result += data.toString();
         } break;
-        case AMetaType::String: {
+        case AMetaType::STRING: {
             result += '"' + data.toString() + '"';
         } break;
-        case AMetaType::VariantMap: {
+        case AMetaType::VARIANTMAP: {
             result += "{";
             result += FORMAT;
             uint32_t i = 1;

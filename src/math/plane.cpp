@@ -1,10 +1,27 @@
-#include "math/amath.h"
+#include "math/math.h"
 
-APlane::APlane() {
+/*!
+    \class Plane
+    \brief The Plane class represents a plane in 3D space.
+    \since Next 1.0
+    \inmodule Math
+
+    A Plane is a flat, 2D surface that extends infinitely far in 3D space.
+
+    \sa Vector3
+*/
+
+/*!
+    Default constructor.
+*/
+Plane::Plane() {
 
 }
-APlane::APlane(const AVector3D &v1, const AVector3D &v2, const AVector3D &v3)  {
-    AVector3D aux1, aux2;
+/*!
+    Cunstructs a Plane by three points \a v1, \a v2 and \a v3
+*/
+Plane::Plane(const Vector3 &v1, const Vector3 &v2, const Vector3 &v3)  {
+    Vector3 aux1, aux2;
     aux1    = v2 - v1;
     aux2    = v3 - v1;
     normal  = aux1.cross(aux2);
@@ -12,7 +29,9 @@ APlane::APlane(const AVector3D &v1, const AVector3D &v2, const AVector3D &v3)  {
     point   = v1;
     d       = normal.dot(point);
 }
-
-areal APlane::distance(const AVector3D &p) {
-    return normal.dot(p) - d;
+/*!
+    Calculate a squared distance between \a point and this Plane
+*/
+areal Plane::sqrDistance(const Vector3 &point) {
+    return normal.dot(point) - d;
 }

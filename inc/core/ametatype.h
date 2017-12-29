@@ -14,23 +14,23 @@ class NEXT_LIBRARY_EXPORT AMetaType {
 public:
     /*! \enum Type */
     enum Type {
-        Invalid                 = 0,
-        Bool,
-        Int,
-        Double,
-        String,
-        VariantMap,
-        VariantList,
-        ByteArray,
+        INVALID                 = 0,
+        BOOLEAN,
+        INTEGER,
+        DOUBLE,
+        STRING,
+        VARIANTMAP,
+        VARIANTLIST,
+        BYTEARRAY,
 
-        Vector2D                = 10,
-        Vector3D,
-        Vector4D,
-        Quaternion,
-        Matrix3D,
-        Matrix4D,
+        VECTOR2                 = 10,
+        VECTOR3,
+        VECTOR4,
+        QUATERNION,
+        MATRIX3,
+        MATRIX4,
 
-        UserType                = 20
+        USERTYPE                = 20
     };
 
     struct Table {
@@ -88,11 +88,11 @@ public:
     static bool             toDouble                    (void *to, const void *from, const uint32_t fromType);
     static bool             toString                    (void *to, const void *from, const uint32_t fromType);
     static bool             toList                      (void *to, const void *from, const uint32_t fromType);
-    static bool             toVector2D                  (void *to, const void *from, const uint32_t fromType);
-    static bool             toVector3D                  (void *to, const void *from, const uint32_t fromType);
-    static bool             toVector4D                  (void *to, const void *from, const uint32_t fromType);
-    static bool             toMatrix3D                  (void *to, const void *from, const uint32_t fromType);
-    static bool             toMatrix4D                  (void *to, const void *from, const uint32_t fromType);
+    static bool             toVector2                  (void *to, const void *from, const uint32_t fromType);
+    static bool             toVector3                  (void *to, const void *from, const uint32_t fromType);
+    static bool             toVector4                  (void *to, const void *from, const uint32_t fromType);
+    static bool             toMatrix3                  (void *to, const void *from, const uint32_t fromType);
+    static bool             toMatrix4                  (void *to, const void *from, const uint32_t fromType);
     static bool             toQuaternion                (void *to, const void *from, const uint32_t fromType);
 
 private:

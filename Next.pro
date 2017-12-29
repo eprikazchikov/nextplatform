@@ -28,7 +28,6 @@ SOURCES += \
     src/core/auri.cpp \
     src/core/avariant.cpp \
     src/math/aabb.cpp \
-    src/math/amath.cpp \
     src/math/matrix3.cpp \
     src/math/matrix4.cpp \
     src/math/obb.cpp \
@@ -37,7 +36,8 @@ SOURCES += \
     src/math/ray.cpp \
     src/math/vector2.cpp \
     src/math/vector3.cpp \
-    src/math/vector4.cpp
+    src/math/vector4.cpp \
+    src/math/math.cpp
 
 
 HEADERS += \
@@ -55,7 +55,6 @@ HEADERS += \
     inc/core/auri.h \
     inc/core/avariant.h \
     inc/math/aabb.h \
-    inc/math/amath.h \
     inc/math/matrix3.h \
     inc/math/matrix4.h \
     inc/math/obb.h \
@@ -65,7 +64,8 @@ HEADERS += \
     inc/math/vector2.h \
     inc/math/vector3.h \
     inc/math/vector4.h \
-    inc/acommon.h
+    inc/acommon.h \
+    inc/math/math.h
 
 
 INCLUDEPATH += \

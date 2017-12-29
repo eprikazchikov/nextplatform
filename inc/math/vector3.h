@@ -22,32 +22,32 @@
 
 #include "acommon.h"
 
-class AVector2D;
+class Vector2;
 
-class NEXT_LIBRARY_EXPORT AVector3D {
+class NEXT_LIBRARY_EXPORT Vector3 {
 public:
-    AVector3D                   ();
-    AVector3D                   (areal v);
-    AVector3D                   (areal x, areal y, areal z);
-    AVector3D                   (const AVector2D &v, areal z);
-    AVector3D                   (const areal *v);
+    Vector3                   ();
+    Vector3                   (areal v);
+    Vector3                   (areal x, areal y, areal z);
+    Vector3                   (const Vector2 &v, areal z);
+    Vector3                   (const areal *v);
 
-    inline bool                 operator==                  (const AVector3D &vector) const;
-    inline bool                 operator!=                  (const AVector3D &vector) const;
-    inline bool                 operator>                   (const AVector3D &vector) const;
-    inline bool                 operator<                   (const AVector3D &vector) const;
+    bool                        operator==                  (const Vector3 &vector) const;
+    bool                        operator!=                  (const Vector3 &vector) const;
+    bool                        operator>                   (const Vector3 &vector) const;
+    bool                        operator<                   (const Vector3 &vector) const;
 
-    inline const AVector3D      operator*                   (areal factor) const;
-    inline const AVector3D      operator*                   (const AVector3D &vector) const;
-    inline const AVector3D      operator/                   (areal divisor) const;
-    inline const AVector3D      operator+                   (const AVector3D &vector) const;
-    inline const AVector3D      operator-                   () const;
-    inline const AVector3D      operator-                   (const AVector3D &vector) const;
+    const Vector3              operator*                   (areal factor) const;
+    const Vector3              operator*                   (const Vector3 &vector) const;
+    const Vector3              operator/                   (areal divisor) const;
+    const Vector3              operator+                   (const Vector3 &vector) const;
+    const Vector3              operator-                   () const;
+    const Vector3              operator-                   (const Vector3 &vector) const;
 
-    AVector3D                  &operator*=                  (areal factor);
-    AVector3D                  &operator/=                  (areal divisor);
-    AVector3D                  &operator+=                  (const AVector3D &vector);
-    AVector3D                  &operator-=                  (const AVector3D &vector);
+    Vector3                   &operator*=                  (areal factor);
+    Vector3                   &operator/=                  (areal divisor);
+    Vector3                   &operator+=                  (const Vector3 &vector);
+    Vector3                   &operator-=                  (const Vector3 &vector);
     
     areal                      &operator[]                  (int i);
     const areal                 operator[]                  (int i) const;
@@ -57,8 +57,8 @@ public:
 
     areal                       normalize                   ();
 
-    AVector3D                   cross                       (const AVector3D &vector) const;
-    areal                       dot                         (const AVector3D &vector) const;
+    Vector3                    cross                       (const Vector3 &vector) const;
+    areal                       dot                         (const Vector3 &vector) const;
 
     union {
         struct {

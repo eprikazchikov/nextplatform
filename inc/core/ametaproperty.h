@@ -32,7 +32,7 @@ public:
     void                    write                       (AObject *obj, const T &value) const {
         uint32_t type   = AMetaType::type<T>();
         AVariant arg;
-        if(type < AMetaType::VariantMap && type >= AMetaType::UserType) {
+        if(type < AMetaType::VARIANTMAP && type >= AMetaType::USERTYPE) {
             arg = AVariant::fromValue<T>(value);
         } else {
             arg = AVariant(value);

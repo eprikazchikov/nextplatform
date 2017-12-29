@@ -1,8 +1,8 @@
-#include "math/amath.h"
+#include "math/math.h"
 
 /*!
-    \class AVector4D
-    \brief The AVector4D class represents a vector or vertex in 4D space.
+    \class Vector4
+    \brief The Vector4 class represents a vector or vertex in 4D space.
     \since Next 1.0
     \inmodule Math
 
@@ -10,21 +10,21 @@
     drawing. They consist of three coordinates, traditionally called
     x, y, z and w.
 
-    The AVector4D class can also be used to represent vertices in 4D space.
+    The Vector4 class can also be used to represent vertices in 4D space.
     We therefore do not need to provide a separate vertex class.
 
-    \note By design values in the AVector4D instance are stored as \c float.
-    This means that on platforms where the \c areal arguments to AVector4D
+    \note By design values in the Vector4 instance are stored as \c float.
+    This means that on platforms where the \c areal arguments to Vector4
     functions are represented by \c double values, it is possible to
     lose precision.
 
-    \sa AVector2D, AVector3D, AQuaternion
+    \sa Vector2, Vector3, Quaternion
 */
 
 /*!
     Constructs a null vector, i.e. with coordinates (0, 0, 0, 1).
 */
-AVector4D::AVector4D() :
+Vector4::Vector4() :
     x(0),
     y(0),
     z(0),
@@ -33,7 +33,7 @@ AVector4D::AVector4D() :
 /*!
     Constructs a vector with coordinates (\a v).
 */
-AVector4D::AVector4D(areal v) :
+Vector4::Vector4(areal v) :
     x(v),
     y(v),
     z(v),
@@ -42,7 +42,7 @@ AVector4D::AVector4D(areal v) :
 /*!
     Constructs a vector with coordinates (\a x, \a y, \a z, \a w).
 */
-AVector4D::AVector4D(areal x, areal y, areal z, areal w) :
+Vector4::Vector4(areal x, areal y, areal z, areal w) :
     x(x),
     y(y),
     z(z),
@@ -52,9 +52,9 @@ AVector4D::AVector4D(areal x, areal y, areal z, areal w) :
     Constructs a 4D vector from the specified 2D \a v. The z and w
     coordinates is set to \a z and \a w.
 
-    \sa AVector2D::AVector2D()
+    \sa Vector2::Vector2()
 */
-AVector4D::AVector4D(const AVector2D &v, areal z, areal w) :
+Vector4::Vector4(const Vector2 &v, areal z, areal w) :
     x(v.x),
     y(v.y),
     z(z),
@@ -64,9 +64,9 @@ AVector4D::AVector4D(const AVector2D &v, areal z, areal w) :
     Constructs a 4D vector from the specified 3D \a v. The w
     coordinate is set to \a w.
 
-    \sa AVector3D::AVector3D()
+    \sa Vector3::Vector3()
 */
-AVector4D::AVector4D(const AVector3D &v, areal w) :
+Vector4::Vector4(const Vector3 &v, areal w) :
     x(v.x),
     y(v.y),
     z(v.z),
@@ -76,28 +76,28 @@ AVector4D::AVector4D(const AVector3D &v, areal w) :
     Returns true if this vector is equal to given \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector4D::operator==(const AVector4D &vector) const {
+bool Vector4::operator==(const Vector4 &vector) const {
     return (x == vector.x) && (y == vector.y) && (z == vector.z) && (w == vector.w);
 }
 /*!
     Returns true if this vector is NOT equal to given \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector4D::operator!=(const AVector4D &vector) const {
+bool Vector4::operator!=(const Vector4 &vector) const {
     return !(*this == vector);
 }
 /*!
     Returns true if this vector is bigger than given \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector4D::operator>(const AVector4D &vector) const {
+bool Vector4::operator>(const Vector4 &vector) const {
     return (x > vector.x) && (y > vector.y) && (z > vector.z) && (w > vector.w);
 }
 /*!
     Returns true if this vector is less than \a vector; otherwise returns false.
     This operator uses an exact floating-point comparison.
 */
-bool AVector4D::operator<(const AVector4D &vector) const {
+bool Vector4::operator<(const Vector4 &vector) const {
     return (x < vector.x) && (y < vector.y) && (z < vector.z) && (w < vector.w);
 }
 /*!
@@ -105,50 +105,50 @@ bool AVector4D::operator<(const AVector4D &vector) const {
 
     \sa operator*=()
 */
-const AVector4D AVector4D::operator*(areal factor) const {
-    return AVector4D(x * factor, y * factor, z * factor, w * factor);
+const Vector4 Vector4::operator*(areal factor) const {
+    return Vector4(x * factor, y * factor, z * factor, w * factor);
 }
 /*!
     Returns a copy of this vector, multiplied by the given \a vector.
 
     \sa operator*=()
 */
-const AVector4D AVector4D::operator*(const AVector4D &vector) const {
-    return AVector4D(x * vector.x, y * vector.y, z * vector.z, w * vector.w);
+const Vector4 Vector4::operator*(const Vector4 &vector) const {
+    return Vector4(x * vector.x, y * vector.y, z * vector.z, w * vector.w);
 }
 /*!
     Returns a copy of this vector, divided by the given \a divisor.
 
     \sa operator/=()
 */
-const AVector4D AVector4D::operator/(areal divisor) const {
-    return AVector4D(x / divisor, y / divisor, z / divisor, w / divisor);
+const Vector4 Vector4::operator/(areal divisor) const {
+    return Vector4(x / divisor, y / divisor, z / divisor, w / divisor);
 }
 /*!
-    Returns a AVector4D object that is the sum of the this vector and \a vector; each component is added separately.
+    Returns a Vector4 object that is the sum of the this vector and \a vector; each component is added separately.
 
     \sa operator+=()
 */
-const AVector4D AVector4D::operator+(const AVector4D &vector) const {
-    return AVector4D(x + vector.x, y + vector.y, z + vector.z, w + vector.w);
+const Vector4 Vector4::operator+(const Vector4 &vector) const {
+    return Vector4(x + vector.x, y + vector.y, z + vector.z, w + vector.w);
 }
 /*!
-    Returns a AVector4D object that is formed by changing the sign of
+    Returns a Vector4 object that is formed by changing the sign of
     all three components of the this vector.
 
-    Equivalent to \c {AVector4D(0,0,0,1) - vector}.
+    Equivalent to \c {Vector4(0,0,0,1) - vector}.
 */
-const AVector4D AVector4D::operator-() const {
-    return AVector4D(-x, -y, -z, -w);
+const Vector4 Vector4::operator-() const {
+    return Vector4(-x, -y, -z, -w);
 }
 /*!
-    Returns a AVector4D object that is formed by subtracting \a vector from this vector;
+    Returns a Vector4 object that is formed by subtracting \a vector from this vector;
     each component is subtracted separately.
 
     \sa operator-=()
 */
-const AVector4D AVector4D::operator-(const AVector4D &vector) const {
-    return AVector4D(x - vector.x, y - vector.y, z - vector.z, z - vector.w);
+const Vector4 Vector4::operator-(const Vector4 &vector) const {
+    return Vector4(x - vector.x, y - vector.y, z - vector.z, z - vector.w);
 }
 /*!
     Multiplies this vector's coordinates by the given \a factor, and
@@ -156,7 +156,7 @@ const AVector4D AVector4D::operator-(const AVector4D &vector) const {
 
     \sa operator/=()
 */
-AVector4D &AVector4D::operator*=(areal factor) {
+Vector4 &Vector4::operator*=(areal factor) {
     return *this = *this * factor;
 }
 /*!
@@ -165,7 +165,7 @@ AVector4D &AVector4D::operator*=(areal factor) {
 
     \sa operator*=()
 */
-AVector4D &AVector4D::operator/=(areal divisor) {
+Vector4 &Vector4::operator/=(areal divisor) {
     return *this = *this / divisor;
 }
 /*!
@@ -174,7 +174,7 @@ AVector4D &AVector4D::operator/=(areal divisor) {
 
     \sa operator-=()
 */
-AVector4D &AVector4D::operator+=(const AVector4D &vector) {
+Vector4 &Vector4::operator+=(const Vector4 &vector) {
     return *this = *this + vector;
 }
 /*!
@@ -183,21 +183,21 @@ AVector4D &AVector4D::operator+=(const AVector4D &vector) {
 
     \sa operator+=()
 */
-AVector4D &AVector4D::operator-=(const AVector4D &vector) {
+Vector4 &Vector4::operator-=(const Vector4 &vector) {
     return *this = *this - vector;
 }
 /*!
     Returns the component of the vector at index position i as a modifiable reference.
     \a i must be a valid index position in the vector (i.e., 0 <= i < 4).
 */
-areal &AVector4D::operator[](int i) {
+areal &Vector4::operator[](int i) {
     return v[i];
 }
 /*!
     Returns the component of the vector at index position.
     \a i must be a valid index position in the vector (i.e., 0 <= i < 4).
 */
-const areal AVector4D::operator[](int i) const {
+const areal Vector4::operator[](int i) const {
     return v[i];
 }
 /*!
@@ -205,7 +205,7 @@ const areal AVector4D::operator[](int i) const {
 
     \sa sqrLength()
 */
-areal AVector4D::length() const {
+areal Vector4::length() const {
     return (areal)sqrt(sqrLength());
 }
 /*!
@@ -213,7 +213,7 @@ areal AVector4D::length() const {
 
     \sa length()
 */
-areal AVector4D::sqrLength() const {
+areal Vector4::sqrLength() const {
     return x * x + y * y + z * z + w * w;
 }
 /*!
@@ -222,7 +222,7 @@ areal AVector4D::sqrLength() const {
 
     \sa length()
 */
-areal AVector4D::normalize() {
+areal Vector4::normalize() {
     areal len = length();
     if (len == 0.0f)
         return 0.0f;
@@ -233,6 +233,6 @@ areal AVector4D::normalize() {
 /*!
     Returns the dot-product of this vector and given \a vector.
 */
-areal AVector4D::dot(const AVector4D &vector) const {
+areal Vector4::dot(const Vector4 &vector) const {
     return x * vector.x + y * vector.y + z * vector.z + w * vector.w;
 }

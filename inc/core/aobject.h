@@ -25,7 +25,6 @@
 #include <map>
 #include <queue>
 #include <list>
-#include <mutex>
 
 #include "acommon.h"
 
@@ -183,14 +182,14 @@ private:
     friend class AObjectSystem;
 
 private:
-    void                        setUUID                     (uint32_t id);
+    void                            setUUID                     (uint32_t id);
 
-    bool                        operator==                  (const AObject &) const { return false; }
-    bool                        operator!=                  (const AObject &) const { return false; }
+    bool                            operator==                  (const AObject &) const { return false; }
+    bool                            operator!=                  (const AObject &) const { return false; }
 
-    AObject                    &operator=                   (AObject &);
+    AObject                        &operator=                   (AObject &);
 
-    AObject                     (const AObject &);
+    AObject                         (const AObject &);
 };
 
 #endif // AOBJECT_H

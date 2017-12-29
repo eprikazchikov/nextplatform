@@ -17,7 +17,7 @@ class ATestObject : public AObject {
 
     A_PROPERTIES(
         A_PROPERTY(bool, slot, getSlot, setSlot),
-        A_PROPERTY(AVector2D, vec, getVector, setVector),
+        A_PROPERTY(Vector2, vec, getVector, setVector),
         A_PROPERTY(ATestObject *, resource, getResource, setResource)
     )
 
@@ -25,7 +25,7 @@ public:
     explicit ATestObject     () :
             AObject() {
         m_bSlot     = false;
-        m_Vector2   = AVector2D(1.0f, 0.0f);
+        m_Vector2   = Vector2(1.0f, 0.0f);
         m_pResource = nullptr;
     }
 
@@ -37,11 +37,11 @@ public:
         m_bSlot     = value;
     }
 
-    AVector2D       getVector       () const {
+    Vector2       getVector       () const {
         return m_Vector2;
     }
 
-    void            setVector       (const AVector2D &value) {
+    void            setVector       (const Vector2 &value) {
         m_Vector2   = value;
     }
 
@@ -56,7 +56,7 @@ public:
     void            signal          (const bool value);
 
     bool            m_bSlot;
-    AVector2D       m_Vector2;
+    Vector2       m_Vector2;
     ATestObject    *m_pResource;
 };
 

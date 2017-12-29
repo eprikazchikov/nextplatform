@@ -28,12 +28,12 @@ void SerializationTest::initTestCase() {
 
     var1["array"]   = a;
 
-    var1["vec2"]    = AVector2D(1);
-    var1["vec3"]    = AVector3D(2);
-    var1["vec4"]    = AVector4D(3);
-    var1["quat"]    = AQuaternion();
-    var1["mat3"]    = AMatrix3D();
-    var1["mat4"]    = AMatrix4D();
+    var1["vec2"]    = Vector2(1);
+    var1["vec3"]    = Vector3(2);
+    var1["vec4"]    = Vector4(3);
+    var1["quat"]    = Quaternion();
+    var1["mat3"]    = Matrix3();
+    var1["mat4"]    = Matrix4();
 }
 
 void SerializationTest::Json_Serialize_Desirialize() {
@@ -45,5 +45,5 @@ void SerializationTest::Bson_Serialize_Desirialize() {
     var1["bin"]     = bin;
 
     uint32_t offset = 0;
-    QCOMPARE(AVariant(var1), ABson::load(ABson::save(var1), offset, AMetaType::VariantMap));
+    QCOMPARE(AVariant(var1), ABson::load(ABson::save(var1), offset, AMetaType::VARIANTMAP));
 }
