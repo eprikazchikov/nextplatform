@@ -27,7 +27,7 @@
 
 #include "acommon.h"
 
-#include "math/math.h"
+#include "math/amath.h"
 #include "ametatype.h"
 
 using namespace std;
@@ -37,6 +37,15 @@ class AVariant;
 typedef map<string, AVariant>   AVariantMap;
 typedef list<AVariant>          AVariantList;
 typedef vector<int8_t>          AByteArray;
+
+#if __ANDROID__
+#include <sstream>
+string to_string(auto v) {
+    ostringstream ss;
+    ss << v;
+    return ss.str();
+}
+#endif
 
 class NEXT_LIBRARY_EXPORT AVariant {
 public:
@@ -131,12 +140,12 @@ public:
     const AVariantList          toList                      () const;
     const AByteArray            toByteArray                 () const;
 
-    const Vector2             toVector2                  () const;
-    const Vector3             toVector3                  () const;
-    const Vector4             toVector4                  () const;
-    const Quaternion           toQuaternion                () const;
-    const Matrix3             toMatrix3                  () const;
-    const Matrix4             toMatrix4                  () const;
+    const Vector2               toVector2                   () const;
+    const Vector3               toVector3                   () const;
+    const Vector4               toVector4                   () const;
+    const Quaternion            toQuaternion                () const;
+    const Matrix3               toMatrix3                   () const;
+    const Matrix4               toMatrix4                   () const;
 
 protected:
     Data                        mData;

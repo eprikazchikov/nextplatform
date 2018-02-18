@@ -1,4 +1,4 @@
-#include "math/math.h"
+#include "math/amath.h"
 
 /*!
     \class Matrix3
@@ -25,6 +25,18 @@ Matrix4::Matrix4(const Matrix3 &matrix) {
     mat[1] = matrix[1]; mat[5] = matrix[4]; mat[ 9] = matrix[7]; mat[13] = 0.0;
     mat[2] = matrix[2]; mat[6] = matrix[5]; mat[10] = matrix[8]; mat[14] = 0.0;
     mat[3] = 0.0;       mat[7] = 0.0;       mat[11] = 0.0;       mat[15] = 1.0;
+}
+/*!
+    Constructs matrix by given \a position, \a rotation and \a scale.
+*/
+Matrix4::Matrix4(const Vector3 &position, const Quaternion &rotation, const Vector3 &scale) {
+    identity();
+    Matrix4 m;
+    m.translate(position);
+    *this *= m;
+    *this *= Matrix4(rotation.toMatrix());
+    m.scale(scale);
+    *this *= m;
 }
 /*!
     Returns true if this matrix is equal to given \a matrix; otherwise returns false.
@@ -161,7 +173,7 @@ areal &Matrix4::operator[](int i) {
     \a i must be a valid index position in the matrix (i.e., 0 <= i < 16).
     Data is stored as column-major format so this function retrieving data from rows in colmns.
 */
-const areal Matrix4::operator[](int i) const {
+areal Matrix4::operator[](int i) const {
     return mat[i];
 }
 /*!

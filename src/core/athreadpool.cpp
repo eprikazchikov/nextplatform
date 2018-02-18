@@ -11,7 +11,7 @@ public:
         PROFILE_FUNCTION()
     }
 
-    AObject *AThreadPoolPrivate::takeTask() {
+    AObject *takeTask() {
         PROFILE_FUNCTION()
         if(!m_Tasks.empty()) {
             AObject *object = m_Tasks.front();

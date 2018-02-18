@@ -7,6 +7,8 @@
     #else
         #define NEXT_LIBRARY_EXPORT __declspec(dllimport)
     #endif
+#else
+    #define NEXT_LIBRARY_EXPORT
 #endif
 
 #ifdef BUILD_WITH_EASY_PROFILER

@@ -1,4 +1,4 @@
-#include "math/math.h"
+#include "math/amath.h"
 
 /*!
     \class Plane

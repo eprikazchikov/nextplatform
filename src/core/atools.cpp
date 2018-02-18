@@ -1,5 +1,7 @@
 #include "core/atools.h"
 
+#include <cstdint>
+
 /*!
     Convert wide character string to utf-8 character string.
     @param[in]  in          Pointer to wide character string.

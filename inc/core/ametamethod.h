@@ -101,7 +101,7 @@ struct Invoker<Return(*)(Args...)> {
 
     template<typename F, unsigned... Is>
     inline static AVariant invoke(AObject *obj, F f, const AVariant *args, unpack::indices<Is...>) {
-        return f(any_cast<Args>(args[Is])...);
+        return f(args[Is]...); //any_cast<Args>(args[Is])...
     }
 
     template<Fun fun>
@@ -131,7 +131,7 @@ struct Invoker<Return(*)()> {
 
     template<typename F, unsigned... Is>
     inline static AVariant invoke(AObject *obj, F f, const AVariant *args, unpack::indices<Is...>) {
-        return f(any_cast<Args>(args[Is])...);
+        return f(args[Is]...); // any_cast<Args>(args[Is])...
     }
 
     template<Fun fun>
@@ -162,8 +162,8 @@ struct Invoker<void(*)(Args...)> {
 
     template<typename F, unsigned... Is>
     inline static AVariant invoke(AObject *obj, F f, const AVariant *args, unpack::indices<Is...>) {
-        f(any_cast<Args>(args[Is])...);
-        return Any();
+        f(args[Is]...); // any_cast<Args>(args[Is])...
+        return AVariant();
     }
 
     template<Fun fun>
@@ -225,7 +225,7 @@ struct Invoker<Return(Class::*)(Args...)> {
 
     template<typename F, unsigned... Is>
     inline static AVariant invoke(AObject *obj, F f, const AVariant *args, unpack::indices<Is...>) {
-        return (static_cast<Class *>(obj)->*f)(any_cast<Args>(args[Is])...);
+        return (static_cast<Class *>(obj)->*f)(args[Is]...); // any_cast<Args>(args[Is])...
     }
 
     template<Fun fun>
@@ -317,7 +317,7 @@ struct Invoker<void(Class::*)()> {
 
     template<typename F, unsigned... Is>
     inline static AVariant invoke(AObject *obj, F f, const AVariant *args, unpack::indices<Is...>) {
-        (static_cast<Class *>(obj)->*f)(any_cast<Args>(args[Is])...);
+        (static_cast<Class *>(obj)->*f)(args[Is]...); // any_cast<Args>(args[Is])...
         return AVariant();
     }
 
@@ -349,7 +349,7 @@ struct Invoker<Return(Class::*)(Args...)const> {
 
     template<typename F, unsigned... Is>
     inline static AVariant invoke(AObject *obj, F f, const AVariant *args, unpack::indices<Is...>) {
-        return (const_cast<const Class *>(static_cast<Class *>(obj))->*f)(any_cast<Args>(args[Is])...);
+        return (const_cast<const Class *>(static_cast<Class *>(obj))->*f)(args[Is]...); // any_cast<Args>(args[Is])...
     }
 
     template<Fun fun>
@@ -415,7 +415,7 @@ struct Invoker<void(Class::*)(Args...)const> {
 
     template<typename F, unsigned... Is>
     inline static AVariant invoke(AObject *obj, F f, const AVariant *args, unpack::indices<Is...>) {
-        (const_cast<const Class *>(static_cast<Class *>(obj))->*f)(any_cast<Args>(args[Is])...);
+        (const_cast<const Class *>(static_cast<Class *>(obj))->*f)(args[Is]...); // any_cast<Args>(args[Is])...
         return AVariant();
     }
 
@@ -446,7 +446,7 @@ struct Invoker<void(Class::*)()const> {
 
     template<typename F, unsigned... Is>
     inline static AVariant invoke(AObject *obj, F f, const AVariant *args, unpack::indices<Is...>) {
-        (const_cast<const Class *>(static_cast<Class *>(obj))->*f)(any_cast<Args>(args[Is])...);
+        (const_cast<const Class *>(static_cast<Class *>(obj))->*f)(args[Is]...); // any_cast<Args>(args[Is])...
         return AVariant();
     }
 

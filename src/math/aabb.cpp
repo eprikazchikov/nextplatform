@@ -1,4 +1,4 @@
-#include "math/math.h"
+#include "math/amath.h"
 /*!
     \class AABBox
     \brief The AABBox class represents a Axis Aligned Bounding Box in 3D space.

@@ -65,7 +65,7 @@ HEADERS += \
     inc/math/vector3.h \
     inc/math/vector4.h \
     inc/acommon.h \
-    inc/math/math.h
+    inc/math/amath.h
 
 
 INCLUDEPATH += \

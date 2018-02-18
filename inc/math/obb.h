@@ -39,8 +39,8 @@ public:
     void                        box                         (Vector3 &min, Vector3 &max) const;
     void                        setBox                      (const Vector3 &min, const Vector3 &max);
 
-    Vector3                    center;
-    Vector3                    size;
+    Vector3                     center;
+    Vector3                     size;
     Quaternion                  rotation;
 };
 
