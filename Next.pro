@@ -14,19 +14,17 @@ TEMPLATE = lib
 CONFIG += c++11
 
 SOURCES += \
-    src/core/abson.cpp \
-    src/core/aevent.cpp \
-    src/core/ajson.cpp \
-    src/core/ametamethod.cpp \
-    src/core/ametaobject.cpp \
-    src/core/ametaproperty.cpp \
-    src/core/ametatype.cpp \
-    src/core/aobject.cpp \
-    src/core/aobjectsystem.cpp \
-    src/core/athreadpool.cpp \
-    src/core/atools.cpp \
-    src/core/auri.cpp \
-    src/core/avariant.cpp \
+    src/core/bson.cpp \
+    src/core/event.cpp \
+    src/core/json.cpp \
+    src/core/metamethod.cpp \
+    src/core/metaobject.cpp \
+    src/core/metaproperty.cpp \
+    src/core/metatype.cpp \
+    src/core/object.cpp \
+    src/core/objectsystem.cpp \
+    src/core/tools.cpp \
+    src/core/uri.cpp \
     src/math/aabb.cpp \
     src/math/matrix3.cpp \
     src/math/matrix4.cpp \
@@ -37,23 +35,22 @@ SOURCES += \
     src/math/vector2.cpp \
     src/math/vector3.cpp \
     src/math/vector4.cpp \
-    src/math/math.cpp
+    src/math/math.cpp \
+    src/core/threadpool.cpp \
+    src/core/variant.cpp \
+    src/anim/animation.cpp \
+    src/anim/variantanimation.cpp \
+    src/anim/propertyanimation.cpp
 
 
 HEADERS += \
-    inc/core/abson.h \
-    inc/core/aevent.h \
-    inc/core/ajson.h \
-    inc/core/ametamethod.h \
-    inc/core/ametaobject.h \
-    inc/core/ametaproperty.h \
-    inc/core/ametatype.h \
-    inc/core/aobject.h \
-    inc/core/aobjectsystem.h \
-    inc/core/athreadpool.h \
-    inc/core/atools.h \
-    inc/core/auri.h \
-    inc/core/avariant.h \
+    inc/core/bson.h \
+    inc/core/event.h \
+    inc/core/json.h \
+    inc/core/metamethod.h \
+    inc/core/metaobject.h \
+    inc/core/metaproperty.h \
+    inc/core/objectsystem.h \
     inc/math/aabb.h \
     inc/math/matrix3.h \
     inc/math/matrix4.h \
@@ -64,8 +61,18 @@ HEADERS += \
     inc/math/vector2.h \
     inc/math/vector3.h \
     inc/math/vector4.h \
-    inc/acommon.h \
-    inc/math/amath.h
+    inc/math/amath.h \
+    inc/core/variant.h \
+    inc/core/metatype.h \
+    inc/common.h \
+    inc/core/uri.h \
+    inc/core/tools.h \
+    inc/core/threadpool.h \
+    inc/core/object.h \
+    inc/patterns/asingleton.h \
+    inc/anim/animation.h \
+    inc/anim/variantanimation.h \
+    inc/anim/propertyanimation.h
 
 
 INCLUDEPATH += \

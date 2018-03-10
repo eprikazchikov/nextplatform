@@ -1,26 +1,26 @@
 #include "tst_threadpool.h"
 
-#include "core/athreadpool.h"
+#include "core/threadpool.h"
 
 #include <QDebug>
 #include <QTest>
 
 #include "tst_common.h"
 
-class AThreadObject : public AObject {
+class ThreadObject : public Object {
 public:
-    explicit AThreadObject     () :
-            AObject() {
+    explicit ThreadObject     () :
+            Object() {
         m_Counter   = 0;
     }
 
     void            post            () {
-        AEvent *e   = new AEvent(AEvent::UserType);
+        Event *e    = new Event(Event::UserType);
         postEvent(e);
     }
 
-    bool            event           (AEvent *e) {
-        if(e->type() == AEvent::UserType) {
+    bool            event           (Event *e) {
+        if(e->type() == Event::UserType) {
             QTest::qSleep(1000);
             m_Counter++;
             return true;
@@ -36,8 +36,8 @@ public:
 };
 
 void ThreadPoolTest::initTestCase() {
-    qDebug() << "Optimal number of threads =" << AThreadPool::optimalThreadCount();
-    m_pPool = new AThreadPool;
+    qDebug() << "Optimal number of threads =" << ThreadPool::optimalThreadCount();
+    m_pPool = new ThreadPool;
 }
 
 void ThreadPoolTest::cleanupTestCase() {
@@ -45,10 +45,10 @@ void ThreadPoolTest::cleanupTestCase() {
 }
 
 void ThreadPoolTest::Multi_Task() {
-    AThreadObject obj;
+    ThreadObject obj;
     obj.setName("MainObject");
     for(int i = 0; i < 16; i++) {
-        AThreadObject *object = new AThreadObject();
+        ThreadObject *object = new ThreadObject();
         object->setName(string("TestComponent") + to_string(i));
         object->setParent(&obj);
         object->post();
@@ -56,7 +56,7 @@ void ThreadPoolTest::Multi_Task() {
     }
     m_pPool->waitForDone();
 
-    for(auto it : obj.findChildren<AThreadObject *>()) {
+    for(auto it : obj.findChildren<ThreadObject *>()) {
         QCOMPARE(it->counter(), uint32_t(1));
     }
 }

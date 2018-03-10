@@ -1,6 +1,5 @@
 !android: {
     QT       += testlib
-    QT       -= gui
 
     TARGET    = ../bin/tst_next
     CONFIG   += console
@@ -47,3 +46,11 @@ win32: {
             -leasy_profiler
     }
 }
+
+HEADERS += \
+    tests/tst_animation.h \
+    tests/tst_math.h
+
+SOURCES += \
+    tests/tst_animation.cpp \
+    tests/tst_math.cpp

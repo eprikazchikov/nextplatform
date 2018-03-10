@@ -7,6 +7,8 @@
 #include "tst_serialization.h"
 #include "tst_threadpool.h"
 #include "tst_uri.h"
+#include "tst_math.h"
+#include "tst_animation.h"
 
 inline int aExec(QObject &ts, int argc, char *argv[]) {
     QStringList args;
@@ -43,8 +45,8 @@ int main(int argc, char *argv[]) {
 
     PROFILE_START
 
-    AObjectSystem system;
-    ATestObject::registerClassFactory();
+    ObjectSystem system;
+    TestObject::registerClassFactory();
     {
         VariantTest ts;
         status |= aExec(ts, argc, argv);
@@ -63,6 +65,14 @@ int main(int argc, char *argv[]) {
     }
     {
         ObjectSystemTest ts;
+        status |= aExec(ts, argc, argv);
+    }
+    {
+        MathTest ts;
+        status |= aExec(ts, argc, argv);
+    }
+    {
+        AnimationTest ts;
         status |= aExec(ts, argc, argv);
     }
     {

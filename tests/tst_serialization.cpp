@@ -1,8 +1,8 @@
 #include "tst_serialization.h"
 
-#include "core/aobjectsystem.h"
-#include "core/abson.h"
-#include "core/ajson.h"
+#include "core/objectsystem.h"
+#include "core/bson.h"
+#include "core/json.h"
 
 #include <QtTest>
 
@@ -12,18 +12,18 @@ void SerializationTest::initTestCase() {
     var1["bool"]    = true;
     var1["str"]     = "";
     var1["int"]     = 2;
-    var1["double"]  = 3.0;
+    var1["float"]   = 3.0f;
 
-    AVariantMap m;
+    VariantMap m;
     m["bool"]       = true;
     m["str"]        = "true";
     m["int"]        = 1;
 
     var1["map"]     = m;
 
-    AVariantList a;
+    VariantList a;
     a.push_back("string");
-    a.push_back(1.0);
+    a.push_back(1.0f);
     a.push_back(123);
 
     var1["array"]   = a;
@@ -37,13 +37,13 @@ void SerializationTest::initTestCase() {
 }
 
 void SerializationTest::Json_Serialize_Desirialize() {
-    QCOMPARE(AVariant(var1), AJson::load(AJson::save(var1)));
+    QCOMPARE(Variant(var1), Json::load(Json::save(var1)));
 }
 
 void SerializationTest::Bson_Serialize_Desirialize() {
-    AByteArray bin  = {'\x00','\x01','\x02','\x03','\x04','\xFF'};
+    ByteArray bin   = {'\x00','\x01','\x02','\x03','\x04','\xFF'};
     var1["bin"]     = bin;
 
     uint32_t offset = 0;
-    QCOMPARE(AVariant(var1), ABson::load(ABson::save(var1), offset, AMetaType::VARIANTMAP));
+    QCOMPARE(Variant(var1), Bson::load(Bson::save(var1), offset, MetaType::VARIANTMAP));
 }

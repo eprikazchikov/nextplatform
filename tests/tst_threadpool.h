@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-class AThreadPool;
+class ThreadPool;
 
 class ThreadPoolTest : public QObject {
     Q_OBJECT
@@ -15,7 +15,7 @@ private slots:
     void Multi_Task();
 
 private:
-    AThreadPool *m_pPool;
+    ThreadPool *m_pPool;
 
 };
 

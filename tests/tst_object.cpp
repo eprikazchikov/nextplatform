@@ -21,16 +21,16 @@
 
 #include "tst_common.h"
 
-#include "core/auri.h"
+#include "core/uri.h"
 
 #include <QtTest>
 
 bool toList(void *to, const void *from, const uint32_t fromType) {
-    if(fromType == AMetaType::type<ATestObject *>()) {
-        const AObject *o = *(const AObject **)from;
+    if(fromType == MetaType::type<TestObject *>()) {
+        const Object *o = *(const Object **)from;
 
-        AVariantList *r = static_cast<AVariantList *>(to);
-        *r  = AObjectSystem::toVariant(o).value<AVariantList>();
+        VariantList *r  = static_cast<VariantList *>(to);
+        *r  = ObjectSystem::toVariant(o).value<VariantList>();
 
         return true;
     }
@@ -38,27 +38,27 @@ bool toList(void *to, const void *from, const uint32_t fromType) {
 }
 
 void ObjectTest::Meta_type() {
-    int type    = AMetaType::type<ATestObject *>();
-    bool result = AMetaType::registerConverter(type, AMetaType::VARIANTLIST, &toList);
+    int type    = MetaType::type<TestObject *>();
+    bool result = MetaType::registerConverter(type, MetaType::VARIANTLIST, &toList);
 
     QCOMPARE(result, true);
 
-    ATestObject *obj    = new ATestObject;
-    AVariant variant    = AVariant::fromValue(obj);
+    TestObject *obj = new TestObject;
+    Variant variant = Variant::fromValue(obj);
 
     QCOMPARE(variant.isValid(), true);
     QCOMPARE((int)variant.userType(), type);
 
-    AVariantList list   = variant.toList();
+    VariantList list    = variant.toList();
     QCOMPARE((int)list.size(), 2);
 }
 
 void ObjectTest::Meta_property() {
-    ATestObject obj;
-    const AMetaObject *meta = obj.metaObject();
+    TestObject obj;
+    const MetaObject *meta  = obj.metaObject();
     QVERIFY(meta != nullptr);
 
-    QCOMPARE(meta->name(), "ATestObject");
+    QCOMPARE(meta->name(), "TestObject");
 
     QCOMPARE(meta->propertyCount(), 3);
     QCOMPARE(meta->property(0).isValid(), true);
@@ -82,21 +82,21 @@ void ObjectTest::Meta_property() {
 }
 
 void ObjectTest::Meta_methods() {
-    ATestObject obj;
-    const AMetaObject *meta = obj.metaObject();
+    TestObject obj;
+    const MetaObject *meta = obj.metaObject();
     QVERIFY(meta != nullptr);
 
     QCOMPARE(meta->methodCount(), 2);
 
     int index   = meta->indexOfMethod("setSlot");
     if(index > -1) {
-        AMetaMethod method = meta->method(index);
+        MetaMethod method   = meta->method(index);
 
         QCOMPARE(method.isValid(), true);
-        AVariant value;
+        Variant value;
         QCOMPARE(obj.getSlot(), false);
 
-        AVariant arg(true);
+        Variant arg(true);
         QCOMPARE(method.invoke(&obj, value, 1, &arg), true);
         QCOMPARE(obj.getSlot(), true);
     }
@@ -110,64 +110,64 @@ void ObjectTest::Meta_methods() {
 }
 
 void ObjectTest::Disconnect_base() {
-    ATestObject obj1;
-    ATestObject obj2;
-    ATestObject obj3;
+    TestObject obj1;
+    TestObject obj2;
+    TestObject obj3;
 
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
     QCOMPARE((int)obj1.getReceivers().size(), 2);
 
-    AObject::disconnect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    Object::disconnect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
     QCOMPARE((int)obj1.getReceivers().size(), 1);
 }
 
 void ObjectTest::Disconnect_all() {
-    ATestObject obj1;
-    ATestObject obj2;
-    ATestObject obj3;
+    TestObject obj1;
+    TestObject obj2;
+    TestObject obj3;
 
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
     QCOMPARE((int)obj1.getReceivers().size(), 2);
 
-    AObject::disconnect(&obj1, 0, 0, 0);
+    Object::disconnect(&obj1, 0, 0, 0);
     QCOMPARE((int)obj1.getReceivers().size(), 0);
 }
 
 void ObjectTest::Disconnect_by_signal() {
-    ATestObject obj1;
-    ATestObject obj2;
-    ATestObject obj3;
+    TestObject obj1;
+    TestObject obj2;
+    TestObject obj3;
 
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
     QCOMPARE((int)obj1.getReceivers().size(), 2);
 
-    AObject::disconnect(&obj1, _SIGNAL(signal(bool)), 0, 0);
+    Object::disconnect(&obj1, _SIGNAL(signal(bool)), 0, 0);
     QCOMPARE((int)obj1.getReceivers().size(), 0);
 }
 
 void ObjectTest::Disconnect_by_receiver() {
-    ATestObject obj1;
-    ATestObject obj2;
-    ATestObject obj3;
+    TestObject obj1;
+    TestObject obj2;
+    TestObject obj3;
 
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
     QCOMPARE((int)obj1.getReceivers().size(), 2);
 
-    AObject::disconnect(&obj1, 0, &obj3, 0);
+    Object::disconnect(&obj1, 0, &obj3, 0);
     QCOMPARE((int)obj1.getReceivers().size(), 1);
 }
 
 void ObjectTest::Child_destructor() {
-    AObject *obj1   = new AObject;
-    AObject *obj2   = new AObject();
+    Object *obj1   = new Object;
+    Object *obj2   = new Object();
     obj2->setName("TestComponent2");
     obj2->setParent(obj1);
 
-    AObject *obj3   = new AObject();
+    Object *obj3   = new Object();
     obj3->setName("TestComponent3");
     obj3->setParent(obj1);
 
@@ -184,10 +184,10 @@ void ObjectTest::Child_destructor() {
 }
 
 void ObjectTest::Reciever_destructor() {
-    ATestObject *obj1   = new ATestObject;
-    ATestObject *obj2   = new ATestObject;
+    TestObject *obj1    = new TestObject;
+    TestObject *obj2    = new TestObject;
 
-    AObject::connect(obj1, _SIGNAL(signal(bool)), obj2, _SIGNAL(signal(bool)));
+    Object::connect(obj1, _SIGNAL(signal(bool)), obj2, _SIGNAL(signal(bool)));
     QCOMPARE((int)obj1->getReceivers().size(),  1);
 
     delete obj2;
@@ -197,12 +197,12 @@ void ObjectTest::Reciever_destructor() {
 }
 
 void ObjectTest::Emit_signal() {
-    ATestObject obj1;
-    ATestObject obj2;
-    ATestObject obj3;
+    TestObject obj1;
+    TestObject obj2;
+    TestObject obj3;
 
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SIGNAL(signal(bool)));
-    AObject::connect(&obj2, _SIGNAL(signal(bool)), &obj3, _SLOT(setSlot(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SIGNAL(signal(bool)));
+    Object::connect(&obj2, _SIGNAL(signal(bool)), &obj3, _SLOT(setSlot(bool)));
 
     {
         QCOMPARE(obj3.m_bSlot, false);
@@ -225,9 +225,9 @@ void ObjectTest::Emit_signal() {
 }
 
 void ObjectTest::Find_object() {
-    AObject obj1;
-    ATestObject obj2;
-    ATestObject obj3;
+    Object obj1;
+    TestObject obj2;
+    TestObject obj3;
 
     obj1.setName("MainObject");
     obj2.setName("TestComponent2");
@@ -235,26 +235,26 @@ void ObjectTest::Find_object() {
     obj2.setParent(&obj1);
     obj3.setParent(&obj1);
     {
-        AObject *result = obj1.find("/MainObject/TestComponent2");
+        Object *result  = obj1.find("/MainObject/TestComponent2");
         QCOMPARE(result, &obj2);
     }
     {
-        AObject *result = obj1.find("/MainObject/TestComponent3");
+        Object *result  = obj1.find("/MainObject/TestComponent3");
         QCOMPARE(&obj3, result);
     }
     {
-        ATestObject *result = obj1.findChild<ATestObject *>();
+        TestObject *result  = obj1.findChild<TestObject *>();
         QCOMPARE(&obj2, result);
     }
     {
-        list<ATestObject *> result = obj1.findChildren<ATestObject *>();
+        list<TestObject *> result   = obj1.findChildren<TestObject *>();
         QCOMPARE(int(result.size()), 2);
     }
 }
 
 void ObjectTest::Clone_object() {
-    ATestObject obj1;
-    ATestObject obj2;
+    TestObject obj1;
+    TestObject obj2;
     obj1.setName("MainObject");
     obj2.setName("TestComponent2");
     obj2.setParent(&obj1);
@@ -262,10 +262,10 @@ void ObjectTest::Clone_object() {
     obj1.setProperty("dynamic1", 100);
     obj2.setProperty("dynamic2", true);
 
-    AObject::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
-    AObject::connect(&obj2, _SIGNAL(signal(bool)), &obj1, _SLOT(setSlot(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
+    Object::connect(&obj2, _SIGNAL(signal(bool)), &obj1, _SLOT(setSlot(bool)));
 
-    AObject *clone  = obj1.clone();
+    Object *clone   = obj1.clone();
     QCOMPARE((clone != nullptr), true);
     QCOMPARE(compare(*clone, obj1), true);
     QCOMPARE((clone->uuid() != 0), true);

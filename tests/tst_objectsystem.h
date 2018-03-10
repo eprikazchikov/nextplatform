@@ -3,8 +3,6 @@
 
 #include <QObject>
 
-class AObjectSystem;
-
 class ObjectSystemTest : public QObject {
     Q_OBJECT
 

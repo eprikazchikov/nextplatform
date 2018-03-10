@@ -9,6 +9,8 @@ class UriTest : public QObject {
 private slots:
     void Parse_URI();
 
+    void Parse_Path();
+
 };
 
 #endif // TST_URI_H

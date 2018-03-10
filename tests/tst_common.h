@@ -1,14 +1,14 @@
 #ifndef TST_COMMON_H
 #define TST_COMMON_H
 
-#include "core/aobject.h"
+#include "core/object.h"
 
-#include "core/aobjectsystem.h"
+#include "core/objectsystem.h"
 
 #include <QTest>
 
-class ATestObject : public AObject {
-    A_REGISTER(ATestObject, AObject, Test)
+class TestObject : public Object {
+    A_REGISTER(TestObject, Object, Test)
 
     A_METHODS(
         A_SLOT(setSlot),
@@ -18,12 +18,12 @@ class ATestObject : public AObject {
     A_PROPERTIES(
         A_PROPERTY(bool, slot, getSlot, setSlot),
         A_PROPERTY(Vector2, vec, getVector, setVector),
-        A_PROPERTY(ATestObject *, resource, getResource, setResource)
+        A_PROPERTY(TestObject *, resource, getResource, setResource)
     )
 
 public:
-    explicit ATestObject     () :
-            AObject() {
+    explicit TestObject     () :
+            Object() {
         m_bSlot     = false;
         m_Vector2   = Vector2(1.0f, 0.0f);
         m_pResource = nullptr;
@@ -37,7 +37,7 @@ public:
         m_bSlot     = value;
     }
 
-    Vector2       getVector       () const {
+    Vector2         getVector       () const {
         return m_Vector2;
     }
 
@@ -45,22 +45,22 @@ public:
         m_Vector2   = value;
     }
 
-    ATestObject    *getResource     () const {
+    TestObject     *getResource     () const {
         return m_pResource;
     }
 
-    void            setResource     (ATestObject *resource) {
+    void            setResource     (TestObject *resource) {
         m_pResource = resource;
     }
 
     void            signal          (const bool value);
 
     bool            m_bSlot;
-    Vector2       m_Vector2;
-    ATestObject    *m_pResource;
+    Vector2         m_Vector2;
+    TestObject     *m_pResource;
 };
 
-inline bool compare(const AObject::Link &left, const AObject::Link &right) {
+inline bool compare(const Object::Link &left, const Object::Link &right) {
     bool result = true;
     result &= left.signal   == right.signal;
     result &= left.method   == right.method;
@@ -68,7 +68,7 @@ inline bool compare(const AObject::Link &left, const AObject::Link &right) {
 }
 
 
-inline bool compare(const AObject &left, const AObject &right) {
+inline bool compare(const Object &left, const Object &right) {
     bool result = true;
 
     result &= (left.isEnable()  == right.isEnable());
@@ -80,10 +80,10 @@ inline bool compare(const AObject &left, const AObject &right) {
 
     {
         for(int i = 0; i < left.metaObject()->propertyCount(); i++) {
-            AMetaProperty lp    = left.metaObject()->property(i);
-            AMetaProperty rp    = right.metaObject()->property(i);
-            AVariant lv = lp.read(&left);
-            AVariant rv = rp.read(&right);
+            MetaProperty lp     = left.metaObject()->property(i);
+            MetaProperty rp     = right.metaObject()->property(i);
+            Variant lv  = lp.read(&left);
+            Variant rv  = rp.read(&right);
             if(lp.name() != rp.name() || lv != rv) {
                 return false;
             }
@@ -114,8 +114,8 @@ inline bool compare(const AObject &left, const AObject &right) {
             auto il = left.getChildren().begin();
             auto ir = right.getChildren().begin();
             while(il != left.getChildren().end() && ir != right.getChildren().end()) {
-                AObject *l  = *il;
-                AObject *r  = *ir;
+                Object *l  = *il;
+                Object *r  = *ir;
                 if(!compare(*l, *r)) {
                     return false;
                 }

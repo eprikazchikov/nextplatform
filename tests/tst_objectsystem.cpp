@@ -2,17 +2,17 @@
 
 #include "tst_common.h"
 
-#include "core/aobjectsystem.h"
+#include "core/objectsystem.h"
 
-#include "core/ajson.h"
-#include "core/abson.h"
+#include "core/json.h"
+#include "core/bson.h"
 
 #include <QtTest>
 
-ATestObject *resource;
+TestObject *resource;
 
 void ObjectSystemTest::initTestCase() {
-    resource   = AObjectSystem::objectCreate<ATestObject>();
+    resource   = ObjectSystem::objectCreate<TestObject>();
     resource->setName("TestResource");
 }
 
@@ -21,16 +21,16 @@ void ObjectSystemTest::cleanupTestCase() {
 }
 
 void ObjectSystemTest::Object_Instansing() {
-    ATestObject obj1;
+    TestObject obj1;
 
-    AObject *result1    = AObjectSystem::objectCreate<ATestObject>();
-    AObject *object = dynamic_cast<AObject*>(&obj1);
+    Object *result1 = ObjectSystem::objectCreate<TestObject>();
+    Object *object  = dynamic_cast<Object*>(&obj1);
 
     QCOMPARE((result1 != 0), true);
     QCOMPARE((object != 0), true);
     QCOMPARE(compare(*object, *result1), true);
 
-    AObject *result2    = AObjectSystem::objectCreate<ATestObject>();
+    Object *result2 = ObjectSystem::objectCreate<TestObject>();
 
     QCOMPARE((result1->uuid() != result2->uuid()), true);
 
@@ -39,9 +39,9 @@ void ObjectSystemTest::Object_Instansing() {
 }
 
 void ObjectSystemTest::Serialize_Desirialize_Object() {
-    ATestObject *obj1   = AObjectSystem::objectCreate<ATestObject>();
-    ATestObject *obj2   = AObjectSystem::objectCreate<ATestObject>();
-    ATestObject *obj3   = AObjectSystem::objectCreate<ATestObject>();
+    TestObject *obj1    = ObjectSystem::objectCreate<TestObject>();
+    TestObject *obj2    = ObjectSystem::objectCreate<TestObject>();
+    TestObject *obj3    = ObjectSystem::objectCreate<TestObject>();
 
     obj1->setName("MainObject");
 
@@ -51,14 +51,14 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
     obj3->setParent(obj2);
 
 
-    AObject::connect(obj1, _SIGNAL(signal(bool)), obj2, _SLOT(setSlot(bool)));
-    AObject::connect(obj1, _SIGNAL(signal(bool)), obj3, _SIGNAL(signal(bool)));
-    AObject::connect(obj2, _SIGNAL(signal(bool)), obj3, _SLOT(setSlot(bool)));
+    Object::connect(obj1, _SIGNAL(signal(bool)), obj2, _SLOT(setSlot(bool)));
+    Object::connect(obj1, _SIGNAL(signal(bool)), obj3, _SIGNAL(signal(bool)));
+    Object::connect(obj2, _SIGNAL(signal(bool)), obj3, _SLOT(setSlot(bool)));
 
-    AByteArray bytes = ABson::save(AObjectSystem::toVariant(obj1));
+    ByteArray bytes = Bson::save(ObjectSystem::toVariant(obj1));
     uint32_t offset = 0;
-    AObject *result = AObjectSystem::toObject(ABson::load(bytes, offset));
-    AObject *object = dynamic_cast<AObject*>(obj1);
+    Object *result  = ObjectSystem::toObject(Bson::load(bytes, offset));
+    Object *object  = dynamic_cast<Object*>(obj1);
 
     QCOMPARE((result != nullptr), true);
     QCOMPARE((object != nullptr), true);
@@ -71,8 +71,8 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
     delete obj1;
 }
 
-class ASecondObject : public ATestObject {
-    A_REGISTER(ASecondObject, ATestObject, Test)
+class SecondObject : public TestObject {
+    A_REGISTER(SecondObject, TestObject, Test)
 
     A_NOMETHODS()
     A_NOPROPERTIES()
@@ -80,29 +80,29 @@ class ASecondObject : public ATestObject {
 };
 
 void ObjectSystemTest::RegisterUnregister_Object() {
-    QCOMPARE((int)AObjectSystem::instance()->factories().size(), 1);
-    ASecondObject::registerClassFactory();
-    QCOMPARE((int)AObjectSystem::instance()->factories().size(), 2);
-    ASecondObject::unregisterClassFactory();
-    QCOMPARE((int)AObjectSystem::instance()->factories().size(), 1);
+    QCOMPARE((int)ObjectSystem::instance()->factories().size(), 1);
+    SecondObject::registerClassFactory();
+    QCOMPARE((int)ObjectSystem::instance()->factories().size(), 2);
+    SecondObject::unregisterClassFactory();
+    QCOMPARE((int)ObjectSystem::instance()->factories().size(), 1);
 }
 
-class ATestObjectEx : public ATestObject {
-    A_OVERRIDE(ATestObjectEx, ATestObject, Test)
+class TestObjectEx : public TestObject {
+    A_OVERRIDE(TestObjectEx, TestObject, Test)
 
     A_NOMETHODS()
     A_NOPROPERTIES()
 };
 
 void ObjectSystemTest::Override_Object() {
-    ATestObjectEx::registerClassFactory();
+    TestObjectEx::registerClassFactory();
 
-    AObject *object = AObjectSystem::objectCreate<ATestObject>();
+    Object *object  = ObjectSystem::objectCreate<TestObject>();
 
     QCOMPARE((object != nullptr), true);
-    const AMetaObject *meta = object->metaObject();
+    const MetaObject *meta = object->metaObject();
 
-    QCOMPARE((dynamic_cast<ATestObjectEx *>(object) != nullptr), true);
+    QCOMPARE((dynamic_cast<TestObjectEx *>(object) != nullptr), true);
     QCOMPARE(meta->methodCount(), 2);
     QCOMPARE(meta->propertyCount(), 3);
 
@@ -110,10 +110,10 @@ void ObjectSystemTest::Override_Object() {
     QCOMPARE((index > -1), true);
     delete object;
 
-    ATestObjectEx::unregisterClassFactory();
+    TestObjectEx::unregisterClassFactory();
 
-    object = AObjectSystem::objectCreate<ATestObject>();
-    QCOMPARE((dynamic_cast<ATestObject *>(object) != nullptr), true);
-    QCOMPARE((dynamic_cast<ATestObjectEx *>(object) == nullptr), true);
+    object = ObjectSystem::objectCreate<TestObject>();
+    QCOMPARE((dynamic_cast<TestObject *>(object) != nullptr), true);
+    QCOMPARE((dynamic_cast<TestObjectEx *>(object) == nullptr), true);
     delete object;
 }

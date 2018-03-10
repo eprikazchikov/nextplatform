@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "core/avariant.h"
+#include "core/variant.h"
 
 class SerializationTest: public QObject {
     Q_OBJECT
@@ -14,7 +14,7 @@ private slots:
     void Bson_Serialize_Desirialize();
 
 private:
-    AVariantMap var1;
+    VariantMap  var1;
 };
 
 #endif // TST_SERIALIZATION_H
