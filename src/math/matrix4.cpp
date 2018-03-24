@@ -343,7 +343,7 @@ Matrix4 Matrix4::perspective(areal fov, areal aspect, areal znear, areal zfar) {
     result[5]   = cotangent;
     result[10]  = -(zfar + znear) / (zfar - znear);
     result[11]  = -1;
-    result[14]  = -(2.0 * zfar * znear) / (zfar - znear);
+    result[14]  = -(2.0f * zfar * znear) / (zfar - znear);
     result[15]  = 0;
 
     return result;
