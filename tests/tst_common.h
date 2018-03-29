@@ -71,7 +71,6 @@ inline bool compare(const Object::Link &left, const Object::Link &right) {
 inline bool compare(const Object &left, const Object &right) {
     bool result = true;
 
-    result &= (left.isEnable()  == right.isEnable());
     result &= (left.typeName()  == right.typeName());
 
     if(!result) {

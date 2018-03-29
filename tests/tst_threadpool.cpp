@@ -15,12 +15,12 @@ public:
     }
 
     void            post            () {
-        Event *e    = new Event(Event::UserType);
+        Event *e    = new Event(Event::USERTYPE);
         postEvent(e);
     }
 
     bool            event           (Event *e) {
-        if(e->type() == Event::UserType) {
+        if(e->type() == Event::USERTYPE) {
             QTest::qSleep(1000);
             m_Counter++;
             return true;
