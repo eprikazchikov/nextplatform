@@ -10,7 +10,7 @@
 
 void SerializationTest::initTestCase() {
     var1["bool"]    = true;
-    var1["str"]     = "";
+    var1["str"]     = "str";
     var1["int"]     = 2;
     var1["float"]   = 3.0f;
 

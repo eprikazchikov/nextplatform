@@ -361,7 +361,30 @@ void Object::connect(Object *sender, const char *signal, Object *receiver, const
         }
     }
 }
+/*!
+    Disconnects \a signal in object \a sender from \a method in object \a receiver.
 
+    A connection is removed when either of the objects are destroyed.
+
+    disconnect() can be used in three ways:
+
+    \list 1
+    \li Disconnect everything from a specific sender:
+        \code
+            Object::disconnect(&obj1, 0, 0, 0);
+        \endcode
+    \li Disconnect everything connected to a specific signal:
+        \code
+            Object::disconnect(&obj1, _SIGNAL(signal(bool)), 0, 0);
+        \endcode
+    \li Disconnect all connections from the receiver:
+        \code
+            Object::disconnect(&obj1, 0, &obj3, 0);
+        \endcode
+    \endlist
+
+    \sa connect()
+*/
 void Object::disconnect(Object *sender, const char *signal, Object *receiver, const char *method) {
     PROFILE_FUNCTION()
     if(sender && !sender->p_ptr->m_lRecievers.empty()) {
@@ -462,7 +485,7 @@ void Object::setParent(Object *parent) {
 */
 void Object::setName(const string &name) {
     PROFILE_FUNCTION()
-    if(!value.empty()) {
+    if(!name.empty()) {
         p_ptr->m_sName = name;
     }
 }
@@ -485,7 +508,16 @@ void Object::removeChild(Object *value) {
         it++;
     }
 }
+/*!
+    Send specific \a signal with \a args for all connected receivers.
 
+    For now it places signal directly to receivers queues.
+    In case of another signal connected as method this signal will be emitted immediately.
+
+    \note Receiver should be in event loop to process incoming message.
+
+    \sa connect()
+*/
 void Object::emitSignal(const char *signal, const Variant &args) {
     PROFILE_FUNCTION()
     int32_t index   = metaObject()->indexOfSignal(&signal[1]);

@@ -50,7 +50,7 @@ void ObjectTest::Meta_type() {
     QCOMPARE((int)variant.userType(), type);
 
     VariantList list    = variant.toList();
-    QCOMPARE((int)list.size(), 2);
+    QCOMPARE((int)list.size(), 1);
 }
 
 void ObjectTest::Meta_property() {
