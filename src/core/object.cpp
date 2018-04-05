@@ -86,6 +86,26 @@ public:
     \sa MetaObject
 */
 /*!
+    \fn T Object::findChild(bool recursive)
+
+    Returns the first child of this object that can be cast to type T.
+    The search is performed recursively, unless \a recursive option is false.
+
+    Returns nullptr if no such object.
+
+    \sa find(), findChildren()
+*/
+/*!
+    \fn list<T> Object::findChildren(bool recursive)
+
+    Returns all children of this object that can be cast to type T.
+    The search is performed recursively, unless \a recursive option is false.
+
+    Returns empty list if no such objects.
+
+    \sa find(), findChildren()
+*/
+/*!
     \macro A_REGISTER(Class, Super, Group)
     \relates Object
 
@@ -439,6 +459,25 @@ const Object::LinkList &Object::getReceivers() const {
     return p_ptr->m_lRecievers;
 }
 
+/*!
+    Returns an object located along the \a path.
+
+    \code
+        Object obj1;
+        Object obj2;
+
+        obj1.setName("MainObject");
+        obj2.setName("TestComponent2");
+        obj2.setParent(&obj1);
+
+        // result will contain pointer to obj2
+        Object *result  = obj1.find("/MainObject/TestComponent2");
+    \endcode
+
+    Returns nullptr if no such object.
+
+    \sa findChild()
+*/
 Object *Object::find(const string &path) {
     PROFILE_FUNCTION()
     if(p_ptr->m_pParent && path[0] == '/') {
