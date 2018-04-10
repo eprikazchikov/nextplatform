@@ -8,6 +8,8 @@ class MathTest : public QObject {
 
 private slots:
     void Euler_angles();
+
+    void Matrix_inverse();
 };
 
 #endif // TST_MATH_H
