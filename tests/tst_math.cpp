@@ -6,6 +6,8 @@
 #include <QQuaternion>
 #include <QMatrix4x4>
 
+#include <QtTest>
+
 void MathTest::Euler_angles() {
     QVector3D angles(90.0f, 90.0f, 90.0f);
     QQuaternion q   = QQuaternion::fromEulerAngles(angles);
@@ -49,19 +51,17 @@ void MathTest::Euler_angles() {
 }
 
 void MathTest::Matrix_inverse() {
-    QMatrix4x4 mat(1.46143, 0.0,        0.0,    0.0,
-                   0.0,     2.41421,    0.0,    0.0,
-                   0.0,     0.0,       -1.0002, 2.24996,
-                   0.0,     0.0,       -1.0,    2.44949);
+    Matrix4 mat;
+    mat.mat[0] = 1.46143f;  mat.mat[4] = 0.0f;      mat.mat[ 8] = 0.0f;     mat.mat[12] = 0.0f;
+    mat.mat[1] = 0.0f;      mat.mat[5] = 2.41421f;  mat.mat[ 9] = 0.0f;     mat.mat[13] = 0.0f;
+    mat.mat[2] = 0.0f;      mat.mat[6] = 0.0f;      mat.mat[10] =-1.0002f;  mat.mat[14] = 2.24996f;
+    mat.mat[3] = 0.0f;      mat.mat[7] = 0.0f;      mat.mat[11] =-1.0f;     mat.mat[15] = 2.44949f;
 
-    qDebug() << mat.inverted();
+    QMatrix4x4 m1   = QMatrix4x4(mat.transpose().mat).inverted();
+    QMatrix4x4 m2(mat.inverse().transpose().mat);
 
-    Matrix4 mat4;
-    mat4.mat[0] = 1.46143;  mat4.mat[4] = 0.0;      mat4.mat[ 8] = 0.0;     mat4.mat[12] = 0.0;
-    mat4.mat[1] = 0.0;      mat4.mat[5] = 2.41421;  mat4.mat[ 9] = 0.0;     mat4.mat[13] = 0.0;
-    mat4.mat[2] = 0.0;      mat4.mat[6] = 0.0;      mat4.mat[10] =-1.0002;  mat4.mat[14] = 2.24996;
-    mat4.mat[3] = 0.0;      mat4.mat[7] = 0.0;      mat4.mat[11] =-1.0;     mat4.mat[15] = 2.44949;
+    qDebug() << m1;
+    qDebug() << m2;
 
-    Matrix4 inv = mat4.inverse();
-    qDebug() << inv.mat;
+    QCOMPARE(m1, m2);
 }

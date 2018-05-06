@@ -64,6 +64,8 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
     QCOMPARE((object != nullptr), true);
     QCOMPARE(compare(*object, *result), true);
 
+    QCOMPARE((object->uuid() == result->uuid()), true);
+
     delete result;
 
     delete obj3;

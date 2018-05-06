@@ -10,13 +10,15 @@ public:
     enum Type {
         INVALID                 = 0,
         METHODCALL,
-        TIMER,
-        DELETE,
+        TIMEREVENT,
+        DESTROY,
         USERTYPE                = 100
     };
 
 public:
     Event                       (uint32_t type);
+
+    virtual ~Event              ();
 
     uint32_t                    type                        () const;
 

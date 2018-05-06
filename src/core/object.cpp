@@ -209,6 +209,8 @@ Object::~Object() {
     if(p_ptr->m_pParent) {
         p_ptr->m_pParent->removeChild(this);
     }
+
+    delete p_ptr;
 }
 /*!
     Returns new instance of Object class.
@@ -256,7 +258,6 @@ Object *Object::clone() {
     PROFILE_FUNCTION()
     const MetaObject *meta  = metaObject();
     Object *result = meta->createInstance();
-    result->p_ptr->m_UUID   = ObjectSystem::instance()->nextID();
     int count  = meta->propertyCount();
     for(int i = 0; i < count; i++) {
         MetaProperty lp = result->metaObject()->property(i);
@@ -280,6 +281,7 @@ Object *Object::clone() {
         connect(result, (to_string(1) + signal.signature()).c_str(),
                 it.receiver, (to_string((method.type() == MetaMethod::Signal) ? 1 : 2) + method.signature()).c_str());
     }
+    result->p_ptr->m_UUID   = ObjectSystem::generateUUID(result);
     return result;
 }
 /*!
@@ -442,7 +444,7 @@ void Object::disconnect(Object *sender, const char *signal, Object *receiver, co
 */
 void Object::deleteLater() {
     PROFILE_FUNCTION()
-    postEvent(new Event(Event::DELETE));
+    postEvent(new Event(Event::DESTROY));
 }
 /*!
     Returns list of child objects for this object.
@@ -595,7 +597,7 @@ void Object::processEvents() {
                 metaObject()->method(call->method()).invoke(this, result, 1, call->args());
                 p_ptr->m_pCurrentSender = nullptr;
             } break;
-            case Event::DELETE: {
+            case Event::DESTROY: {
                 locker.unlock();
                 delete this;
                 return;

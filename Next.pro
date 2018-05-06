@@ -23,7 +23,6 @@ SOURCES += \
     src/core/metatype.cpp \
     src/core/object.cpp \
     src/core/objectsystem.cpp \
-    src/core/tools.cpp \
     src/core/uri.cpp \
     src/math/aabb.cpp \
     src/math/matrix3.cpp \
@@ -66,7 +65,6 @@ HEADERS += \
     inc/core/metatype.h \
     inc/common.h \
     inc/core/uri.h \
-    inc/core/tools.h \
     inc/core/threadpool.h \
     inc/core/object.h \
     inc/patterns/asingleton.h \
