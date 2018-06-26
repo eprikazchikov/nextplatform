@@ -1,4 +1,0 @@
-modules=next
-sources=next
-excluded_sources=*tests*
-excluded_sources=*moc*

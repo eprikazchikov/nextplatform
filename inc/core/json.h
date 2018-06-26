@@ -11,14 +11,12 @@
 
 class NEXT_LIBRARY_EXPORT Json {
 public:
-    Json                        ();
-
     static Variant              load                        (const string &data);
     static string               save                        (const Variant &data, int32_t depth = -1);
 
+protected:
     static inline string        readString                  (const string &data, uint32_t &it);
 
-protected:
     static inline void          skipSpaces                  (const char *data, uint32_t &it);
 
     static inline bool          isSpace                     (uint8_t c);

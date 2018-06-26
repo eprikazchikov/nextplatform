@@ -54,10 +54,6 @@ enum States {
     propertyValue
 };
 
-Json::Json() {
-    PROFILE_FUNCTION()
-}
-
 Variant Json::load(const string &data) {
     PROFILE_FUNCTION()
     Variant result;

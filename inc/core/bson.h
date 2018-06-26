@@ -8,8 +8,6 @@
 
 class NEXT_LIBRARY_EXPORT Bson {
 public:
-    Bson                        ();
-
     static Variant              load                        (const ByteArray &data, uint32_t &offset, MetaType::Type type = MetaType::VARIANTLIST, bool first = true);
     static ByteArray            save                        (const Variant &data);
 

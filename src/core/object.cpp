@@ -67,7 +67,7 @@ public:
     \since Next 1.0
     \inmodule Core
 
-    The object is the central part of the library Next.
+    The object is the central part of the Next library.
     For communication between objects two mechanisms was implemented the signals and slots also event based approach.
     To connect two objects between use connect() method and the sender object  will notify the receiver object about necessary events.
 
@@ -172,7 +172,7 @@ public:
     \sa ObjectSystem::objectCreate(), A_REGISTER(), A_OBJECT()
 */
 /*!
-    Cunstructs an object.
+    Constructs an object.
 
     By default Object create without parent to assign the parent object use setParent().
 */
@@ -281,7 +281,7 @@ Object *Object::clone() {
         connect(result, (to_string(1) + signal.signature()).c_str(),
                 it.receiver, (to_string((method.type() == MetaMethod::Signal) ? 1 : 2) + method.signature()).c_str());
     }
-    result->p_ptr->m_UUID   = ObjectSystem::generateUUID(result);
+    result->p_ptr->m_UUID   = ObjectSystem::generateUUID();
     return result;
 }
 /*!

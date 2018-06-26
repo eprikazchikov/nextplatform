@@ -8,8 +8,7 @@
 
     TEMPLATE  = app
 win32: {
-    QMAKE_CXXFLAGS  += -Zc:wchar_t -Zi -DWINVER=0x0601 -D_WIN32_WINNT=0x0601 -D_CCRT_SECURE_NO_WARNINGS
-    QMAKE_LFLAGS += /INCREMENTAL:NO /FIXED:NO
+    QMAKE_CXXFLAGS  += -DWINVER=0x0601 -D_WIN32_WINNT=0x0601 -D_CCRT_SECURE_NO_WARNINGS
 }
     SOURCES += \
         tests/main.cpp \
@@ -30,8 +29,10 @@ win32: {
         tests/tst_serialization.h \
         tests/tst_threadpool.h
 
-    Debug:LIBS   += bin/anextd.lib
-    Release:LIBS += bin/anext.lib
+    LIBS += -Lbin
+
+    Debug:LIBS   += -lanextd
+    Release:LIBS += -lanext
 
     INCLUDEPATH  += \
         inc \

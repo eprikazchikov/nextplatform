@@ -5,10 +5,17 @@
 #include "core/bson.h"
 #include "core/json.h"
 
+#include <random>
+
+static random_device rd;
+static mt19937 mt(rd());
+static uniform_int_distribution<uint32_t> dist(0, UINT32_MAX);
+
 class ObjectSystemPrivate {
 public:
     ObjectSystemPrivate() :
         m_Exit(false) {
+
     }
 
     /// Container for registered callbacks.
@@ -64,7 +71,7 @@ Object *ObjectSystem::objectCreate(const string &uri, const string &name, Object
         object = (*it).second->createInstance();
         object->setName(name);
         object->setParent(parent);
-        object->setUUID(generateUUID(object));
+        object->setUUID(generateUUID());
     }
     return object;
 }
@@ -242,6 +249,6 @@ Object *ObjectSystem::toObject(const Variant &variant) {
     return result;
 }
 
-uint32_t ObjectSystem::generateUUID(const Object *object) {
-    return hash<const void *>()(object);
+uint32_t ObjectSystem::generateUUID() {
+    return dist(mt);
 }
