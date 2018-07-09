@@ -5,6 +5,17 @@
 #include "math/amath.h"
 #include "core/variant.h"
 
+/*!
+    \fn uint32_t registerMetaType(const char *typeName)
+
+    Registers a new type with type T and \a typeName as MetaType.
+    After registration it can be used as Variant in MetaObject system.
+*/
+/*!
+    \fn uint32_t MetaType::type()
+
+    Returns the type ID for type T.
+*/
 #define DECLARE_BUILT_TYPE(TYPE) \
     { \
         TypeFuncs<TYPE>::size, \
@@ -329,13 +340,13 @@ static NameMap s_Names = {
 };
 /*!
     \class MetaType
-    \brief Variant represents union value in Next library and work with most common data types.
+    \brief The MetaType provides an interface to retrieve information about data type at runtime.
     \since Next 1.0
     \inmodule Core
 
-    This class is used as implementation helper for Variant class.
+    This class is designed for retrieving of runtime type information with additional functionality.
 
-    Some of regestered types can be automaticaly converted to different types with MetaType::convert functunction.
+    Some of registered types can be automatically converted to different types with MetaType::convert functunction.
     The following conversions are predefined:
     \table
     \header
@@ -379,10 +390,16 @@ static NameMap s_Names = {
         \li MetaType::VARIANTLIST
     \endtable
 
-    To convert values to other types developer should define own conversion type function using MetaType::registerConverter()function
+    To convert values to other types developer should define own conversion type function using MetaType::registerConverter() function
 */
 /*!
-    Constructs MetaType object wich will contain information about type.
+    \typedef MetaType::converterCallback
+
+    Callback which contain address to converter function.
+    This converter must be able to convert \a from value with \a fromType type to \a to value with type represented by this MetaType.
+*/
+/*!
+    Constructs MetaType object wich will contain information provided in a \a table.
 */
 MetaType::MetaType(const Table *table) :
         m_pTable(table) {
@@ -462,8 +479,6 @@ bool MetaType::isValid() const {
 /*!
     Registers type by type MetaType::Table \a table. Use registerMetaType() instead this function.
     Returns an ID of registered type.
-
-    \sa registerMetaType();
 */
 uint32_t MetaType::registerType(Table &table) {
     PROFILE_FUNCTION()

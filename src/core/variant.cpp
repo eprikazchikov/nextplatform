@@ -36,7 +36,7 @@ Variant::Data::Data() {
     \endcode
 */
 /*!
-    \fn T Variant::value()
+    \fn T Variant::value() const
 
     Returns contained value wich cast or converted to type T.
 
@@ -52,6 +52,13 @@ Variant::Data::Data() {
     Returns an invalid variant if unknown \a value type.
 
     \sa value, canConvert, MetaType::convert
+*/
+/*!
+    \fn bool Variant::canConvert() const
+
+    Returns the possibility of conversion for this variant to type T.
+
+    \sa value, MetaType::convert
 */
 /*!
     Constructs an invalid variant.

@@ -1,0 +1,24 @@
+.sidebar {
+    display: block;
+    position: relative;
+    position: sticky;
+    float: right;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 20%;
+    padding-right: 20px;
+}
+
+pre {
+    background-color: #3a4055;
+    color: #fff;
+    display: block;
+    line-height: 1.5;
+    overflow-x: auto;
+    margin-bottom: 25px;
+    padding: 25px;
+    margin-top: 0.75em;
+    font-size: .8em;
+}

@@ -103,9 +103,9 @@ void ObjectTest::Meta_methods() {
 
     QCOMPARE(meta->indexOfSignal("setSlot"), -1);
 
-    index   = meta->indexOfSignal("signal");
+    index   = meta->indexOfSignal("signal(bool)");
     if(index > -1) {
-        qDebug() << meta->method(index).signature().c_str();
+        //qDebug() << meta->method(index).signature().c_str();
     }
 }
 

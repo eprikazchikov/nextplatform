@@ -56,8 +56,7 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
     Object::connect(obj2, _SIGNAL(signal(bool)), obj3, _SLOT(setSlot(bool)));
 
     ByteArray bytes = Bson::save(ObjectSystem::toVariant(obj1));
-    uint32_t offset = 0;
-    Object *result  = ObjectSystem::toObject(Bson::load(bytes, offset));
+    Object *result  = ObjectSystem::toObject(Bson::load(bytes));
     Object *object  = dynamic_cast<Object*>(obj1);
 
     QCOMPARE((result != nullptr), true);

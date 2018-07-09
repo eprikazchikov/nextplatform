@@ -53,7 +53,7 @@ public:
         m_pResource = resource;
     }
 
-    void            signal          (const bool value);
+    void            signal          (const bool);
 
     bool            m_bSlot;
     Vector2         m_Vector2;

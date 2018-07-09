@@ -24,7 +24,6 @@ win32: {
         tests/tst_object.h \
         tests/tst_variant.h \
         tests/tst_objectsystem.h \
-        tests/tst_math.h \
         tests/tst_uri.h \
         tests/tst_serialization.h \
         tests/tst_threadpool.h
@@ -49,9 +48,7 @@ win32: {
 }
 
 HEADERS += \
-    tests/tst_animation.h \
-    tests/tst_math.h
+    tests/tst_animation.h
 
 SOURCES += \
-    tests/tst_animation.cpp \
-    tests/tst_math.cpp
+    tests/tst_animation.cpp

@@ -44,6 +44,5 @@ void SerializationTest::Bson_Serialize_Desirialize() {
     ByteArray bin   = {'\x00','\x01','\x02','\x03','\x04','\xFF'};
     var1["bin"]     = bin;
 
-    uint32_t offset = 0;
-    QCOMPARE(Variant(var1), Bson::load(Bson::save(var1), offset, MetaType::VARIANTMAP));
+    QCOMPARE(Variant(var1), Bson::load(Bson::save(var1), MetaType::VARIANTMAP));
 }

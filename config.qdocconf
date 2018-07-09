@@ -14,23 +14,23 @@ outputformats = HTML
 #				  "</div>\n" \
 #				  "</nav>\n" \
 
-HTML.stylesheets += doc/css/bootstrap.css \
-					doc/css/bootstrap-theme.css \
+HTML.stylesheets += doc/css/bootstrap.min.css \
 					doc/css/online.css
 
-HTML.headerstyles += "<link href=\"style/bootstrap.css\" rel=\"stylesheet\">\n" \
-                     "<link href=\"style/bootstrap-theme.css\" rel=\"stylesheet\">\n" \
+HTML.headerstyles += "<link href=\"style/bootstrap.min.css\" rel=\"stylesheet\">\n" \
 					 "<link href=\"style/online.css\" rel=\"stylesheet\">\n"
-					
-HTML.postheader = "<div class=\"container\">\n"
+					 					
+HTML.postheader = 	 \
+					"<div class=\"container\">\n" \
 				  
 HTML.footer 	= "</div>\n" \
 				  "<script src=\"https://code.jquery.com/jquery-3.1.1.slim.min.js\" integrity=\"sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n\" crossorigin=\"anonymous\"></script>\n" \
-				  "<script>window.jQuery || document.write('<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js\"><\/script>')</script>\n" \
+				  "<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>\n" \
 				  "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js\" integrity=\"sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb\" crossorigin=\"anonymous\"></script>\n" \
 				  "<script src=\"js/bootstrap.min.js\"></script>\n" \
 				  "<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->\n" \
-				  "<script src=\"../../assets/js/ie10-viewport-bug-workaround.js\"></script>\n"
+				  "<script src=\"js/ie10-viewport-bug-workaround.js\"></script>\n" \
+				  "<script src=\"https://unpkg.com/turndown/dist/turndown.js\"></script>"
 
 headerdirs  = .
 sourcedirs  = .

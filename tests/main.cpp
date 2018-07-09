@@ -7,7 +7,6 @@
 #include "tst_serialization.h"
 #include "tst_threadpool.h"
 #include "tst_uri.h"
-#include "tst_math.h"
 #include "tst_animation.h"
 
 inline int aExec(QObject &ts, int argc, char *argv[]) {
@@ -65,10 +64,6 @@ int main(int argc, char *argv[]) {
     }
     {
         ObjectSystemTest ts;
-        status |= aExec(ts, argc, argv);
-    }
-    {
-        MathTest ts;
         status |= aExec(ts, argc, argv);
     }
     {
