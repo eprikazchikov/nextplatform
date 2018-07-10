@@ -153,9 +153,9 @@ public:
 
     virtual bool                    event                       (Event *event);
 
-    virtual void                    loadUserData                (const VariantList &data);
+    virtual void                    loadUserData                (const VariantMap &data);
 
-    virtual VariantList             saveUserData                () const;
+    virtual VariantMap              saveUserData                () const;
 
 protected:
     void                            emitSignal                  (const char *signal, const Variant &args = Variant());

@@ -700,15 +700,15 @@ bool Object::event(Event *event) {
 /*!
     This method allows to DESERIALIZE \a data which not present as A_PROPERTY() in object.
 */
-void Object::loadUserData(const VariantList &data) {
+void Object::loadUserData(const VariantMap &data) {
     A_UNUSED(data)
 }
 /*!
     This method allows to SERIALIZE data which not present as A_PROPERTY() in object.
     Returns serialized data as VariantList.
 */
-VariantList Object::saveUserData() const {
-    return VariantList();
+VariantMap Object::saveUserData() const {
+    return VariantMap();
 }
 /*!
     Returns the value of the object's property by \a name.

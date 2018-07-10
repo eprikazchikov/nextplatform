@@ -276,7 +276,7 @@ Object *ObjectSystem::toObject(const Variant &variant) {
                 }
                 i++;
                 // Load user data
-                object->loadUserData((*i).toList());
+                object->loadUserData((*i).value<VariantMap>());
             }
         }
     }
