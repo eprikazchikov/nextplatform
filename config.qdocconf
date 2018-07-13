@@ -2,6 +2,10 @@
 project = Next
 description = Next Reference Documentation
 
+navigation.homepage  = "Next Library"
+
+navigation.cppclassespage = "Core"
+
 outputdir = html
 outputformats = HTML
 
