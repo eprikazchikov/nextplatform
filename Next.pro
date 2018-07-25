@@ -39,7 +39,8 @@ SOURCES += \
     src/core/variant.cpp \
     src/anim/animation.cpp \
     src/anim/variantanimation.cpp \
-    src/anim/propertyanimation.cpp
+    src/anim/propertyanimation.cpp \
+    src/anim/keyframe.cpp
 
 
 HEADERS += \
@@ -70,7 +71,8 @@ HEADERS += \
     inc/patterns/asingleton.h \
     inc/anim/animation.h \
     inc/anim/variantanimation.h \
-    inc/anim/propertyanimation.h
+    inc/anim/propertyanimation.h \
+    inc/anim/keyframe.h
 
 
 INCLUDEPATH += \
