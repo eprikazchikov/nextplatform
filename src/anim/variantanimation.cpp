@@ -89,7 +89,7 @@ void VariantAnimation::update() {
         KeyFrame b;
         for(size_t i = 0; i < p_ptr->m_KeyFrames.size(); i++) {
             if(factor == p_ptr->m_KeyFrames[i].mPosition) {
-                p_ptr->m_CurrentValue   = p_ptr->m_KeyFrames[i].mValue;
+                setCurrentValue(p_ptr->m_KeyFrames[i].mValue);
                 return;
             }
             if(factor >= p_ptr->m_KeyFrames[i].mPosition) {
