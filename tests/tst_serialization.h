@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "core/variant.h"
+#include "variant.h"
 
 class SerializationTest: public QObject {
     Q_OBJECT

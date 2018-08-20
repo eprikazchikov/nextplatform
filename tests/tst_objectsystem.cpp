@@ -2,10 +2,10 @@
 
 #include "tst_common.h"
 
-#include "core/objectsystem.h"
+#include "objectsystem.h"
 
-#include "core/json.h"
-#include "core/bson.h"
+#include "json.h"
+#include "bson.h"
 
 #include <QtTest>
 

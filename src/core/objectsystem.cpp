@@ -106,13 +106,9 @@ Object *ObjectSystem::objectCreate(const string &uri, const string &name, Object
     PROFILE_FUNCTION()
     Object *object  = nullptr;
 
-    ObjectSystem *inst = instance();
-    FactoryMap::iterator it = inst->p_ptr->m_Factories.find(uri);
-    if(it == inst->p_ptr->m_Factories.end()) {
-        it  = inst->p_ptr->m_Factories.find(inst->p_ptr->m_Groups[uri]);
-    }
-    if(it != inst->p_ptr->m_Factories.end()) {
-        object = (*it).second->createInstance();
+    const MetaObject *meta  = instance()->metaFactory(uri);
+    if(meta) {
+        object = meta->createInstance();
         object->setName(name);
         object->setParent(parent);
         object->setUUID(generateUID());
@@ -144,6 +140,19 @@ void ObjectSystem::factoryClear() {
 ObjectSystem::GroupMap ObjectSystem::factories() const {
     PROFILE_FUNCTION()
     return p_ptr->m_Groups;
+}
+/*!
+    Returns MetaObject for registered factory by provided \a uri.
+*/
+const MetaObject *ObjectSystem::metaFactory(const string &uri) const {
+    FactoryMap::iterator it = p_ptr->m_Factories.find(uri);
+    if(it == p_ptr->m_Factories.end()) {
+        it  = p_ptr->m_Factories.find(p_ptr->m_Groups[uri]);
+    }
+    if(it != p_ptr->m_Factories.end()) {
+        return (*it).second;
+    }
+    return nullptr;
 }
 
 typedef list<const Object *>    ObjectArray;

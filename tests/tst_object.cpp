@@ -21,7 +21,7 @@
 
 #include "tst_common.h"
 
-#include "core/uri.h"
+#include "uri.h"
 
 #include <QtTest>
 

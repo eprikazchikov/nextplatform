@@ -1,9 +1,9 @@
 #ifndef TST_COMMON_H
 #define TST_COMMON_H
 
-#include "core/object.h"
+#include "object.h"
 
-#include "core/objectsystem.h"
+#include "objectsystem.h"
 
 #include <QTest>
 

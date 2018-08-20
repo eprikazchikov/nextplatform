@@ -22,6 +22,8 @@ public:
 
     GroupMap                            factories               () const;
 
+    const MetaObject                   *metaFactory             (const string &uri) const;
+
 public:
     static ObjectSystem                *instance                ();
 
