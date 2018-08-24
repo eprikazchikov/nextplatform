@@ -41,6 +41,10 @@ public:
         ObjectSystem *inst = ObjectSystem::instance();
         inst->factoryAdd(name, uri, meta);
 
+        if(MetaType::type(name.c_str()) == 0) {
+            registerMetaType<T>(name.c_str());
+        }
+
         name += " *";
         if(MetaType::type(name.c_str()) == 0) {
             registerMetaType<T *>(name.c_str());

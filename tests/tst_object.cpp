@@ -51,6 +51,14 @@ void ObjectTest::Meta_type() {
 
     VariantList list    = variant.toList();
     QCOMPARE((int)list.size(), 1);
+
+    type    = MetaType::type<TestObject>();
+    size_t size     = sizeof(TestObject);
+    void *where     = malloc(size);
+    MetaType::construct(type, where);
+    TestObject *r   = reinterpret_cast<TestObject *>(where);
+    QCOMPARE(r->getVector(), Vector2(1.0f, 0.0f));
+    MetaType::destruct(type, where);
 }
 
 void ObjectTest::Meta_property() {
