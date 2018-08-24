@@ -6,7 +6,7 @@ public:
             m_Duration(0) {
     }
 
-    FrameVector             m_KeyFrames;
+    VariantAnimation::Curve m_KeyFrames;
     Variant                 m_CurrentValue;
     int32_t                 m_Duration;
 };
@@ -66,15 +66,15 @@ void VariantAnimation::setCurrentValue(const Variant &value) {
     p_ptr->m_CurrentValue   = value;
 }
 /*!
-    Returns the sequence of key frames for the animation track.
+    Returns the sequence of key frames as curve for the animation track.
 */
-FrameVector &VariantAnimation::keyFrames() const {
+VariantAnimation::Curve &VariantAnimation::keyFrames() const {
     return p_ptr->m_KeyFrames;
 }
 /*!
     Sets the new sequence of the key \a frames.
 */
-void VariantAnimation::setKeyFrames(const FrameVector &frames) {
+void VariantAnimation::setKeyFrames(const Curve &frames) {
     p_ptr->m_KeyFrames  = frames;
 }
 /*!
@@ -88,40 +88,60 @@ void VariantAnimation::update() {
         KeyFrame a;
         KeyFrame b;
         for(size_t i = 0; i < p_ptr->m_KeyFrames.size(); i++) {
-            if(factor == p_ptr->m_KeyFrames[i].first) {
-                p_ptr->m_CurrentValue   = p_ptr->m_KeyFrames[i].second;
+            if(factor == p_ptr->m_KeyFrames[i].mPosition) {
+                setCurrentValue(p_ptr->m_KeyFrames[i].mValue);
                 return;
             }
-            if(factor >= p_ptr->m_KeyFrames[i].first) {
+            if(factor >= p_ptr->m_KeyFrames[i].mPosition) {
                 a   = p_ptr->m_KeyFrames[i];
             }
-            if(factor <= p_ptr->m_KeyFrames[i].first) {
+            if(factor <= p_ptr->m_KeyFrames[i].mPosition) {
                 b   = p_ptr->m_KeyFrames[i];
                 break;
             }
         }
-        factor  = (factor - a.first) / (b.first - a.first);
+        factor  = (factor - a.mPosition) / (b.mPosition - a.mPosition);
 
-        if(a.second.type() == b.second.type()) {
-            switch(a.second.type()) {
+        if(a.mValue.type() == b.mValue.type()) {
+            switch(a.mValue.type()) {
                 case MetaType::INTEGER: {
-                    setCurrentValue(MIX(a.second.toInt(),       b.second.toInt(), factor));
+                    if(a.mType == KeyFrame::Linear) {
+                        setCurrentValue(MIX(a.mValue.toInt(), b.mValue.toInt(), factor));
+                    } else {
+                        setCurrentValue(CMIX(a.mValue.toInt(), a.mSupport.toInt(), b.mSupport.toInt(), b.mValue.toInt(), factor));
+                    }
                 } break;
                 case MetaType::FLOAT: {
-                    setCurrentValue(MIX(a.second.toFloat(),     b.second.toInt(), factor));
+                    if(a.mType == KeyFrame::Linear) {
+                        setCurrentValue(MIX(a.mValue.toFloat(), b.mValue.toFloat(), factor));
+                    } else {
+                        setCurrentValue(CMIX(a.mValue.toFloat(), a.mSupport.toFloat(), b.mSupport.toFloat(), b.mValue.toFloat(), factor));
+                    }
                 } break;
                 case MetaType::VECTOR2: {
-                    setCurrentValue(MIX(a.second.toVector2(),   b.second.toVector2(), factor));
+                    if(a.mType == KeyFrame::Linear) {
+                        setCurrentValue(MIX(a.mValue.toVector2(), b.mValue.toVector2(), factor));
+                    } else {
+                        setCurrentValue(CMIX(a.mValue.toVector2(), a.mSupport.toVector2(), b.mSupport.toVector2(), b.mValue.toVector2(), factor));
+                    }
                 } break;
                 case MetaType::VECTOR3: {
-                    setCurrentValue(MIX(a.second.toVector3(),   b.second.toVector3(), factor));
+                    if(a.mType == KeyFrame::Linear) {
+                        setCurrentValue(MIX(a.mValue.toVector3(), b.mValue.toVector3(), factor));
+                    } else {
+                        setCurrentValue(CMIX(a.mValue.toVector3(), a.mSupport.toVector3(), b.mSupport.toVector3(), b.mValue.toVector3(), factor));
+                    }
                 } break;
                 case MetaType::VECTOR4: {
-                    setCurrentValue(MIX(a.second.toVector4(),   b.second.toVector4(), factor));
+                    if(a.mType == KeyFrame::Linear) {
+                        setCurrentValue(MIX(a.mValue.toVector4(), b.mValue.toVector4(), factor));
+                    } else {
+                        setCurrentValue(CMIX(a.mValue.toVector4(), a.mSupport.toVector4(), b.mSupport.toVector4(), b.mValue.toVector4(), factor));
+                    }
                 } break;
                 case MetaType::QUATERNION: {
                     Quaternion result;
-                    result.mix(a.second.toQuaternion(), b.second.toQuaternion(), factor);
+                    result.mix(a.mValue.toQuaternion(), b.mValue.toQuaternion(), factor);
                     setCurrentValue(result);
                 } break;
                 default: break;
