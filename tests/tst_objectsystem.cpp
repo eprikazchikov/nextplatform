@@ -104,7 +104,7 @@ void ObjectSystemTest::Override_Object() {
     const MetaObject *meta = object->metaObject();
 
     QCOMPARE((dynamic_cast<TestObjectEx *>(object) != nullptr), true);
-    QCOMPARE(meta->methodCount(), 2);
+    QCOMPARE(meta->methodCount(), 3);
     QCOMPARE(meta->propertyCount(), 3);
 
     int index   = meta->indexOfProperty("slot");

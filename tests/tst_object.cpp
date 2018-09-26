@@ -94,27 +94,25 @@ void ObjectTest::Meta_methods() {
     const MetaObject *meta = obj.metaObject();
     QVERIFY(meta != nullptr);
 
-    QCOMPARE(meta->methodCount(), 2);
+    QCOMPARE(meta->methodCount(), 3);
 
-    int index   = meta->indexOfMethod("setSlot");
-    if(index > -1) {
-        MetaMethod method   = meta->method(index);
+    int index   = meta->indexOfSlot("setSlot(int)");
+    QCOMPARE(index > -1, true);
 
-        QCOMPARE(method.isValid(), true);
-        Variant value;
-        QCOMPARE(obj.getSlot(), false);
+    MetaMethod method   = meta->method(index);
+    QCOMPARE(method.isValid(), true);
+    Variant value;
+    QCOMPARE(obj.getSlot(), false);
 
-        Variant arg(true);
-        QCOMPARE(method.invoke(&obj, value, 1, &arg), true);
-        QCOMPARE(obj.getSlot(), true);
-    }
+    Variant arg(true);
+    QCOMPARE(method.invoke(&obj, value, 1, &arg), true);
+    QCOMPARE(obj.getSlot(), true);
+
 
     QCOMPARE(meta->indexOfSignal("setSlot"), -1);
 
-    index   = meta->indexOfSignal("signal(bool)");
-    if(index > -1) {
-        //qDebug() << meta->method(index).signature().c_str();
-    }
+    index   = meta->indexOfSignal("signal(int)");
+    QCOMPARE(index > -1, true);
 }
 
 void ObjectTest::Disconnect_base() {
@@ -122,11 +120,11 @@ void ObjectTest::Disconnect_base() {
     TestObject obj2;
     TestObject obj3;
 
-    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
-    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(int)), &obj2, _SLOT(setSlot(int)));
+    Object::connect(&obj1, _SIGNAL(signal(int)), &obj3, _SIGNAL(signal(int)));
     QCOMPARE((int)obj1.getReceivers().size(), 2);
 
-    Object::disconnect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    Object::disconnect(&obj1, _SIGNAL(signal(int)), &obj3, _SIGNAL(signal(int)));
     QCOMPARE((int)obj1.getReceivers().size(), 1);
 }
 
@@ -135,8 +133,8 @@ void ObjectTest::Disconnect_all() {
     TestObject obj2;
     TestObject obj3;
 
-    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
-    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(int)), &obj2, _SLOT(setSlot(int)));
+    Object::connect(&obj1, _SIGNAL(signal(int)), &obj3, _SIGNAL(signal(int)));
     QCOMPARE((int)obj1.getReceivers().size(), 2);
 
     Object::disconnect(&obj1, 0, 0, 0);
@@ -148,11 +146,11 @@ void ObjectTest::Disconnect_by_signal() {
     TestObject obj2;
     TestObject obj3;
 
-    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
-    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(int)), &obj2, _SLOT(setSlot(int)));
+    Object::connect(&obj1, _SIGNAL(signal(int)), &obj3, _SIGNAL(signal(int)));
     QCOMPARE((int)obj1.getReceivers().size(), 2);
 
-    Object::disconnect(&obj1, _SIGNAL(signal(bool)), 0, 0);
+    Object::disconnect(&obj1, _SIGNAL(signal(int)), 0, 0);
     QCOMPARE((int)obj1.getReceivers().size(), 0);
 }
 
@@ -161,8 +159,8 @@ void ObjectTest::Disconnect_by_receiver() {
     TestObject obj2;
     TestObject obj3;
 
-    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
-    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj3, _SIGNAL(signal(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(int)), &obj2, _SLOT(setSlot(int)));
+    Object::connect(&obj1, _SIGNAL(signal(int)), &obj3, _SIGNAL(signal(int)));
     QCOMPARE((int)obj1.getReceivers().size(), 2);
 
     Object::disconnect(&obj1, 0, &obj3, 0);
@@ -195,7 +193,7 @@ void ObjectTest::Reciever_destructor() {
     TestObject *obj1    = new TestObject;
     TestObject *obj2    = new TestObject;
 
-    Object::connect(obj1, _SIGNAL(signal(bool)), obj2, _SIGNAL(signal(bool)));
+    Object::connect(obj1, _SIGNAL(signal(int)), obj2, _SIGNAL(signal(int)));
     QCOMPARE((int)obj1->getReceivers().size(),  1);
 
     delete obj2;
@@ -209,26 +207,26 @@ void ObjectTest::Emit_signal() {
     TestObject obj2;
     TestObject obj3;
 
-    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SIGNAL(signal(bool)));
-    Object::connect(&obj2, _SIGNAL(signal(bool)), &obj3, _SLOT(setSlot(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(int)), &obj2, _SIGNAL(signal(int)));
+    Object::connect(&obj2, _SIGNAL(signal(int)), &obj3, _SLOT(setSlot(int)));
 
     {
-        QCOMPARE(obj3.m_bSlot, false);
-        obj2.emitSignal(_SIGNAL(signal(bool)), true);
+        QCOMPARE(obj3.m_bSlot, 0);
+        obj2.emitSignal(_SIGNAL(signal(int)), 1);
         obj1.processEvents();
         obj2.processEvents();
         obj3.processEvents();
 
-        QCOMPARE(obj3.m_bSlot, true);
+        QCOMPARE(obj3.m_bSlot, 1);
     }
     {
-        QCOMPARE(obj3.m_bSlot, true);
-        obj1.emitSignal(_SIGNAL(signal(bool)), false);
+        QCOMPARE(obj3.m_bSlot, 1);
+        obj1.emitSignal(_SIGNAL(signal(int)), 0);
         obj1.processEvents();
         obj2.processEvents();
         obj3.processEvents();
 
-        QCOMPARE(obj3.m_bSlot, false);
+        QCOMPARE(obj3.m_bSlot, 0);
     }
 }
 
@@ -270,8 +268,8 @@ void ObjectTest::Clone_object() {
     obj1.setProperty("dynamic1", 100);
     obj2.setProperty("dynamic2", true);
 
-    Object::connect(&obj1, _SIGNAL(signal(bool)), &obj2, _SLOT(setSlot(bool)));
-    Object::connect(&obj2, _SIGNAL(signal(bool)), &obj1, _SLOT(setSlot(bool)));
+    Object::connect(&obj1, _SIGNAL(signal(int)), &obj2, _SLOT(setSlot(int)));
+    Object::connect(&obj2, _SIGNAL(signal(int)), &obj1, _SLOT(setSlot(int)));
 
     Object *clone   = obj1.clone();
     QCOMPARE((clone != nullptr), true);

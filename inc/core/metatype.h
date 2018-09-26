@@ -12,6 +12,7 @@ using namespace std;
 
 class NEXT_LIBRARY_EXPORT MetaType {
 public:
+    /*! \enum Type */
     enum Type {
         INVALID                 = 0,
         BOOLEAN,
@@ -34,7 +35,7 @@ public:
 
     struct Table {
         int                 (*get_size)                 ();
-        void                (*static_new)               (void **);
+        void               *(*static_new)               ();
         void                (*construct)                (void *);
         void                (*static_delete)            (void **);
         void                (*destruct)                 (void *);
@@ -81,8 +82,7 @@ public:
     static bool             registerConverter           (uint32_t from, uint32_t to, converterCallback function);
     static bool             hasConverter                (uint32_t from, uint32_t to);
 
-    static void            *constructor                 (uint32_t type);
-    static void            *destructor                  (uint32_t type);
+    static Table           *table                       (uint32_t type);
 
 private:
     const Table            *m_pTable;
@@ -95,8 +95,8 @@ struct TypeFuncs {
     static int size() {
         return sizeof(T);
     }
-    static void static_new(void **dest) {
-        *dest = new T();
+    static void *static_new() {
+        return new T();
     }
     static void static_delete(void **x) {
         delete (*reinterpret_cast<T **>(x));
@@ -172,7 +172,15 @@ struct Table {
 //Function to unpack args properly
 template<typename T>
 inline static MetaType::Table *getTable(const char *typeName) {
-    return Table<T>::get(typeName);
+    const char *checker = "class ";
+    bool flag   = true;
+    for(uint32_t i = 0; i < 6; i++) {
+        if(typeName[i] != checker[i]) {
+            flag    = false;
+            break;
+        }
+    }
+    return Table<T>::get(flag ? &typeName[6] : typeName);
 }
 
 template<typename T>

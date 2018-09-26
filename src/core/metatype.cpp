@@ -441,7 +441,7 @@ void *MetaType::create(const void *copy) const {
     if(copy) {
         m_pTable->clone(&copy, &where);
     } else {
-        m_pTable->static_new(&where);
+        where   = m_pTable->static_new();
     }
     return where;
 }
@@ -646,24 +646,13 @@ bool MetaType::hasConverter(uint32_t from, uint32_t to) {
     return false;
 }
 /*!
-    Returns address to constructor for a \a type; otherwise returns nullptr.
+    Returns type information table if type registered; otherwise returns nullptr.
 */
-void *MetaType::constructor(uint32_t type) {
+MetaType::Table *MetaType::table(uint32_t type) {
     PROFILE_FUNCTION()
     auto it = s_Types.find(type);
     if(it != s_Types.end()) {
-        return it->second.construct;
-    }
-    return nullptr;
-}
-/*!
-    Returns address to desstructor for a \a type; otherwise returns nullptr.
-*/
-void *MetaType::destructor(uint32_t type) {
-    PROFILE_FUNCTION()
-    auto it = s_Types.find(type);
-    if(it != s_Types.end()) {
-        return it->second.destruct;
+        return &(it->second);
     }
     return nullptr;
 }
