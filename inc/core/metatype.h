@@ -1,5 +1,5 @@
-#ifndef MetaType_H
-#define MetaType_H
+#ifndef METATYPE_H
+#define METATYPE_H
 
 #include <map>
 #include <typeinfo>
@@ -9,6 +9,8 @@
 #include <common.h>
 
 using namespace std;
+
+#define REGISTER_META_TYPE(Class) registerMetaType<Class>(#Class)
 
 class NEXT_LIBRARY_EXPORT MetaType {
 public:
@@ -171,16 +173,13 @@ struct Table {
 
 //Function to unpack args properly
 template<typename T>
-inline static MetaType::Table *getTable(const char *typeName) {
-    const char *checker = "class ";
-    bool flag   = true;
-    for(uint32_t i = 0; i < 6; i++) {
-        if(typeName[i] != checker[i]) {
-            flag    = false;
-            break;
-        }
+inline static MetaType::Table *getTable(const char *typeName = "") {
+    uint32_t type   = MetaType::type<T>();
+    MetaType::Table *result   = MetaType::table(type);
+    if(result) {
+        return result;
     }
-    return Table<T>::get(flag ? &typeName[6] : typeName);
+    return Table<T>::get(typeName);
 }
 
 template<typename T>
@@ -188,4 +187,4 @@ static uint32_t registerMetaType(const char *typeName) {
     return MetaType::registerType(*getTable<T>(typeName));
 }
 
-#endif // MetaType_H
+#endif // METATYPE_H

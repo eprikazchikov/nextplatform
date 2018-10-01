@@ -100,7 +100,7 @@ struct Invoker<Return(*)(Args...)> {
     inline static const MetaType::Table **types(const char *typeName) {
         static const MetaType::Table *staticTypes[] = {
             Table<Return>::get(typeName),
-            getTable<Args>(typeid(Args).name())...
+            getTable<Args>()...
         };
         return staticTypes;
     }
@@ -178,7 +178,7 @@ struct Invoker<void(*)(Args...)> {
         A_UNUSED(typeName);
         static const MetaType::Table *staticTypes[] = {
             nullptr,
-            getTable<Args>(typeid(Args).name())...
+            getTable<Args>()...
         };
         return staticTypes;
     }
@@ -258,7 +258,7 @@ struct Invoker<Return(Class::*)(Args...)> {
     inline static const MetaType::Table **types(const char *typeName) {
         static const MetaType::Table *staticTypes[] = {
             Table<Return>::get(typeName),
-            getTable<Args>(typeid(Args).name())...
+            getTable<Args>()...
         };
         return staticTypes;
     }
@@ -336,7 +336,7 @@ struct Invoker<void(Class::*)(Args...)> {
         A_UNUSED(typeName);
         static const MetaType::Table *staticTypes[] = {
             nullptr,
-            getTable<Args>(typeid(Args).name())...
+            getTable<Args>()...
         };
         return staticTypes;
     }
@@ -417,7 +417,7 @@ struct Invoker<Return(Class::*)(Args...)const> {
     inline static const MetaType::Table **types(const char *typeName) {
         static const MetaType::Table *staticTypes[] = {
             Table<Return>::get(typeName),
-            getTable<Args>(typeid(Args).name())...
+            getTable<Args>()...
         };
         return staticTypes;
     }
@@ -495,7 +495,7 @@ struct Invoker<void(Class::*)(Args...)const> {
         A_UNUSED(typeName);
         static const MetaType::Table *staticTypes[] = {
             nullptr,
-            getTable<Args>(typeid(Args).name())...
+            getTable<Args>()...
         };
         return staticTypes;
     }
