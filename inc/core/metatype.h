@@ -2,6 +2,7 @@
 #define METATYPE_H
 
 #include <map>
+#include <unordered_map>
 #include <typeinfo>
 #include <typeindex>
 #include <stdint.h>
@@ -10,7 +11,11 @@
 
 using namespace std;
 
-#define REGISTER_META_TYPE(Class) registerMetaType<Class>(#Class)
+#define REGISTER_META_TYPE(Class) \
+    REGISTER_META_TYPE_IMPL(Class); \
+    REGISTER_META_TYPE_IMPL(Class *);
+
+#define REGISTER_META_TYPE_IMPL(Class) registerMetaType<Class>(#Class)
 
 class NEXT_LIBRARY_EXPORT MetaType {
 public:
@@ -49,6 +54,8 @@ public:
 
     typedef bool            (*converterCallback)        (void *to, const void *from, const uint32_t fromType);
 
+    typedef unordered_map<uint32_t, Table>              TypeMap;
+
 public:
     MetaType               (const Table *table);
 
@@ -85,6 +92,8 @@ public:
     static bool             hasConverter                (uint32_t from, uint32_t to);
 
     static Table           *table                       (uint32_t type);
+
+    static TypeMap          types                       ();
 
 private:
     const Table            *m_pTable;

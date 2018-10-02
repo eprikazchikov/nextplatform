@@ -30,7 +30,8 @@ bool toList(void *to, const void *from, const uint32_t fromType) {
         const Object *o = *(const Object **)from;
 
         VariantList *r  = static_cast<VariantList *>(to);
-        *r  = ObjectSystem::toVariant(o).value<VariantList>();
+        ObjectSystem system;
+        *r  = system.toVariant(o).value<VariantList>();
 
         return true;
     }
@@ -207,24 +208,22 @@ void ObjectTest::Emit_signal() {
     TestObject obj2;
     TestObject obj3;
 
+    ObjectSystem system;
+
     Object::connect(&obj1, _SIGNAL(signal(int)), &obj2, _SIGNAL(signal(int)));
     Object::connect(&obj2, _SIGNAL(signal(int)), &obj3, _SLOT(setSlot(int)));
 
     {
         QCOMPARE(obj3.m_bSlot, 0);
         obj2.emitSignal(_SIGNAL(signal(int)), 1);
-        obj1.processEvents();
-        obj2.processEvents();
-        obj3.processEvents();
+        system.update();
 
         QCOMPARE(obj3.m_bSlot, 1);
     }
     {
         QCOMPARE(obj3.m_bSlot, 1);
         obj1.emitSignal(_SIGNAL(signal(int)), 0);
-        obj1.processEvents();
-        obj2.processEvents();
-        obj3.processEvents();
+        system.update();
 
         QCOMPARE(obj3.m_bSlot, 0);
     }

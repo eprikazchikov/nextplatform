@@ -36,23 +36,24 @@
 #define A_REGISTER(Class, Super, Group) \
     A_OBJECT(Class, Super) \
 public: \
-    static void                     registerClassFactory    () { \
-        ObjectSystem::factoryAdd<Class>(#Group, Class::metaClass()); \
+    static void                     registerClassFactory    (ObjectSystem *system) { \
+        REGISTER_META_TYPE(Class); \
+        system->factoryAdd<Class>(#Group, Class::metaClass()); \
     } \
-    static void                     unregisterClassFactory  () { \
-        ObjectSystem::factoryRemove<Class>(#Group); \
+    static void                     unregisterClassFactory  (ObjectSystem *system) { \
+        system->factoryRemove<Class>(#Group); \
     }
 
 
 #define A_OVERRIDE(Class, Super, Group) \
     A_OBJECT(Class, Super) \
 public: \
-    static void                     registerClassFactory    () { \
-        ObjectSystem::factoryAdd<Super>(#Group, Class::metaClass()); \
+    static void                     registerClassFactory    (ObjectSystem *system) { \
+        system->factoryAdd<Super>(#Group, Class::metaClass()); \
     } \
-    static void                     unregisterClassFactory  () { \
-        ObjectSystem::factoryRemove<Super>(#Group); \
-        ObjectSystem::factoryAdd<Super>(#Group, Super::metaClass()); \
+    static void                     unregisterClassFactory  (ObjectSystem *system) { \
+        system->factoryRemove<Super>(#Group); \
+        system->factoryAdd<Super>(#Group, Super::metaClass()); \
     } \
     virtual string                  typeName                () const { \
         return Super::metaClass()->name(); \
@@ -176,7 +177,7 @@ private:
     friend class ObjectSystem;
 
 private:
-    void                            processEvents               ();
+    virtual void                    processEvents               ();
 
     void                            addChild                    (Object *value);
     void                            removeChild                 (Object *value);

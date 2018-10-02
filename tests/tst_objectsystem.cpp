@@ -12,7 +12,8 @@
 TestObject *resource;
 
 void ObjectSystemTest::initTestCase() {
-    resource   = ObjectSystem::objectCreate<TestObject>();
+    ObjectSystem system;
+    resource   = system.objectCreate<TestObject>();
     resource->setName("TestResource");
 }
 
@@ -22,15 +23,15 @@ void ObjectSystemTest::cleanupTestCase() {
 
 void ObjectSystemTest::Object_Instansing() {
     TestObject obj1;
-
-    Object *result1 = ObjectSystem::objectCreate<TestObject>();
+    ObjectSystem system;
+    Object *result1 = system.objectCreate<TestObject>();
     Object *object  = dynamic_cast<Object*>(&obj1);
 
     QCOMPARE((result1 != 0), true);
     QCOMPARE((object != 0), true);
     QCOMPARE(compare(*object, *result1), true);
 
-    Object *result2 = ObjectSystem::objectCreate<TestObject>();
+    Object *result2 = system.objectCreate<TestObject>();
 
     QCOMPARE((result1->uuid() != result2->uuid()), true);
 
@@ -39,9 +40,10 @@ void ObjectSystemTest::Object_Instansing() {
 }
 
 void ObjectSystemTest::Serialize_Desirialize_Object() {
-    TestObject *obj1    = ObjectSystem::objectCreate<TestObject>();
-    TestObject *obj2    = ObjectSystem::objectCreate<TestObject>();
-    TestObject *obj3    = ObjectSystem::objectCreate<TestObject>();
+    ObjectSystem system;
+    TestObject *obj1    = system.objectCreate<TestObject>();
+    TestObject *obj2    = system.objectCreate<TestObject>();
+    TestObject *obj3    = system.objectCreate<TestObject>();
 
     obj1->setName("MainObject");
 
@@ -55,8 +57,8 @@ void ObjectSystemTest::Serialize_Desirialize_Object() {
     Object::connect(obj1, _SIGNAL(signal(bool)), obj3, _SIGNAL(signal(bool)));
     Object::connect(obj2, _SIGNAL(signal(bool)), obj3, _SLOT(setSlot(bool)));
 
-    ByteArray bytes = Bson::save(ObjectSystem::toVariant(obj1));
-    Object *result  = ObjectSystem::toObject(Bson::load(bytes));
+    ByteArray bytes = Bson::save(system.toVariant(obj1));
+    Object *result  = system.toObject(Bson::load(bytes));
     Object *object  = dynamic_cast<Object*>(obj1);
 
     QCOMPARE((result != nullptr), true);
@@ -81,11 +83,12 @@ class SecondObject : public TestObject {
 };
 
 void ObjectSystemTest::RegisterUnregister_Object() {
-    QCOMPARE((int)ObjectSystem::instance()->factories().size(), 1);
-    SecondObject::registerClassFactory();
-    QCOMPARE((int)ObjectSystem::instance()->factories().size(), 2);
-    SecondObject::unregisterClassFactory();
-    QCOMPARE((int)ObjectSystem::instance()->factories().size(), 1);
+    ObjectSystem system;
+    QCOMPARE((int)system.factories().size(), 1);
+    SecondObject::registerClassFactory(&system);
+    QCOMPARE((int)system.factories().size(), 2);
+    SecondObject::unregisterClassFactory(&system);
+    QCOMPARE((int)system.factories().size(), 1);
 }
 
 class TestObjectEx : public TestObject {
@@ -96,9 +99,10 @@ class TestObjectEx : public TestObject {
 };
 
 void ObjectSystemTest::Override_Object() {
-    TestObjectEx::registerClassFactory();
+    ObjectSystem system;
+    TestObjectEx::registerClassFactory(&system);
 
-    Object *object  = ObjectSystem::objectCreate<TestObject>();
+    Object *object  = system.objectCreate<TestObject>();
 
     QCOMPARE((object != nullptr), true);
     const MetaObject *meta = object->metaObject();
@@ -111,9 +115,9 @@ void ObjectSystemTest::Override_Object() {
     QCOMPARE((index > -1), true);
     delete object;
 
-    TestObjectEx::unregisterClassFactory();
+    TestObjectEx::unregisterClassFactory(&system);
 
-    object = ObjectSystem::objectCreate<TestObject>();
+    object = system.objectCreate<TestObject>();
     QCOMPARE((dynamic_cast<TestObject *>(object) != nullptr), true);
     QCOMPARE((dynamic_cast<TestObjectEx *>(object) == nullptr), true);
     delete object;

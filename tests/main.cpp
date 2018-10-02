@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     PROFILE_START
 
     ObjectSystem system;
-    TestObject::registerClassFactory();
+    TestObject::registerClassFactory(&system);
     {
         VariantTest ts;
         status |= aExec(ts, argc, argv);
