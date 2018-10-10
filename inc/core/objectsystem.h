@@ -52,6 +52,9 @@ public:
 
     static uint32_t                     generateUID             ();
 
+protected:
+    static void                         processObject           (Object *object);
+
 private:
     friend class ObjectSystemTest;
     friend class Object;

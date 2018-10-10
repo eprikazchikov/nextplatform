@@ -13,11 +13,11 @@ public:
 public:
     KeyFrame                    ();
 
-    KeyFrame                    (float position, Variant &value);
+    KeyFrame                    (uint32_t position, Variant &value);
 
-    KeyFrame                    (float position, Variant &value, Variant &support);
+    KeyFrame                    (uint32_t position, Variant &value, Variant &support);
 
-    float                       mPosition;
+    uint32_t                    mPosition;
 
     Type                        mType;
 

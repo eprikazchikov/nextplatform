@@ -6,14 +6,14 @@ KeyFrame::KeyFrame() :
 
 }
 
-KeyFrame::KeyFrame(float position, Variant &value) :
+KeyFrame::KeyFrame(uint32_t position, Variant &value) :
         mPosition(position),
         mType(Linear),
         mValue(value) {
 
 }
 
-KeyFrame::KeyFrame(float position, Variant &value, Variant &support) :
+KeyFrame::KeyFrame(uint32_t position, Variant &value, Variant &support) :
         mPosition(position),
         mType(Linear),
         mValue(value),

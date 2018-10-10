@@ -39,6 +39,7 @@ public:
 
     void                        box                         (Vector3 &min, Vector3 &max) const;
     void                        setBox                      (const Vector3 &min, const Vector3 &max);
+    void                        setBox                      (const Vector3 *points, uint32_t number);
 
     Vector3                     center;
     Vector3                     size;
