@@ -156,7 +156,8 @@ struct CheckType<T, True> {
 
 template<typename T>
 struct CheckType<T, False> {
-    typedef typename std::remove_cv<T>::type type;
+    typedef typename std::remove_cv<
+            typename std::remove_reference<T>::type>::type type;
 };
 
 template<typename T>
