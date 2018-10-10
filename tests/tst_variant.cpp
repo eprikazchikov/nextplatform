@@ -1,6 +1,6 @@
 #include "tst_variant.h"
 
-#include "core/variant.h"
+#include "variant.h"
 
 #include <QTest>
 #include <QDebug>

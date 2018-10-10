@@ -1,6 +1,6 @@
 #include "tst_threadpool.h"
 
-#include "core/threadpool.h"
+#include "threadpool.h"
 
 #include <QDebug>
 #include <QTest>

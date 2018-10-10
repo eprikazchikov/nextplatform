@@ -1,9 +1,9 @@
 #ifndef TST_COMMON_H
 #define TST_COMMON_H
 
-#include "core/object.h"
+#include "object.h"
 
-#include "core/objectsystem.h"
+#include "objectsystem.h"
 
 #include <QTest>
 
@@ -12,13 +12,14 @@ class TestObject : public Object {
 
     A_METHODS(
         A_SLOT(setSlot),
-        A_SIGNAL(signal)
+        A_SIGNAL(signal),
+        A_METHOD(bool, test)
     )
 
     A_PROPERTIES(
         A_PROPERTY(bool, slot, getSlot, setSlot),
         A_PROPERTY(Vector2, vec, getVector, setVector),
-        A_PROPERTY(TestObject *, resource, getResource, setResource)
+        A_PROPERTY(TestObject *, resource, TestObject::getResource, TestObject::setResource)
     )
 
 public:
@@ -33,7 +34,11 @@ public:
         return m_bSlot;
     }
 
-    void            setSlot         (const bool value) {
+    bool            test            () {
+        return false;
+    }
+
+    void            setSlot         (const int value) {
         m_bSlot     = value;
     }
 
@@ -53,9 +58,9 @@ public:
         m_pResource = resource;
     }
 
-    void            signal          (const bool);
+    void            signal          (const int);
 
-    bool            m_bSlot;
+    int             m_bSlot;
     Vector2         m_Vector2;
     TestObject     *m_pResource;
 };
