@@ -3,12 +3,11 @@
 class VariantAnimationPrivate {
 public:
     VariantAnimationPrivate() :
-            m_Duration(0) {
+            m_KeyFrames(nullptr) {
     }
 
-    VariantAnimation::Curve m_KeyFrames;
-    Variant                 m_CurrentValue;
-    int32_t                 m_Duration;
+    VariantAnimation::Curve    *m_KeyFrames;
+    Variant                     m_CurrentValue;
 };
 /*!
     \class VariantAnimation
@@ -45,13 +44,10 @@ VariantAnimation::~VariantAnimation() {
     Returns the duration of the animation (in milliseconds).
 */
 int32_t VariantAnimation::loopDuration() const {
-    return p_ptr->m_Duration;
-}
-/*!
-    Sets the new \a duration of the animation (in milliseconds).
-*/
-void VariantAnimation::setLoopDuration(int32_t duration) {
-    p_ptr->m_Duration   = duration;
+    if(p_ptr->m_KeyFrames && !p_ptr->m_KeyFrames->empty()) {
+        return p_ptr->m_KeyFrames->back().mPosition;
+    }
+    return 0;
 }
 /*!
     Returns the current value for the animated Variant.
@@ -69,41 +65,49 @@ void VariantAnimation::setCurrentValue(const Variant &value) {
     Returns the sequence of key frames as curve for the animation track.
 */
 VariantAnimation::Curve &VariantAnimation::keyFrames() const {
-    return p_ptr->m_KeyFrames;
+    return *(p_ptr->m_KeyFrames);
 }
 /*!
     Sets the new sequence of the key \a frames.
 */
-void VariantAnimation::setKeyFrames(const Curve &frames) {
-    p_ptr->m_KeyFrames  = frames;
+void VariantAnimation::setKeyFrames(Curve &frames) {
+    p_ptr->m_KeyFrames  = &frames;
 }
 /*!
     \overload
     This function interpolates animated Variant value from one KeyFrame to another.
 */
 void VariantAnimation::update() {
-    float factor    = float(loopTime()) / float(loopDuration());
+    uint32_t duration   = loopDuration();
+    uint32_t current    = loopTime();
 
-    if(p_ptr->m_KeyFrames.size() >= 2) {
+    if(p_ptr->m_KeyFrames->size() >= 2) {
         KeyFrame a;
         KeyFrame b;
-        for(size_t i = 0; i < p_ptr->m_KeyFrames.size(); i++) {
-            if(factor == p_ptr->m_KeyFrames[i].mPosition) {
-                setCurrentValue(p_ptr->m_KeyFrames[i].mValue);
+
+        for(auto i = p_ptr->m_KeyFrames->begin(); i != p_ptr->m_KeyFrames->end(); i++) {
+            if(current == i->mPosition) {
+                setCurrentValue(i->mValue);
                 return;
             }
-            if(factor >= p_ptr->m_KeyFrames[i].mPosition) {
-                a   = p_ptr->m_KeyFrames[i];
+            if(current >= i->mPosition) {
+                a   = (*i);
             }
-            if(factor <= p_ptr->m_KeyFrames[i].mPosition) {
-                b   = p_ptr->m_KeyFrames[i];
+            if(current <= i->mPosition) {
+                b   = (*i);
                 break;
             }
         }
-        factor  = (factor - a.mPosition) / (b.mPosition - a.mPosition);
+        float f1    = float(a.mPosition) / duration;
+        float f2    = float(b.mPosition) / duration;
+        float f     = float(current) / duration;
+        float factor    = (f - f1) / (f2 - f1);
 
         if(a.mValue.type() == b.mValue.type()) {
             switch(a.mValue.type()) {
+                case MetaType::BOOLEAN: {
+                    setCurrentValue((factor >= 1.0f) ? b.mValue.toBool() : a.mValue.toBool());
+                } break;
                 case MetaType::INTEGER: {
                     if(a.mType == KeyFrame::Linear) {
                         setCurrentValue(MIX(a.mValue.toInt(), b.mValue.toInt(), factor));

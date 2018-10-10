@@ -13,35 +13,43 @@ void AnimationTest::Base_animation() {
 
 void AnimationTest::Variant_animation() {
     VariantAnimation anim;
-    anim.setLoopDuration(1000);
+
     {
-        anim.setKeyFrames({ KeyFrame(0.0f, Variant(0.0f)),
-                            KeyFrame(1.0f, Variant(10.0f)) });
+        VariantAnimation::Curve curve   = { KeyFrame(0,     Variant(0.0f)),
+                                            KeyFrame(1000,  Variant(10.0f)) };
+        anim.setKeyFrames(curve);
         anim.setCurrentTime(200);
         QCOMPARE(anim.currentValue().toInt(), 2);
     }
     {
-        anim.setKeyFrames({ KeyFrame(0.0f, Variant(1.0f)),
-                            KeyFrame(1.0f, Variant(2.0f)) });
+        VariantAnimation::Curve curve   = { KeyFrame(0,     Variant(1.0f)),
+                                            KeyFrame(1000,  Variant(2.0f)) };
+        anim.setKeyFrames(curve);
         anim.setCurrentTime(250);
         QCOMPARE(anim.currentValue().toFloat(), 1.25f);
     }
     {
-        anim.setKeyFrames({ KeyFrame(0.0f, Variant(Vector2(1.0f, 2.0f))),
-                            KeyFrame(1.0f, Variant(Vector2(3.0f, 4.0f))) });
+        VariantAnimation::Curve curve   = { KeyFrame(0,     Variant(Vector2(1.0f, 2.0f))),
+                                            KeyFrame(1000,  Variant(Vector2(3.0f, 4.0f))) };
+
+        anim.setKeyFrames(curve);
         anim.setCurrentTime(300);
         QCOMPARE(anim.currentValue().toVector2(), Vector2(1.6f, 2.6f));
     }
     {
-        anim.setKeyFrames({ KeyFrame(0.0f, Variant(Vector3(1.0f, 2.0f, 3.0f))),
-                            KeyFrame(1.0f, Variant(Vector3(3.0f, 4.0f, 5.0f))) });
+        VariantAnimation::Curve curve   = { KeyFrame(0,     Variant(Vector3(1.0f, 2.0f, 3.0f))),
+                                            KeyFrame(1000,  Variant(Vector3(3.0f, 4.0f, 5.0f))) };
+
+        anim.setKeyFrames(curve);
         anim.setCurrentTime(300);
         QCOMPARE(anim.currentValue().toVector3(), Vector3(1.6f, 2.6f, 3.6f));
     }
     {
-        anim.setKeyFrames({ KeyFrame(0.0f, Variant(Vector4(1.0f, 2.0f, 3.0f, 4.0f))),
-                            KeyFrame(0.5f, Variant(Vector4(4.0f, 5.0f, 6.0f, 7.0f))),
-                            KeyFrame(1.0f, Variant(Vector4(3.0f, 4.0f, 5.0f, 6.0f))) });
+        VariantAnimation::Curve curve   = { KeyFrame(0,     Variant(Vector4(1.0f, 2.0f, 3.0f, 4.0f))),
+                                            KeyFrame(500,   Variant(Vector4(4.0f, 5.0f, 6.0f, 7.0f))),
+                                            KeyFrame(1000,  Variant(Vector4(3.0f, 4.0f, 5.0f, 6.0f))) };
+
+        anim.setKeyFrames(curve);
         anim.setCurrentTime(500);
         Vector4 v   = anim.currentValue().toVector4();
         QCOMPARE(v, Vector4(4.0f, 5.0f, 6.0f, 7.0f));
@@ -50,8 +58,10 @@ void AnimationTest::Variant_animation() {
         QCOMPARE(anim.currentValue().toVector4(), Vector4(3.5f, 4.5f, 5.5f, 6.5f));
     }
     {
-        anim.setKeyFrames({ KeyFrame(0.0f, Variant(Quaternion(Vector3(0.0f, 1.0f, 0.0f), 0.0f))),
-                            KeyFrame(1.0f, Variant(Quaternion(Vector3(0.0f, 1.0f, 0.0f), 90.0f))) });
+        VariantAnimation::Curve curve   = { KeyFrame(0,     Variant(Quaternion(Vector3(0.0f, 1.0f, 0.0f), 0.0f))),
+                                            KeyFrame(1000,  Variant(Quaternion(Vector3(0.0f, 1.0f, 0.0f), 90.0f))) };
+
+        anim.setKeyFrames(curve);
         anim.setCurrentTime(500);
 
         Quaternion result   = anim.currentValue().toQuaternion();
@@ -62,14 +72,15 @@ void AnimationTest::Variant_animation() {
 
 void AnimationTest::Property_animation() {
     PropertyAnimation anim;
-    anim.setLoopDuration(1000);
 
     TestObject object;
     anim.setTarget(&object, "vec");
     QCOMPARE((anim.target() != nullptr), true);
 
-    anim.setKeyFrames({ KeyFrame(0.0f, Variant(Vector2(0.0f, 0.0f))),
-                        KeyFrame(1.0f, Variant(Vector2(1.0f, 2.0f))) });
+    VariantAnimation::Curve curve   = { KeyFrame(0,     Variant(Vector2(0.0f, 0.0f))),
+                                        KeyFrame(1000,  Variant(Vector2(1.0f, 2.0f))) };
+
+    anim.setKeyFrames(curve);
     anim.setCurrentTime(500);
 
     QCOMPARE(object.getVector(), Vector2(0.5, 1.0f));

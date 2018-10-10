@@ -12,7 +12,7 @@ class NEXT_LIBRARY_EXPORT VariantAnimation : public Animation {
 
 public:
 
-    typedef vector<KeyFrame>        Curve;
+    typedef list<KeyFrame>          Curve;
 
 public:
     VariantAnimation                ();
@@ -20,13 +20,12 @@ public:
     ~VariantAnimation               ();
 
     int32_t                         loopDuration                () const;
-    void                            setLoopDuration             (int32_t duration);
 
     Variant                         currentValue                () const;
     virtual void                    setCurrentValue             (const Variant &value);
 
     Curve                          &keyFrames                   () const;
-    void                            setKeyFrames                (const Curve &frames);
+    void                            setKeyFrames                (Curve &frames);
 
 protected:
     void                            update                      ();

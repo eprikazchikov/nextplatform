@@ -120,6 +120,10 @@ Object *ObjectSystem::objectCreate(const string &uri, const string &name, Object
     return object;
 }
 
+void ObjectSystem::processObject(Object *object) {
+    object->processEvents();
+}
+
 void ObjectSystem::factoryAdd(const string &name, const string &uri, const MetaObject *meta) {
     PROFILE_FUNCTION()
     p_ptr->m_Groups[name]   = uri;
@@ -146,8 +150,7 @@ ObjectSystem::GroupMap ObjectSystem::factories() const {
     return p_ptr->m_Groups;
 }
 
-typedef list<const Object *>    ObjectArray;
-
+typedef list<const Object *> ObjectArray;
 void enumObjects(const Object *object, ObjectArray &list) {
     PROFILE_FUNCTION()
     list.push_back(object);
@@ -167,11 +170,14 @@ Variant ObjectSystem::toVariant(const Object *object) {
     PROFILE_FUNCTION()
     VariantList result;
 
-    ObjectArray array;
-    enumObjects(object, array);
+    ObjectArray list;
+    enumObjects(object, list);
 
-    for(auto it : array) {
+    for(auto it : list) {
         // Save Object
+        if(!it->isSerializable()) {
+            continue;
+        }
         int uuid    = int(it->uuid());
 
         VariantList o;
