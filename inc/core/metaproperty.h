@@ -58,12 +58,15 @@ template<typename T, typename Class, T(Class::*ReadFunc)()>
 struct Reader<T(Class::*)(), ReadFunc> {
     typedef T(Class::*Fun)();
 
+    typedef Bool<std::is_pointer<T>::value>         is_pointer;
+    typedef typename CheckType<T, is_pointer>::type T_no_cv;
+
     inline static const MetaType::Table *type(const char *typeName) {
         return Table<T>::get(typeName);
     }
 
     inline static Variant read(const Object *obj) {
-        return Variant::fromValue<T>((static_cast<Class *>(obj)->*ReadFunc)());
+        return Variant::fromValue<T_no_cv>((static_cast<Class *>(obj)->*ReadFunc)());
     }
 
     template<Fun fun>
@@ -78,12 +81,15 @@ template<typename T, typename Class, T(Class::*ReadFunc)()const>
 struct Reader<T(Class::*)()const, ReadFunc> {
     typedef T(Class::*Fun)()const;
 
+    typedef Bool<std::is_pointer<T>::value>         is_pointer;
+    typedef typename CheckType<T, is_pointer>::type T_no_cv;
+
     inline static const MetaType::Table *type(const char *typeName) {
         return Table<T>::get(typeName);
     }
 
     inline static Variant read(const Object *obj) {
-        return Variant::fromValue<T>((static_cast<const Class *>(obj)->*ReadFunc)());
+        return Variant::fromValue<T_no_cv>((static_cast<const Class *>(obj)->*ReadFunc)());
     }
 
     template<Fun fun>
@@ -103,8 +109,11 @@ template<typename T, typename Class, void(Class::*WriteFunc)(T)>
 struct Writer<void(Class::*)(T), WriteFunc> {
     typedef void(Class::*Fun)(T);
 
+    typedef Bool<std::is_pointer<T>::value>         is_pointer;
+    typedef typename CheckType<T, is_pointer>::type T_no_cv;
+
     inline static void write(Object *obj, const Variant &value) {
-        return (static_cast<Class *>(obj)->*WriteFunc)(value.value<T>());
+        return (static_cast<Class *>(obj)->*WriteFunc)(value.value<T_no_cv>());
     }
 
     template<Fun fun>
@@ -119,8 +128,11 @@ template<typename T, typename Class, void(Class::*WriteFunc)(const T&)>
 struct Writer<void(Class::*)(const T&), WriteFunc> {
     typedef void(Class::*Fun)(const T&);
 
+    typedef Bool<std::is_pointer<T>::value>         is_pointer;
+    typedef typename CheckType<T, is_pointer>::type T_no_cv;
+
     inline static void write(Object *obj, const Variant &value) {
-        return (static_cast<Class *>(obj)->*WriteFunc)(value.value<T>());
+        return (static_cast<Class *>(obj)->*WriteFunc)(value.value<T_no_cv>());
     }
 
     template<Fun fun>
