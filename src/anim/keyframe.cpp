@@ -6,17 +6,18 @@ KeyFrame::KeyFrame() :
 
 }
 
-KeyFrame::KeyFrame(uint32_t position, Variant &value) :
+KeyFrame::KeyFrame(uint32_t position, const Variant &value) :
         mPosition(position),
         mType(Linear),
         mValue(value) {
 
 }
 
-KeyFrame::KeyFrame(uint32_t position, Variant &value, Variant &support) :
+KeyFrame::KeyFrame(uint32_t position, uint32_t type, const Variant &value, const Variant &left, const Variant &right) :
         mPosition(position),
-        mType(Linear),
+        mType((Type)type),
         mValue(value),
-        mSupport(support) {
+        mLeftTangent(left),
+        mRightTangent(right) {
 
 }

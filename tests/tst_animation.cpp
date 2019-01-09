@@ -68,6 +68,26 @@ void AnimationTest::Variant_animation() {
         Quaternion expected = Quaternion(Vector3(0.0f, 1.0f, 0.0f), 45.0f);
         //QCOMPARE(result, expected);
     }
+
+    {
+        VariantAnimation::Curve curve   = { KeyFrame(0,     KeyFrame::Cubic, Variant(0.0f),Variant( 0.0f), Variant(0.0f)),
+                                            KeyFrame(500,   KeyFrame::Cubic, Variant(0.0f),Variant(-16.0f),Variant(-16.0f)),
+                                            KeyFrame(1000,  KeyFrame::Cubic, Variant(0.0f),Variant( 0.0f), Variant(0.0f)) };
+
+        anim.setKeyFrames(curve);
+
+        anim.setCurrentTime(150);
+        float v0 = anim.currentValue().toFloat();
+
+        anim.setCurrentTime(500);
+        float v   = anim.currentValue().toFloat();
+        QCOMPARE(v, 0.0f);
+
+        anim.setCurrentTime(850);
+        float v1 = anim.currentValue().toFloat();
+
+        QCOMPARE(v0, v1);
+    }
 }
 
 void AnimationTest::Property_animation() {
